@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  name      String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("users")
+}
+
+// model Campaing {
+//   id          String   @id @default(uuid())
+//   name        String?
+//   description String?
+//   // image
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+//   user        User     @relation(fields: [id], references: [id])
+
+//   @@map("campaings")
+// }
+
+// model Images {
+//   id        String      @default(uuid()) @id
+//   url     String   @unique
+//   owner      idDoDono
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@map("users")
+// }
+
+// model Training {
+//   id        String      @default(uuid()) @id
+//   email     String   @unique
+//   name      String?
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@map("users")
+// }
+
+// Pensar em usecasa, controlers etc - vide projetos anteriores
