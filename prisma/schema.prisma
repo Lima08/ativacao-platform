@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output   = "./generated/prisma-client-js"
@@ -11,29 +8,103 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Campaign {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  imagens Image[]
+  videos  Video[]
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@map("campaigns")
+}
+
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  name      String?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  companyId String
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campaigns Campaign[]
+  company   Company    @relation(fields: [companyId], references: [id])
 
   @@map("users")
 }
 
-// model Campaing {
-//   id          String   @id @default(uuid())
-//   name        String?
-//   description String?
-//   // image
-//   createdAt   DateTime @default(now())
-//   updatedAt   DateTime @updatedAt
-//   user        User     @relation(fields: [id], references: [id])
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-//   @@map("campaings")
+  user User[]
+
+  @@map("companies")
+}
+
+model Image {
+  id         String   @id @default(uuid())
+  url        String   @unique
+  campaingId String?
+  trainingId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  campaing Campaign? @relation(fields: [campaingId], references: [id])
+  training Training? @relation(fields: [trainingId], references: [id])
+
+  @@map("images")
+}
+
+model Video {
+  id         String   @id @default(uuid())
+  url        String   @unique
+  campaingId String?
+  trainingId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  campaing Campaign? @relation(fields: [campaingId], references: [id])
+  training Training? @relation(fields: [trainingId], references: [id])
+
+  @@map("videos")
+}
+
+model Training {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  status      Boolean
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  imagens Image[]
+  videos  Video[]
+
+  @@map("trainings")
+}
+
+// model Analize {
+//   id        String      @default(uuid()) @id
+//   email     String   @unique
+//   name      String?
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@map("analizes")
 // }
 
-// model Images {
+// model Permissions { (vide esquma de permissionamento por feat)
 //   id        String      @default(uuid()) @id
 //   url     String   @unique
 //   owner      idDoDono
@@ -43,14 +114,6 @@ model User {
 //   @@map("users")
 // }
 
-// model Training {
-//   id        String      @default(uuid()) @id
-//   email     String   @unique
-//   name      String?
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-
-//   @@map("users")
-// }
-
 // Pensar em usecasa, controlers etc - vide projetos anteriores
+
+//  TODO: EScrever documentação das requests
