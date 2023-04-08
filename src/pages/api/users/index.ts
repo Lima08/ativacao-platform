@@ -1,13 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '../../../databases/prisma'
-import { Users } from 'models/Users'
+import { User } from 'models/User'
 import { REQUEST_METHODS } from 'constants/requestMethods'
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const userRepository = Users.of(prisma)
+  const userRepository = User.of(prisma)
 
   switch (req.method) {
     case REQUEST_METHODS.POST:

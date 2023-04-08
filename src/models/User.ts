@@ -6,14 +6,14 @@ import {
   IUserModifier
 } from 'interfaces/entities/users'
 
-export class Users {
+export class User {
   private repository: PrismaClient
   constructor(connect: PrismaClient) {
     this.repository = connect
   }
 
-  static of(client: PrismaClient): Users {
-    return new Users(client)
+  static of(client: PrismaClient): User {
+    return new User(client)
   }
 
   async create(data: IUser): Promise<IUserCreated> {
