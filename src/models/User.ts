@@ -4,7 +4,7 @@ import {
   IUserCreated,
   IUserFilter,
   IUserModifier
-} from 'interfaces/entities/users'
+} from 'interfaces/entities/user'
 
 export class User {
   private repository: PrismaClient
