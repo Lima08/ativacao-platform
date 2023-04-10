@@ -1,4 +1,4 @@
-import { checkUserAuthenticated } from './check-user-authenticated'
-import { checkIdPublicRoute } from './check-id-public-route'
+import { checkUserAuthenticated } from './checkUserAuthenticated'
+import { checkIdPublicRoute } from './checkIdPublicRoute'
 
 export { checkUserAuthenticated, checkIdPublicRoute }
