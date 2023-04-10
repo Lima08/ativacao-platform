@@ -8,12 +8,17 @@ import {
 
 export class User {
   private repository: PrismaClient
+  private static instance: User
+
   constructor(connect: PrismaClient) {
     this.repository = connect
   }
 
   static of(client: PrismaClient): User {
-    return new User(client)
+    if (!this.instance) {
+      this.instance = new User(client)
+    }
+    return this.instance
   }
 
   async create(data: IUser): Promise<IUserCreated> {

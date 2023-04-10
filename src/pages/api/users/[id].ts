@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { prisma } from '../../../databases/prisma'
+import { prisma } from '../../../lib/prisma'
 import { User } from 'models/User'
-import { REQUEST_METHODS } from 'constants/requestMethods'
+import { REQUEST_METHODS } from 'constants/http/requestMethods'
 
 const userRepository = User.of(prisma)
 
