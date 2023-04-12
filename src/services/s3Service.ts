@@ -3,11 +3,10 @@ import {
   GetObjectOutput,
   PutObjectCommand,
   GetObjectCommand,
-  PutObjectOutput,
-  S3Client,
-  PutObjectRequest
+  S3Client
 } from '@aws-sdk/client-s3'
 import { getS3Client } from '../lib/s3'
+import { IUpload } from 'interfaces/services/IUpload'
 
 export default class s3Service {
   private static instance: s3Service
@@ -31,22 +30,16 @@ export default class s3Service {
       const s3Object = await this.s3Client.send(command)
       return s3Object
     } catch (error) {
-      console.log('Error', error) // TODO: REmover console e fazer tratativa de erro global
       throw error
     }
   }
 
-  public async putObject(params: any): Promise<string> {
-    console.log(
-      '🚀 ~ file: s3Service.ts:40 ~ s3Service ~ putObject ~ params:',
-      params
-    )
+  public async putObject(params: IUpload): Promise<string> {
     const command = new PutObjectCommand(params)
     try {
-      const s3Object = await this.s3Client.send(command)
+      await this.s3Client.send(command)
       return `https://${params.Bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${params.Key}`
     } catch (error) {
-      console.log('Error', error) // TODO: REmover console e fazer tratativa de erro global
       throw error
     }
   }

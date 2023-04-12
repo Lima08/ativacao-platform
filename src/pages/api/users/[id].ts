@@ -1,9 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { prisma } from '../../../lib/prisma'
-import { User } from 'models/User'
 import { REQUEST_METHODS } from 'constants/http/requestMethods'
-
-const userRepository = User.of(prisma)
+import { deleteUser, getUserById, updateUser } from 'useCases/users'
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,14 +10,16 @@ export default async function handler(
 
   if (!id)
     return res.status(404).json({
-      message: `User with id: ${id} not found.`,
-      name: 'User not found'
+      error: {
+        message: `User with id ${id} not found.`,
+        name: 'User not found'
+      }
     })
 
   switch (req.method) {
     case REQUEST_METHODS.GET:
       try {
-        const user = await userRepository.getOneBy({ id })
+        const user = await getUserById(id)
         res.status(200).json(user)
       } catch (error) {
         res.status(404).json(error)
@@ -28,32 +27,33 @@ export default async function handler(
       break
 
     case REQUEST_METHODS.PUT:
+      const { name, email, password, companyId, imageUrl } = req.body
+
       try {
-        const { name, email, password, companyId, imageUrl } = req.body
-        const updatedUser = await userRepository.update(id, {
+        const updatedUser = await updateUser(id, {
           name,
           email,
           password,
           companyId,
           imageUrl
         })
-        res.status(200).json(updatedUser)
+        res.status(200).json({ data: updatedUser })
       } catch (error) {
-        res.status(404).json(error)
+        res.status(404).json({ error })
       }
       break
 
     case REQUEST_METHODS.DELETE:
       try {
-        await userRepository.delete(id)
+        await deleteUser(id)
         res.status(204).end()
       } catch (error) {
-        res.status(404).json(error)
+        res.status(404).json({ error })
       }
       break
 
     default:
-      res.status(400).send('Invalid method')
+      res.status(400).send({ error: { message: 'Invalid method' } })
       break
   }
 }
