@@ -11,6 +11,7 @@
     "create:container": "docker run -e  MYSQL_ROOT_PASSWORD=root --name db_ativacao -d -p 3306:3306 -v $(pwd)/database:/var/lib/mysql mysql:5.7"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.309.0",
     "@headlessui/react": "^1.7.13",
     "@heroicons/react": "^2.0.17",
     "@prisma/client": "^4.12.0",
@@ -18,8 +19,12 @@
     "@types/react": "18.0.31",
     "@types/react-dom": "18.0.11",
     "axios": "^1.3.4",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.3",
     "eslint-config-next": "13.2.4",
     "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "multer-s3": "^3.0.1",
     "next": "^13.3.0",
     "next-auth": "^4.20.1",
     "react": "18.2.0",
@@ -28,6 +33,8 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
+    "@types/multer": "^1.4.7",
+    "@types/multer-s3": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
     "autoprefixer": "^10.4.14",
