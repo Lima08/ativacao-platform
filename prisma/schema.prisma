@@ -26,7 +26,7 @@ model Campaign {
 model User {
   id        String   @id @default(uuid())
   name      String
-  email     String   @unique
+  email     String
   password  String
   companyId String
   imageUrl  String?
