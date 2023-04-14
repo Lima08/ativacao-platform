@@ -20,21 +20,19 @@ export default async function handler(
     case REQUEST_METHODS.GET:
       try {
         const user = await getUserById(id)
-        res.status(200).json(user)
+        res.status(200).json({ data: user })
       } catch (error) {
-        res.status(404).json(error)
+        res.status(404).json({ error })
       }
       break
 
     case REQUEST_METHODS.PUT:
-      const { name, email, password, companyId, imageUrl } = req.body
+      const { name, password, imageUrl } = req.body
 
       try {
         const updatedUser = await updateUser(id, {
           name,
-          email,
           password,
-          companyId,
           imageUrl
         })
         res.status(200).json({ data: updatedUser })
@@ -53,7 +51,7 @@ export default async function handler(
       break
 
     default:
-      res.status(400).send({ error: { message: 'Invalid method' } })
+      res.status(400).json({ error: { message: 'Invalid method' } })
       break
   }
 }
