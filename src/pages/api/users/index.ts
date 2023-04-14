@@ -19,7 +19,7 @@ export default async function handler(
         //@ts-ignore
         uploadS3Multer(req, res, async (error) => {
           if (error) {
-            return res.status(400).json(error)
+            return res.status(400).json({ error })
           }
 
           const imageUrl = req.file?.location
@@ -36,7 +36,7 @@ export default async function handler(
           res.status(201).json({ data: createdUser })
         })
       } catch (error) {
-        res.status(500).send('Error creating user')
+        res.status(500).json({ error: { message: 'Error creating user' } })
       }
 
       break
@@ -46,12 +46,12 @@ export default async function handler(
         const allUsers = await getUsers()
         res.status(200).json({ data: allUsers })
       } catch (error) {
-        res.status(500).send('Error getting users')
+        res.status(500).json({ error: { message: 'Error creating user' } })
       }
       break
 
     default:
-      res.status(400).send('Invalid method')
+      res.status(400).json({ error: { message: 'Invalid method' } })
       break
   }
 }
