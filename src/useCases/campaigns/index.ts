@@ -33,9 +33,4 @@ async function deleteCampaign(id: string): Promise<void> {
   await repository.delete(id)
 }
 
-export {
-  createCampaign,
-  getCampaigns,
-  updateCampaign,
-  deleteCampaign
-}
+export { createCampaign, getCampaigns, updateCampaign, deleteCampaign }

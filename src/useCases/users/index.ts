@@ -1,7 +1,11 @@
 import dotenv from 'dotenv'
 import { prisma } from 'lib/prisma'
 import { User } from 'models/User'
-import type { IUser, IUserCreated } from 'interfaces/entities/user'
+import type {
+  IUser,
+  IUserCreated,
+  IUserModifier
+} from 'interfaces/entities/user'
 
 dotenv.config()
 const userRepository = User.of(prisma)
@@ -21,7 +25,10 @@ async function getUserById(id: string): Promise<IUserCreated> {
   return user
 }
 
-async function updateUser(id: string, params: IUser): Promise<IUserCreated> {
+async function updateUser(
+  id: string,
+  params: IUserModifier
+): Promise<IUserCreated> {
   const updatedUser = await userRepository.update(id, params)
   return updatedUser
 }
