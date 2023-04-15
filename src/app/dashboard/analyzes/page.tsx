@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 
-export default async function Trainings() {
+export default async function Analyzes() {
   return (
     <main>
       <div className="container mx-auto flex flex-col items-center justify-center">
