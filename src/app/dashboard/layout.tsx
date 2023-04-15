@@ -1,13 +1,13 @@
 'use client'
 import BaseNavbar from 'components/BaseNavbar'
-import LeftPanelAside from 'components/LeftPanelAside'
+import AsidePanel from 'components/AsidePanel'
 import { ReactNode } from 'react'
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <div lang="en">
       <BaseNavbar />
-      <LeftPanelAside />
+      <AsidePanel />
       {children}
     </div>
   )

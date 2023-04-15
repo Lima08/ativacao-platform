@@ -1,12 +1,12 @@
 import React from 'react'
 
-type LeftPanelItemProps = {
+type AsidePanelItemProps = {
   title: string
   linkSrc: string
   icon: any
 }
 
-function LeftPanelItem({ title, linkSrc, icon }: LeftPanelItemProps) {
+function AsidePanelItem({ title, linkSrc, icon }: AsidePanelItemProps) {
   return (
     <li>
       <a
@@ -20,4 +20,4 @@ function LeftPanelItem({ title, linkSrc, icon }: LeftPanelItemProps) {
   )
 }
 
-export default LeftPanelItem
+export default AsidePanelItem

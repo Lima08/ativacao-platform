@@ -1,5 +1,5 @@
 import React from 'react'
-import LeftPanelItem from 'components/LeftPanelItem'
+import AsidePanelItem from 'components/AsidePanelItem'
 
 import pizzaGraph from '../../../images/icons/pizzaGraph'
 import fourSquares from '../../../images/icons/fourSquares'
@@ -8,7 +8,7 @@ import homeIcon from '../../../images/icons/homeIcon'
 import filesIcon from '../../../images/icons/filesIcon'
 import inboxIcon from '../../../images/icons/inboxIcon'
 
-function LeftPanelAside() {
+function AsidePanel() {
   return (
     <aside
       id="sidebar"
@@ -20,37 +20,37 @@ function LeftPanelAside() {
         <div className="flex-1 flex flex-col pt-5 pb-4">
           <div className="flex-1 px-3 bg-white divide-y space-y-1">
             <ul className="space-y-2 pb-2">
-              <LeftPanelItem
+              <AsidePanelItem
                 title="Home"
                 linkSrc="/dashboard/"
                 icon={homeIcon}
               />
-              <LeftPanelItem
+              <AsidePanelItem
                 title="Campanhas"
                 linkSrc="/dashboard/campaigns"
                 icon={megaphoneIcon}
               />
-              <LeftPanelItem
+              <AsidePanelItem
                 title="Treinamentos"
                 linkSrc="/dashboard/trainings"
                 icon={fourSquares}
               />
-              <LeftPanelItem
+              <AsidePanelItem
                 title="Análises"
                 linkSrc="/dashboard/analyzes"
                 icon={pizzaGraph}
               />
-              {/* <LeftPanelItem
+              {/* <AsidePanelItem
                 title="Usuários"
                 linkSrc="/dashboard/users"
                 icon={userIcon}
               /> */}
-              <LeftPanelItem
+              <AsidePanelItem
                 title="Processos"
                 linkSrc="/dashboard/processess"
                 icon={filesIcon}
               />
-              <LeftPanelItem
+              <AsidePanelItem
                 title="Mural de Avisos"
                 linkSrc="/dashboard/communications"
                 icon={inboxIcon}
@@ -63,4 +63,4 @@ function LeftPanelAside() {
   )
 }
 
-export default LeftPanelAside
+export default AsidePanel
