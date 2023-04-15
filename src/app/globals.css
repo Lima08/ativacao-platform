@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-900;
+  @apply bg-gray-500;
   @apply text-slate-100;
+}
+
+main {
+  width: calc(100% - 257px);
+  height: calc(100% - 72px);
+  margin-top: 72px;
+  margin-left: 257px;
 }
