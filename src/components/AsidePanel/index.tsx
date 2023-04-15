@@ -1,4 +1,3 @@
-import React from 'react'
 import AsidePanelItem from 'components/AsidePanelItem'
 
 import pizzaGraph from '../../../images/icons/pizzaGraph'

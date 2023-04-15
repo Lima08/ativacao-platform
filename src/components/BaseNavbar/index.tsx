@@ -1,5 +1,3 @@
-import React from 'react'
-
 function BaseNavbar() {
   return (
     <nav className="bg-white border-b border-gray-200 fixed z-30 w-full top-0">

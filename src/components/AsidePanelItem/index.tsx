@@ -1,5 +1,3 @@
-import React from 'react'
-
 type AsidePanelItemProps = {
   title: string
   linkSrc: string
