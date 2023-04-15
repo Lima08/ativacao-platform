@@ -20,39 +20,30 @@ function AsidePanel() {
         <div className="flex-1 flex flex-col pt-5 pb-4">
           <div className="flex-1 px-3 bg-white divide-y space-y-1">
             <ul className="space-y-2 pb-2">
-              <AsidePanelItem
-                title="Home"
-                linkSrc="/dashboard/"
-                icon={homeIcon}
-              />
+              <AsidePanelItem title="Home" linkSrc="/in" icon={homeIcon} />
               <AsidePanelItem
                 title="Campanhas"
-                linkSrc="/dashboard/campaigns"
+                linkSrc="/in/campaigns"
                 icon={megaphoneIcon}
               />
               <AsidePanelItem
                 title="Treinamentos"
-                linkSrc="/dashboard/trainings"
+                linkSrc="/in/trainings"
                 icon={fourSquares}
               />
               <AsidePanelItem
                 title="Análises"
-                linkSrc="/dashboard/analyzes"
+                linkSrc="/in/analyzes"
                 icon={pizzaGraph}
               />
-              {/* <AsidePanelItem
-                title="Usuários"
-                linkSrc="/dashboard/users"
-                icon={userIcon}
-              /> */}
               <AsidePanelItem
                 title="Processos"
-                linkSrc="/dashboard/processess"
+                linkSrc="/in/processes"
                 icon={filesIcon}
               />
               <AsidePanelItem
                 title="Mural de Avisos"
-                linkSrc="/dashboard/communications"
+                linkSrc="/in/communications"
                 icon={inboxIcon}
               />
             </ul>

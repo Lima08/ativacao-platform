@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 
-export default async function Dashboard() {
+export default async function Processes() {
   return (
     <main>
       <div className="container mx-auto flex flex-col items-center justify-center">
@@ -11,7 +11,7 @@ export default async function Dashboard() {
             </div>
           }
         ></Suspense>
-        <h1>Dashboard</h1>
+        <h1>Processos</h1>
       </div>
     </main>
   )
