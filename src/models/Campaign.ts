@@ -30,7 +30,7 @@ export class Campaign {
 
   async getAll(filter: ICampaignFilter): Promise<ICampaignCreated[]> {
     const allCampaigns = await this.repository.campaign.findMany({
-      where: { ...filter }
+      where: filter
     })
 
     return allCampaigns
@@ -54,7 +54,7 @@ export class Campaign {
   ): Promise<ICampaignCreated> {
     const updatedCampaign = await this.repository.campaign.update({
       where: { id },
-      data: { ...modifier }
+      data: modifier
     })
     return updatedCampaign
   }

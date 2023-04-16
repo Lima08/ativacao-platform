@@ -42,8 +42,10 @@ export default async function handler(
       break
 
     case REQUEST_METHODS.GET:
+      const { companyId } = req.body
+
       try {
-        const allUsers = await getUsers()
+        const allUsers = await getUsers({ companyId })
         res.status(200).json({ data: allUsers })
       } catch (error) {
         res.status(500).json({ error: { message: 'Error creating user' } })

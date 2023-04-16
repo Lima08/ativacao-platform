@@ -4,6 +4,7 @@ import { User } from 'models/User'
 import type {
   IUser,
   IUserCreated,
+  IUserFilter,
   IUserModifier
 } from 'interfaces/entities/user'
 
@@ -15,13 +16,13 @@ async function createUser(params: IUser): Promise<IUserCreated> {
   return users
 }
 
-async function getUsers(): Promise<IUserCreated[]> {
-  const users = await userRepository.getAll()
+async function getUsers(filter: IUserFilter): Promise<IUserCreated[]> {
+  const users = await userRepository.getAll(filter)
   return users
 }
 
 async function getUserById(id: string): Promise<IUserCreated> {
-  const user = await userRepository.getOneBy({ id })
+  const user = await userRepository.getOneBy(id)
   return user
 }
 
