@@ -43,12 +43,12 @@ model Company {
 model Image {
   id         String   @id @default(uuid())
   url        String   @unique
-  campaingId String?
+  campaignId String?
   trainingId String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  campaing Campaign? @relation(fields: [campaingId], references: [id])
+  campaign Campaign? @relation(fields: [campaignId], references: [id])
   training Training? @relation(fields: [trainingId], references: [id])
 
   @@map("images")
@@ -57,12 +57,12 @@ model Image {
 model Video {
   id         String   @id @default(uuid())
   url        String   @unique
-  campaingId String?
+  campaignId String?
   trainingId String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  campaing Campaign? @relation(fields: [campaingId], references: [id])
+  campaign Campaign? @relation(fields: [campaignId], references: [id])
   training Training? @relation(fields: [trainingId], references: [id])
 
   @@map("videos")
@@ -106,12 +106,21 @@ model Training {
 
 // model Analize {
 //   id        String      @default(uuid()) @id
-//   email     String   @unique
+//   userId     String   (pegar o email para enviar o status)
 //   name      String?
+//   companyId      String?
+//   bucketUrl      String?
+//   biUrl      String?
+//   status      enum? default = "pending"?? (pending, done, rejected)
 //   createdAt DateTime @default(now())
 //   updatedAt DateTime @updatedAt
 
 //   @@map("analizes")
+// Metodos de usecases: Get, uptate, getByCompay,
+
+
+
+
 // }
 
 // model Permissions { (vide esquma de permissionamento por feat)

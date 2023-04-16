@@ -1,9 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { prisma } from '../../../lib/prisma'
-import { Campaign } from '../../../models/Campaign'
 import { REQUEST_METHODS } from 'constants/http/requestMethods'
-
-const repository = Campaign.of(prisma)
+import { updateCampaign, deleteCampaign } from 'useCases/campaigns'
 
 export default async function handler(
   req: NextApiRequest,
@@ -21,7 +18,7 @@ export default async function handler(
     case REQUEST_METHODS.PUT:
       try {
         const { name, description } = req.body
-        const updatedCampaign = await repository.update(id, {
+        const updatedCampaign = await updateCampaign(id, {
           name,
           description
         })
@@ -33,7 +30,7 @@ export default async function handler(
 
     case REQUEST_METHODS.DELETE:
       try {
-        await repository.delete(id)
+        await deleteCampaign(id)
         res.status(204).end()
       } catch (error) {
         res.status(404).json({ error })
