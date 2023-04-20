@@ -8,7 +8,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     <div lang="en">
       <BaseNavbar />
       <AsidePanel />
-      {children}
+      <main className="w-full md:w-[calc(100%_-_257px)] h-[calc(100%_-_72px)] mt-[72px] md:ml-[257px]">
+        {children}
+      </main>
     </div>
   )
 }
