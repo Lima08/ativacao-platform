@@ -1,18 +1,10 @@
-import { Suspense } from 'react'
+import PageContainer from 'components/PageContainer'
 
 export default async function Campaigns() {
   return (
-    <main>
-      <div className="container mx-auto flex flex-col items-center justify-center">
-        <Suspense
-          fallback={
-            <div>
-              <h1>Carregando...</h1>
-            </div>
-          }
-        ></Suspense>
-        <h1>Campaign</h1>
-      </div>
-    </main>
+    <>
+      <title>Ativação TEC | Campanhas</title>
+      <PageContainer pageTitle="Campanhas" buttonTitle="campanha" />
+    </>
   )
 }
