@@ -3,7 +3,8 @@ import {
   GetObjectOutput,
   PutObjectCommand,
   GetObjectCommand,
-  S3Client
+  S3Client,
+  // DeleteBucketCommand
 } from '@aws-sdk/client-s3'
 import { getS3Client } from '../lib/s3'
 import { IUpload } from 'interfaces/services/IUpload'
@@ -43,4 +44,19 @@ export default class s3Service {
       throw error
     }
   }
+
+//   public async deleteObject(bucketName, objectUrl): Promise<void> {
+
+// const key = o
+
+//     const command = new DeleteBucketCommand({
+//       Bucket: bucketName,
+//       Key: objectKey
+//     })
+//     try {
+//       await this.s3Client.send(command)
+//     } catch (error) {
+//       throw error
+//     }
+//   }
 }

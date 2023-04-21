@@ -9,7 +9,7 @@ dotenv.config()
 const upload = multer({
   storage: multerS3({
     s3: getS3Client(),
-    bucket: process.env.AWS_BUCKET_NAME!,
+    bucket: process.env.AWS_BUCKET_IMAGE!,
     contentType: multerS3.AUTO_CONTENT_TYPE,
     key: (_req, file, cb) => {
       const filename = `${randomToken()}.${file.originalname}`
@@ -18,7 +18,3 @@ const upload = multer({
   })
 })
 export const uploadS3Multer = upload.single('file')
-
-// const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
-// const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
-// const buffer = await sharp(req.file.buffer).resize({ width: 1080, height: 1920, fit: 'contain' }).toBuffer()
