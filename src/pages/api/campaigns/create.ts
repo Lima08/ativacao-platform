@@ -1,6 +1,7 @@
 import handler from 'handler'
 import { createCampaign } from 'useCases/campaigns'
 
+// TODO: Colocar middleware de validação
 export default handler.post(async (req, res) => {
   const { name, description } = req.body
   const companyId = req.companyId!
