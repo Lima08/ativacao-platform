@@ -3,7 +3,6 @@ import { REQUEST_METHODS } from 'constants/enums/requestMethods'
 import { deleteUser, getUserById, getUsers, updateUser } from 'useCases/users'
 import { IUserCreated } from 'interfaces/entities/user'
 
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -22,7 +21,7 @@ export default async function handler(
     case REQUEST_METHODS.GET:
       const { id } = req.body
       let response: IUserCreated | IUserCreated[]
-      
+
       console.log('🚀 ~ file: [companyId].ts:11 ~ companyId:', companyId)
       console.log('🚀 ~ file: [companyId].ts:24 ~ req.body:', req.body)
       console.log('🚀 ~ file: [companyId].ts:23 ~ id:', id)
@@ -38,7 +37,7 @@ export default async function handler(
 
         res.status(200).json({ data: response })
       } catch (error) {
-        res.status(404).json({ error })
+        res.status(500).json({ error })
       }
 
       break
@@ -54,7 +53,7 @@ export default async function handler(
         })
         res.status(200).json({ data: updatedUser })
       } catch (error) {
-        res.status(404).json({ error })
+        res.status(500).json({ error })
       }
       break
 
@@ -63,7 +62,7 @@ export default async function handler(
         await deleteUser(id)
         res.status(204).end()
       } catch (error) {
-        res.status(404).json({ error })
+        res.status(500).json({ error })
       }
       break
 

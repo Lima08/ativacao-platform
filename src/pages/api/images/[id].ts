@@ -20,7 +20,7 @@ export default async function handler(
         await files.deleteOne('image', id)
         res.status(204).end()
       } catch (error) {
-        res.status(404).json({ error })
+        res.status(500).json({ error })
       }
       break
 

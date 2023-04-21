@@ -1,7 +1,7 @@
 import { NextApiRequestWithMulter, NextApiResponse } from 'next'
-import { REQUEST_METHODS } from 'constants/http/requestMethods'
 import files from 'useCases/files'
 import { uploadS3Multer } from 'middlewares/upload'
+import { REQUEST_METHODS } from 'constants/enums/requestMethods'
 
 /* 
 - [x]  salvar uma imagem e utilizar o seu retorno para definir o tipo para salvar no banco
@@ -28,7 +28,7 @@ export default async function handler(
         //@ts-ignore
         uploadS3Multer(req, res, async (error) => {
           if (error) {
-            res.status(400).json({ error: { message: error.message } })
+            res.status(500).json({ error })
             return
           }
 
@@ -45,7 +45,7 @@ export default async function handler(
           res.status(201).json({ data: createdUpload })
         })
       } catch (error) {
-        res.status(500).json({ error: { message: 'Error upload image' } })
+        res.status(500).json({ error })
       }
       break
 

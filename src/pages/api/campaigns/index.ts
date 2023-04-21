@@ -15,8 +15,7 @@ export default async function handler(
       const { name, description } = req.body
       const userId = USER_ID
       const companyId = COMPANY_ID
-// TODO: No create enviar um array com as imagens e videos sendo os ids do nosso banco
-// Dar update nesses ids colocando o id do treinamento 
+
       try {
         const createdCampaign = await createCampaign({
           name,
@@ -26,18 +25,16 @@ export default async function handler(
         })
         res.status(201).json({ data: createdCampaign })
       } catch (error) {
-        res.status(500).json({ error: { message: 'Error creating campaign' } })
+        res.status(500).json({ error })
       }
       break
 
     case REQUEST_METHODS.GET:
-        // TODO: Ajustar para que no get de campanhas retorne as imagens e videos
-  // Envia uma lista de videos url e imagens url sendo obj do nosso banco
       try {
         const campaigns = await getCampaigns({ companyId: COMPANY_ID })
         res.status(200).json({ data: campaigns })
       } catch (error) {
-        res.status(404).json({ error })
+        res.status(500).json({ error })
       }
       break
 

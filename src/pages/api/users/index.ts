@@ -20,7 +20,7 @@ export default async function handler(
         //@ts-ignore
         uploadS3Multer(req, res, async (error) => {
           if (error) {
-            return res.status(400).json({ error })
+            res.status(500).json({ error })
           }
 
           const imageUrl = req.file?.location
@@ -37,7 +37,7 @@ export default async function handler(
           res.status(201).json({ data: createdUser })
         })
       } catch (error) {
-        res.status(500).json({ error: { message: 'Error creating user' } })
+        res.status(500).json({ error })
       }
 
       break

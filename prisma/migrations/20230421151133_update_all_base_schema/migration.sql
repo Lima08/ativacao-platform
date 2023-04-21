@@ -1,14 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the column `campaingId` on the `images` table. All the data in the column will be lost.
-  - You are about to drop the column `status` on the `trainings` table. All the data in the column will be lost.
-  - You are about to drop the column `campaingId` on the `videos` table. All the data in the column will be lost.
-  - Added the required column `companyId` to the `campaigns` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `companyId` to the `trainings` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `userId` to the `trainings` table without a default value. This is not possible if the table is not empty.
-
-*/
 -- DropForeignKey
 ALTER TABLE `images` DROP FOREIGN KEY `images_campaingId_fkey`;
 
