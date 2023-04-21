@@ -24,15 +24,17 @@ export class User {
   }
 
   async getAll(filter?: IUserFilter | undefined): Promise<IUserCreated[]> {
-    const allUsers = await this.repository.user.findMany(filter)
+    const allUsers = await this.repository.user.findMany({
+      where: filter
+    })
 
     return allUsers
   }
 
-  async getOneBy(filter: IUserFilter): Promise<IUserCreated> {
+  async getOneBy(id: string): Promise<IUserCreated> {
     try {
       const foundedUser = await this.repository.user.findUnique({
-        where: { ...filter }
+        where: { id }
       })
 
       return foundedUser
@@ -44,7 +46,7 @@ export class User {
   async update(id: string, modifier: IUserModifier): Promise<IUserCreated> {
     const updatedUser = await this.repository.user.update({
       where: { id },
-      data: { ...modifier }
+      data: modifier
     })
     return updatedUser
   }

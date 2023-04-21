@@ -1,38 +1,49 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import { prisma } from '../../../databases/prisma'
-import { User } from 'models/User'
-import { REQUEST_METHODS } from 'constants/requestMethods'
+import { NextApiRequestWithMulter, NextApiResponse } from 'next'
+import { createUser, getUsers } from 'useCases/users'
+import { uploadS3Multer } from 'middlewares/upload'
+import { REQUEST_METHODS } from 'constants/enums/requestMethods'
+
+export const config = {
+  api: {
+    bodyParser: false
+  }
+}
+const COMPANY_ID = '6d3482b1-b989-4db9-ac37-0668341e0ed4'
 
 export default async function handler(
-  req: NextApiRequest,
+  req: NextApiRequestWithMulter,
   res: NextApiResponse
 ) {
-  const userRepository = User.of(prisma)
-
   switch (req.method) {
     case REQUEST_METHODS.POST:
-      const { name, email, password, companyId, imageUrl } = req.body
-      const user = await userRepository.create({
-        name,
-        email,
-        password,
-        companyId,
-        imageUrl
-      })
-      res.status(201).json(user)
-      break
-
-    case REQUEST_METHODS.GET:
       try {
-        const users = await userRepository.getAll()
-        res.status(200).json(users)
+        //@ts-ignore
+        uploadS3Multer(req, res, async (error) => {
+          if (error) {
+            return res.status(400).json({ error })
+          }
+
+          const imageUrl = req.file?.location
+          const { email, password, name } = req.body
+
+          const createdUser = await createUser({
+            email,
+            password,
+            companyId: COMPANY_ID,
+            name,
+            imageUrl
+          })
+
+          res.status(201).json({ data: createdUser })
+        })
       } catch (error) {
-        res.status(404).json(error)
+        res.status(500).json({ error: { message: 'Error creating user' } })
       }
+
       break
 
     default:
-      res.status(400).send('Invalid method')
+      res.status(400).json({ error: { message: 'Invalid method' } })
       break
   }
 }

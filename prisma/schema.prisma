@@ -8,100 +8,124 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Campaign {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  imagens Image[]
-  videos  Video[]
-  user    User    @relation(fields: [userId], references: [id])
-
-  @@map("campaigns")
-}
-
 model User {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   name      String
   email     String
   password  String
   companyId String
   imageUrl  String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   campaigns Campaign[]
+  trainings Training[]
+  // analizes Analize[]
   company   Company    @relation(fields: [companyId], references: [id])
 
   @@map("users")
 }
 
 model Company {
-  id        String   @id @default(uuid())
-  name      String
-  slug      String   @unique
-  imageUrl  String?
+  id       String  @id @default(uuid())
+  name     String
+  slug     String  @unique
+  imageUrl String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User[]
+  user      User[]
+  campaigns Campaign[]
+  trainings Training[]
+  // analizes Analize[]
 
   @@map("companies")
 }
 
 model Image {
-  id         String   @id @default(uuid())
-  url        String   @unique
-  campaingId String?
+  id         String  @id @default(uuid())
+  url        String  @unique
+  campaignId String?
   trainingId String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
 
-  campaing Campaign? @relation(fields: [campaingId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campaign Campaign? @relation(fields: [campaignId], references: [id])
   training Training? @relation(fields: [trainingId], references: [id])
 
   @@map("images")
 }
 
 model Video {
-  id         String   @id @default(uuid())
-  url        String   @unique
-  campaingId String?
+  id         String  @id @default(uuid())
+  url        String  @unique
+  campaignId String?
   trainingId String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
 
-  campaing Campaign? @relation(fields: [campaingId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campaign Campaign? @relation(fields: [campaignId], references: [id])
   training Training? @relation(fields: [trainingId], references: [id])
 
   @@map("videos")
 }
 
 model Training {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
   description String?
-  status      Boolean
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  userId      String
+  companyId   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   imagens Image[]
   videos  Video[]
+  user    User    @relation(fields: [userId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
 
   @@map("trainings")
 }
 
+model Campaign {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  userId      String
+  companyId   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  imagens Image[]
+  videos  Video[]
+  user    User    @relation(fields: [userId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@map("campaigns")
+}
+
 // model Analize {
 //   id        String      @default(uuid()) @id
-//   email     String   @unique
 //   name      String?
+//   userId     String   (pegar o email para enviar o status)
+//   companyId      String?
+//   bucketUrl      String?
+//   biUrl      String?
+//   status      enum? default = "pending"?? (pending, done, rejected)
 //   createdAt DateTime @default(now())
 //   updatedAt DateTime @updatedAt
 
+// user    User    @relation(fields: [userId], references: [id])
+
 //   @@map("analizes")
+// Metodos de usecases: Get, uptate, getByCompay,
+
 // }
 
 // model Permissions { (vide esquma de permissionamento por feat)
