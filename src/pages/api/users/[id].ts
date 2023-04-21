@@ -1,5 +1,5 @@
+import handler from 'handler'
 import { getUserById } from 'useCases/users'
-import handler from '../../../handler'
 
 export default handler.get(async (req, res) => {
   const id = req.query.id as string
