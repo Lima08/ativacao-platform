@@ -3,11 +3,11 @@ import { Suspense } from 'react'
 
 export default async function Homepage() {
   return (
-    <main>
+    <div className="container h-screen w-screen mx-auto flex flex-col items-center justify-center">
       <div className="flex gap-2">
-        <Link href="/dashboard">entrar</Link>
+        <Link href="/in">Entrar</Link>
       </div>
-      <div className="container h-screen w-screen mx-auto flex flex-col items-center justify-center">
+      <div>
         <Suspense
           fallback={
             <div>
@@ -18,6 +18,6 @@ export default async function Homepage() {
         <h1>Pagina inicial | Login </h1>
         {/* TODO: Adicionar logica para caso esteja locado ir direto para dashboard */}
       </div>
-    </main>
+    </div>
   )
 }
