@@ -44,9 +44,10 @@ model Company {
   @@map("companies")
 }
 
-model Image {
-  id         String  @id @default(uuid())
-  url        String  @unique
+model Media {
+  id         String    @id @default(uuid())
+  url        String    @unique
+  type       MediaType
   campaignId String?
   trainingId String?
 
@@ -56,39 +57,12 @@ model Image {
   campaign Campaign? @relation(fields: [campaignId], references: [id])
   training Training? @relation(fields: [trainingId], references: [id])
 
-  @@map("images")
+  @@map("media")
 }
 
-model Video {
-  id         String  @id @default(uuid())
-  url        String  @unique
-  campaignId String?
-  trainingId String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  campaign Campaign? @relation(fields: [campaignId], references: [id])
-  training Training? @relation(fields: [trainingId], references: [id])
-
-  @@map("videos")
-}
-
-model Campaign {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  userId      String
-  companyId   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  imagens Image[]
-  videos  Video[]
-  user    User    @relation(fields: [userId], references: [id])
-  company Company @relation(fields: [companyId], references: [id])
-
-  @@map("campaigns")
+enum MediaType {
+  image
+  video
 }
 
 model Training {
@@ -101,11 +75,7 @@ model Training {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  imagens Image[]
-  videos  Video[]
-  user    User    @relation(fields: [userId], references: [id])
-  company Company @relation(fields: [companyId], references: [id])
-
+  medias  Media[]
   user    User    @relation(fields: [userId], references: [id])
   company Company @relation(fields: [companyId], references: [id])
 
@@ -122,8 +92,7 @@ model Campaign {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  imagens Image[]
-  videos  Video[]
+  medias  Media[]
   user    User    @relation(fields: [userId], references: [id])
   company Company @relation(fields: [companyId], references: [id])
 

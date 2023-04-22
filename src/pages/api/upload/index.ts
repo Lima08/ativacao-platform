@@ -1,16 +1,9 @@
-import { NextApiRequestWithMulter, NextApiResponse } from 'next'
+import { NextApiRequestCustom, NextApiResponse } from 'next'
 import files from 'useCases/files'
 import { uploadS3Multer } from 'middlewares/upload'
 import { REQUEST_METHODS } from 'constants/enums/requestMethods'
 
-/* 
-- [x]  salvar uma imagem e utilizar o seu retorno para definir o tipo para salvar no banco
-- [ ] conseguir deletar uma imagem especifica - bucket e banco
-- [ ] retorno de campaigns com array de imagens  
-- [ ] Salvar da campanha envia um array de videos e imagens (ja salvas no bucket pelo upload) e no usecase atualiza image com id da campanha
-- [ ] no delete de uma campanha deletar imagens do banco e do bucket
 
-*/
 
 export const config = {
   api: {
@@ -19,7 +12,7 @@ export const config = {
 }
 
 export default async function handler(
-  req: NextApiRequestWithMulter,
+  req: NextApiRequestCustom,
   res: NextApiResponse
 ) {
   switch (req.method) {

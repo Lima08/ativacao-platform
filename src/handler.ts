@@ -1,7 +1,7 @@
-import { NextApiRequestWithMulter, NextApiResponse } from 'next'
+import { NextApiRequestCustom, NextApiResponse } from 'next'
 import nc from 'next-connect'
 
-export default nc<NextApiRequestWithMulter, NextApiResponse>({
+export default nc<NextApiRequestCustom, NextApiResponse>({
   onError: (error, _req, res) => {
     const statusCode = error.code || 500
     res.status(statusCode).json({ message: error.message, meta: error.meta })
