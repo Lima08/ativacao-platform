@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { IFile, IFileCreated, IFileFilter } from 'interfaces/entities/file'
+import { IMedia, IMediaCreated, IMediaFilter } from 'interfaces/entities/media'
 
 export class Media {
   private repository: PrismaClient
@@ -16,14 +16,14 @@ export class Media {
     return this.instance
   }
 
-  async create(data: IFile): Promise<IFileCreated> {
+  async create(data: IMedia): Promise<IMediaCreated> {
     const newMedia = await this.repository.Media.create({
       data
     })
     return newMedia
   }
 
-  async getAll(filter: IFileFilter): Promise<IFileCreated[]> {
+  async getAll(filter: IMediaFilter): Promise<IMediaCreated[]> {
     const allMedias = await this.repository.Media.findMany({
       where: filter
     })
