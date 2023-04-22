@@ -28,6 +28,12 @@ export class Media {
     return newMedia
   }
 
+  async get(id: string): Promise<IMediaCreated> {
+    const allMedias = await this.repository.media.findUnique({ where: { id } })
+
+    return allMedias
+  }
+
   async getAll(filter: IMediaFilter): Promise<IMediaCreated[]> {
     const allMedias = await this.repository.media.findMany({
       where: filter

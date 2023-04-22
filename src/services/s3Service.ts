@@ -1,13 +1,15 @@
 import {
+  S3Client,
   GetObjectRequest,
   GetObjectOutput,
   PutObjectCommand,
   GetObjectCommand,
-  S3Client,
-  // DeleteBucketCommand
+  DeleteObjectCommand,
+  PutObjectOutput
 } from '@aws-sdk/client-s3'
 import { getS3Client } from '../lib/s3'
-import { IUpload } from 'interfaces/services/IUpload'
+import { IPutObject, IDeleteObject } from 'interfaces/services/'
+import CustomError from 'constants/errors/CustoError'
 
 export default class s3Service {
   private static instance: s3Service
@@ -28,35 +30,37 @@ export default class s3Service {
     const command = new GetObjectCommand(params)
 
     try {
-      const s3Object = await this.s3Client.send(command)
-      return s3Object
+      return this.s3Client.send(command)
     } catch (error) {
       throw error
     }
   }
 
-  public async putObject(params: IUpload): Promise<string> {
-    const command = new PutObjectCommand(params)
+  public async putObject(params: IPutObject): Promise<PutObjectOutput> {
+    const command = new PutObjectCommand({
+      Bucket: params.bucket,
+      Key: params.key,
+      Body: params.body,
+      ContentType: params.contentType
+    })
     try {
-      await this.s3Client.send(command)
-      return `https://${params.Bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${params.Key}`
+      return this.s3Client.send(command)
     } catch (error) {
       throw error
     }
   }
 
-//   public async deleteObject(bucketName, objectUrl): Promise<void> {
+  public async deleteObject({ bucket, key }: IDeleteObject): Promise<any> {
+    const command = new DeleteObjectCommand({
+      Bucket: bucket,
+      Key: key
+    })
 
-// const key = o
-
-//     const command = new DeleteBucketCommand({
-//       Bucket: bucketName,
-//       Key: objectKey
-//     })
-//     try {
-//       await this.s3Client.send(command)
-//     } catch (error) {
-//       throw error
-//     }
-//   }
+    await this.s3Client.send(command).catch(() => {
+      throw new CustomError('Error to delete bucket object', 500, {
+        bucket,
+        key
+      })
+    })
+  }
 }

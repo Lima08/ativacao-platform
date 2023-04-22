@@ -4,7 +4,9 @@ import nc from 'next-connect'
 export default nc<NextApiRequestCustom, NextApiResponse>({
   onError: (error, _req, res) => {
     const statusCode = error.code || 500
-    res.status(statusCode).json({ message: error.message, meta: error.meta })
+    res
+      .status(statusCode)
+      .json({ error: { message: error.message, meta: error.meta } })
   },
   onNoMatch: (_req, res) => {
     res.status(404).json({ error: { message: 'Page is not found' } })

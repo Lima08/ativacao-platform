@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 import { prisma } from 'lib/prisma'
 import { Media } from 'models/Media'
+import s3Service from 'services/s3Service'
 import CustomError from 'constants/errors/CustoError'
 import {
   IMedia,
@@ -19,7 +20,7 @@ async function createMedia({
   url,
   key
 }: IMedia): Promise<IMediaCreated> {
-  if (!type) throw new Error('Type is required')
+  if (!type) throw new CustomError('Type is required', 400)
 
   let fileType: string
   if (['image', 'video'].includes(type)) {
@@ -67,12 +68,19 @@ async function getMediasBy(filter: IMediaFilter): Promise<IMediaCreated[]> {
 }
 
 async function deleteMedia(id: string): Promise<void> {
-  try {
-    await repository.delete(id)
-  } catch (error: any) {
-    const meta = error.meta
-    throw new CustomError('Error delete media', 400, meta)
-  }
+  const bucketService = s3Service.getInstance()
+
+  const media = await repository.get(id)
+  if (!media) throw new CustomError('Media not found', 400)
+
+  await bucketService.deleteObject({
+    bucket: process.env.AWS_BUCKET_IMAGE!,
+    key: media.key
+  })
+
+  await repository.delete(id).catch((error) => {
+    throw new CustomError('Fail to delete media', 500, error)
+  })
 }
 
 export { createMedia, updateMedia, getMediasBy, deleteMedia }
