@@ -1,4 +1,4 @@
 export interface ICampaignModifier {
-  name: string
-  description?: string
+  name?: string
+  description?: string,
 }

@@ -1,17 +1,28 @@
 import handler from 'handler'
-import { updateCampaign, deleteCampaign } from 'useCases/campaigns'
+import {
+  updateCampaign,
+  deleteCampaign,
+  getCampaignById
+} from 'useCases/campaigns'
 
 export default handler
-  .put(async (req, res) => {
-    const { name, description } = req.body
+  .get(async (req, res) => {
     const id = req.query.id as string
 
-    const createdCampaign = await updateCampaign(id, {
+    const campaign = await getCampaignById(id)
+    res.status(200).json({ data: campaign })
+  })
+  .put(async (req, res) => {
+    const { name, description, mediaIds } = req.body
+    const id = req.query.id as string
+
+    const updatedCampaign = await updateCampaign(id, {
       name,
-      description
+      description,
+      mediaIds
     })
 
-    res.status(200).json({ data: createdCampaign })
+    res.status(200).json({ data: updatedCampaign })
   })
   .delete(async (req, res) => {
     const id = req.query.id as string

@@ -3,7 +3,7 @@ import { createCampaign } from 'useCases/campaigns'
 
 // TODO: Colocar middleware de validação
 export default handler.post(async (req, res) => {
-  const { name, description } = req.body
+  const { name, description, mediaIds } = req.body
   const companyId = req.companyId!
   const userId = req.userId!
 
@@ -11,7 +11,8 @@ export default handler.post(async (req, res) => {
     name,
     description,
     userId,
-    companyId
+    companyId,
+    mediaIds
   })
   res.status(201).json({ data: createdCampaign })
 })
