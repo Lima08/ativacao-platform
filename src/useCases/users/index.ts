@@ -10,11 +10,11 @@ import type {
 import CustomError from 'constants/errors/CustoError'
 
 dotenv.config()
-const userRepository = User.of(prisma)
+const repository = User.of(prisma)
 
 async function createUser(params: IUser): Promise<IUserCreated> {
   try {
-    const user = await userRepository.create(params)
+    const user = await repository.create(params)
     return user
   } catch (error: any) {
     const meta = error.meta
@@ -24,8 +24,7 @@ async function createUser(params: IUser): Promise<IUserCreated> {
 
 async function getUsers(filter: IUserFilter): Promise<IUserCreated[]> {
   try {
-    // TODO: Colocar validação se company existe e retornar erro caso não (getCompanyById)
-    const users = await userRepository.getAll(filter)
+    const users = await repository.getAll(filter)
     return users
   } catch (error: any) {
     const meta = error.meta
@@ -35,7 +34,7 @@ async function getUsers(filter: IUserFilter): Promise<IUserCreated[]> {
 
 async function getUserById(id: string): Promise<IUserCreated> {
   try {
-    const user = await userRepository.getOneBy(id)
+    const user = await repository.getOneBy(id)
     return user
   } catch (error: any) {
     const meta = error.meta
@@ -48,7 +47,7 @@ async function updateUser(
   params: IUserModifier
 ): Promise<IUserCreated> {
   try {
-    const updatedUser = await userRepository.update(id, params)
+    const updatedUser = await repository.update(id, params)
     return updatedUser
   } catch (error: any) {
     const meta = error.meta
@@ -58,7 +57,7 @@ async function updateUser(
 
 async function deleteUser(id: string): Promise<void> {
   try {
-    await userRepository.delete(id)
+    await repository.delete(id)
   } catch (error: any) {
     const meta = error.meta
     throw new CustomError(`Error to delete user`, 400, meta)
