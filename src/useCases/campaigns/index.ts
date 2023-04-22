@@ -1,6 +1,6 @@
 import { prisma } from 'lib/prisma'
 import { Campaign } from 'models/Campaign'
-import { updateMedia, getMediasBy } from '../media'
+import { updateMedia, getMediasBy, deleteMedia } from '../media'
 import CustomError from 'constants/errors/CustoError'
 import { ICampaignCreated, ICampaignFilter } from 'interfaces/entities/campaign'
 import { createdCampaignDto, newCampaignDto, modifierCampaignDto } from './dto'
@@ -106,12 +106,19 @@ async function updateCampaign(
 }
 
 async function deleteCampaign(id: string): Promise<void> {
-  try {
-    await repository.delete(id)
-  } catch (error: any) {
+  const allMedias = await getMediasBy({ campaignId: id })
+  if (!!allMedias.length) {
+    const promises = allMedias.map((media) => deleteMedia(media.id))
+    await Promise.all(promises).catch((error: any) => {
+      const meta = error.meta
+      throw new CustomError('Error to delete campaign media', 500, meta)
+    })
+  }
+
+  await repository.delete(id).catch((error: any) => {
     const meta = error.meta
     throw new CustomError('Error to delete campaign', 400, meta)
-  }
+  })
 }
 
 export {
