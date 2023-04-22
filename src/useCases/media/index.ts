@@ -16,8 +16,9 @@ async function createMedia({
   type,
   campaignId,
   trainingId,
-  url
-}: IMedia): Promise<IMedia> {
+  url,
+  key
+}: IMedia): Promise<IMediaCreated> {
   if (!type) throw new Error('Type is required')
 
   let fileType: string
@@ -32,6 +33,7 @@ async function createMedia({
       campaignId,
       trainingId,
       url,
+      key,
       type: fileType
     })
     return mediasFile

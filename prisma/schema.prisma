@@ -48,6 +48,7 @@ model Media {
   id         String    @id @default(uuid())
   url        String    @unique
   type       MediaType
+  key        String    
   campaignId String?
   trainingId String?
 

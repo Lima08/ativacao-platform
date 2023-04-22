@@ -10,7 +10,8 @@ export const config = {
 
 export default handler.use(uploadS3Multer).post(async (req, res) => {
   const url = req.file.location
-  const createdFile = await createMedia({ type: req.type, url })
+  const key = req.file.key
 
-  res.status(201).json({ data: { createdFile } })
+  const createdFile = await createMedia({ type: req.type, url, key })
+  res.status(201).json({ data: createdFile })
 })

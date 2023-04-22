@@ -8,7 +8,6 @@ import { NextApiRequestCustom } from 'next'
 dotenv.config()
 
 function getBucketName(type: string): string {
-  console.log('🚀 ~ file: upload.ts:16 ~ getBucketName ~ type:', type)
   switch (type) {
     case 'image':
       return process.env.AWS_BUCKET_IMAGE!
@@ -26,6 +25,7 @@ const upload = multer({
     s3: getS3Client(),
     bucket: (req, file, cb) => {
       const type = file.mimetype.split('/')[0]
+      // @ts-ignore
       req.type = type
       const bucketName = getBucketName(type)
       cb(null, bucketName)
