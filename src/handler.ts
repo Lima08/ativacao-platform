@@ -11,8 +11,8 @@ export default nc<NextApiRequestCustom, NextApiResponse>({
   }
 }).use((req, res, next) => {
   // TEMP: This will come from jwt token
-  req.companyId = '6d3482b1-b989-4db9-ac37-0668341e0ed4'
-  req.userId = 'c8a22840-3351-4249-bcc9-eef74487a039'
+  req.companyId = 'dfda4d4a-df82-47c3-bb5e-391cc4589ea1'
+  req.userId = '30eb9932-1235-4352-96f5-c1871f9cdf6d'
 
   next()
 })

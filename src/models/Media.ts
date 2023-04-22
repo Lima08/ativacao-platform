@@ -1,5 +1,10 @@
 import { PrismaClient } from '@prisma/client'
-import { IMedia, IMediaCreated, IMediaFilter } from 'interfaces/entities/media'
+import {
+  IMedia,
+  IMediaCreated,
+  IMediaFilter,
+  IMediaModifier
+} from 'interfaces/entities/media'
 
 export class Media {
   private repository: PrismaClient
@@ -17,22 +22,30 @@ export class Media {
   }
 
   async create(data: IMedia): Promise<IMediaCreated> {
-    const newMedia = await this.repository.Media.create({
+    const newMedia = await this.repository.media.create({
       data
     })
     return newMedia
   }
 
   async getAll(filter: IMediaFilter): Promise<IMediaCreated[]> {
-    const allMedias = await this.repository.Media.findMany({
+    const allMedias = await this.repository.media.findMany({
       where: filter
     })
 
     return allMedias
   }
 
+  async update(id: string, modifier: IMediaModifier): Promise<IMediaCreated> {
+    const updatedMedia = await this.repository.media.update({
+      where: { id },
+      data: modifier
+    })
+    return updatedMedia
+  }
+
   async delete(id: string): Promise<void> {
-    await this.repository.Media.delete({
+    await this.repository.media.delete({
       where: { id }
     })
   }
