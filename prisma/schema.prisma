@@ -19,10 +19,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  campaigns Campaign[]
-  trainings Training[]
+  campaigns    Campaign[]
+  trainings    Training[]
   // analizes Analize[]
-  company   Company    @relation(fields: [companyId], references: [id])
+  company      Company        @relation(fields: [companyId], references: [id])
+  userTraining UserTraining[]
 
   @@map("users")
 }
@@ -36,9 +37,9 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user      User[]
-  campaigns Campaign[]
-  trainings Training[]
+  user         User[]
+  campaigns    Campaign[]
+  trainings    Training[]
   // analizes Analize[]
 
   @@map("companies")
@@ -48,7 +49,7 @@ model Media {
   id         String    @id @default(uuid())
   url        String    @unique
   type       MediaType
-  key        String    
+  key        String
   campaignId String?
   trainingId String?
 
@@ -69,6 +70,7 @@ enum MediaType {
 model Training {
   id          String  @id @default(uuid())
   name        String
+  active      Boolean @default(true)
   description String?
   userId      String
   companyId   String
@@ -76,9 +78,10 @@ model Training {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  medias  Media[]
-  user    User    @relation(fields: [userId], references: [id])
-  company Company @relation(fields: [companyId], references: [id])
+  medias       Media[]
+  user         User           @relation(fields: [userId], references: [id])
+  company      Company        @relation(fields: [companyId], references: [id])
+  userTraining UserTraining[]
 
   @@map("trainings")
 }
@@ -98,6 +101,26 @@ model Campaign {
   company Company @relation(fields: [companyId], references: [id])
 
   @@map("campaigns")
+}
+
+model UserTraining {
+  id         String     @id @default(uuid())
+  trainingId String
+  userId     String
+  status     StatusType @default(started)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id])
+  training Training @relation(fields: [trainingId], references: [id])
+
+  @@map("user_training")
+}
+
+enum StatusType {
+  started
+  finished
 }
 
 // model Analize {
