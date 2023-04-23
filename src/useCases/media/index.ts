@@ -22,23 +22,17 @@ async function createMedia({
 }: IMedia): Promise<IMediaCreated> {
   if (!type) throw new CustomError('Type is required', 400)
 
-  let fileType: string
-  if (['image', 'video'].includes(type)) {
-    fileType = type
-  } else {
-    fileType = 'document'
-  }
-
   try {
     const mediasFile = await repository.create({
       campaignId,
       trainingId,
       url,
       key,
-      type: fileType
+      type
     })
     return mediasFile
   } catch (error: any) {
+    console.log('🚀 ~ file: index.ts:35 ~ error:', error)
     const meta = error.meta
     throw new CustomError('Error creating media', 400, meta)
   }
