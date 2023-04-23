@@ -3,7 +3,6 @@ import multer from 'multer'
 import multerS3 from 'multer-s3'
 import { getS3Client } from '../lib/s3'
 import { randomToken } from 'functions/randomToken'
-import { NextApiRequestCustom } from 'next'
 
 dotenv.config()
 
