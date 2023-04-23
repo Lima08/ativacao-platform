@@ -1,5 +1,5 @@
 import handler from 'handler'
-import { createCampaign } from 'useCases/campaigns'
+import { createTraining } from 'useCases/trainings'
 
 // TODO: Colocar middleware de validação
 export default handler.post(async (req, res) => {
@@ -7,12 +7,12 @@ export default handler.post(async (req, res) => {
   const companyId = req.companyId!
   const userId = req.userId!
 
-  const createdCampaign = await createCampaign({
+  const createdTraining = await createTraining({
     name,
     description,
     userId,
     companyId,
     mediaIds
   })
-  res.status(201).json({ data: createdCampaign })
+  res.status(201).json({ data: createdTraining })
 })

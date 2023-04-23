@@ -1,32 +1,32 @@
 import handler from 'handler'
 import {
-  updateCampaign,
-  deleteCampaign,
-  getCampaignById
-} from 'useCases/campaigns'
+  updateTraining,
+  deleteTraining,
+  getTrainingById
+} from 'useCases/trainings'
 
 export default handler
   .get(async (req, res) => {
     const id = req.query.id as string
 
-    const campaign = await getCampaignById(id)
-    res.status(200).json({ data: campaign })
+    const training = await getTrainingById(id)
+    res.status(200).json({ data: training })
   })
   .put(async (req, res) => {
     const { name, description, mediaIds } = req.body
     const id = req.query.id as string
 
-    const updatedCampaign = await updateCampaign(id, {
+    const updatedTraining = await updateTraining(id, {
       name,
       description,
       mediaIds
     })
 
-    res.status(200).json({ data: updatedCampaign })
+    res.status(200).json({ data: updatedTraining })
   })
   .delete(async (req, res) => {
     const id = req.query.id as string
 
-    await deleteCampaign(id)
+    await deleteTraining(id)
     res.status(204).end()
   })

@@ -1,4 +1,4 @@
-export interface ICampaignModifier {
+export interface ITrainingModifier {
   name?: string
   description?: string,
 }
