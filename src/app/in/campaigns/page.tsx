@@ -9,13 +9,14 @@ export default function Campaigns() {
 
   return (
     <CampaignsContext.Provider
-      value={{ state: campaingsList, setState: setCampaingsList }}
+      value={{
+        state: campaingsList,
+        setState: setCampaingsList
+      }}
     >
       <title>Ativação TEC | Campanhas</title>
       <PageContainer pageTitle="Campanhas" buttonTitle="campanha">
         <ListWrapper2 pageTitle="campanha" />
-        {/* <ListItem itemTitle="Campanha Fashion SP 2023" />
-          <ListItem itemTitle="Campanha Nike Air Jordan 2024" /> */}
       </PageContainer>
     </CampaignsContext.Provider>
   )
