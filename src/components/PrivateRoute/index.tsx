@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { ReactNode, useEffect } from 'react'
 import { checkUserAuthenticated } from 'functions'
-import { APP_ROUTES } from 'constants/app-routes'
+import { APP_ROUTES } from 'constants/appRoutes'
 
 type PrivateRouteProps = {
   children: ReactNode

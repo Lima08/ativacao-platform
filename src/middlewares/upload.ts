@@ -6,8 +6,6 @@ import { randomToken } from 'functions/randomToken'
 
 dotenv.config()
 
-
-
 const upload = multer({
   storage: multerS3({
     s3: getS3Client(),
@@ -26,7 +24,7 @@ const upload = multer({
         // @ts-ignore
         req.type = 'document'
       }
-        // @ts-ignore
+      // @ts-ignore
       cb(null, bucketName)
     },
     contentType: multerS3.AUTO_CONTENT_TYPE,
