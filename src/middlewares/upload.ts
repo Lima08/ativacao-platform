@@ -6,27 +6,27 @@ import { randomToken } from 'functions/randomToken'
 
 dotenv.config()
 
-function getBucketName(type: string): string {
-  switch (type) {
-    case 'image':
-      return process.env.AWS_BUCKET_IMAGE!
-    case 'video':
-      return process.env.AWS_BUCKET_VIDEO!
-    case 'document':
-      return process.env.AWS_BUCKET_DOC!
-    default:
-      throw new Error(`Tipo de arquivo inválido: ${type}`)
-  }
-}
+
 
 const upload = multer({
   storage: multerS3({
     s3: getS3Client(),
     bucket: (req, file, cb) => {
+      let bucketName: string
+
       const type = file.mimetype.split('/')[0]
-      // @ts-ignore
-      req.type = type
-      const bucketName = getBucketName(type)
+      if (['image', 'video'].includes(type)) {
+        bucketName = process.env.AWS_BUCKET_MEDIA!
+        // @ts-ignore
+        req.type = type
+      }
+
+      if (type === 'application' && file.mimetype.endsWith('sheet')) {
+        bucketName = process.env.AWS_BUCKET_DOC!
+        // @ts-ignore
+        req.type = 'document'
+      }
+        // @ts-ignore
       cb(null, bucketName)
     },
     contentType: multerS3.AUTO_CONTENT_TYPE,
