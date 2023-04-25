@@ -32,7 +32,6 @@ async function createMedia({
     })
     return mediasFile
   } catch (error: any) {
-    console.log('🚀 ~ file: index.ts:35 ~ error:', error)
     const meta = error.meta
     throw new CustomError('Error creating media', 400, meta)
   }
