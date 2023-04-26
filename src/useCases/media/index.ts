@@ -67,7 +67,7 @@ async function deleteMedia(id: string): Promise<void> {
   if (!media) throw new CustomError('Media not found', 400)
 
   await bucketService.deleteObject({
-    bucket: process.env.AWS_BUCKET_IMAGE!,
+    bucket: process.env.AWS_BUCKET_MEDIA!,
     key: media.key
   })
 

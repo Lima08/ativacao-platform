@@ -1,7 +1,13 @@
 type TableWrapperProps = {
   data: any[]
+  onDelete: (id: string) => void
+  onEdit: (id: string) => void
 }
-export default function TableWrapper({ data }: TableWrapperProps) {
+export default function TableWrapper({
+  data,
+  onDelete,
+  onEdit
+}: TableWrapperProps) {
   return (
     <section className="w-[90%] container px-4 mx-auto">
       <div className="flex flex-col mt-6">
@@ -57,13 +63,16 @@ export default function TableWrapper({ data }: TableWrapperProps) {
 
                           <td className="px-4 py-4 text-sm whitespace-nowrap flex items-center justify-evenly">
                             <div className="rounded px-1 py-1 text-gray-500 flex w-[40%] gap-2 flex-grow-[2]">
-                              <button className="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md sm:w-auto gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 disabled">
+                              <button
+                                className="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md sm:w-auto gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 disabled"
+                                onClick={() => onEdit(id)}
+                              >
                                 Editar
                               </button>
                               <button
                                 id={`${id}`}
                                 className="flex items-center justify-center w-1/2 px-5 py-2 text-sm hover:text-gray-100 border-red-600 text-gray-700 capitalize transition-colors duration-200 hover:bg-red-600 border rounded-md sm:w-auto gap-x-2  dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
-                                onClick={(e) => console.log(e.currentTarget)}
+                                onClick={() => onDelete(id)}
                               >
                                 Deletar
                               </button>
