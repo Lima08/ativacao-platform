@@ -1,14 +1,17 @@
-'use client'
+import { useContext } from 'react'
+import { CampaignsContext } from '../../../context'
+import ListItem from 'components/ListItem'
 
-import { useCampaignsContext } from '../../../context/CampaignsContext'
-import TableWrapper from 'components/TableWrapper'
-import PageContainer from 'components/PageContainer'
+type ListWrapperProps = {
+  pageTitle: string
+}
 
-export default function CampaignsPage() {
-  const { state, setCampaign } = useCampaignsContext()
+function ListWrapper2({ pageTitle }: ListWrapperProps) {
+  const { state } = useContext(CampaignsContext)
+
   return (
-    <PageContainer pageTitle="Campanhas" pageSection="campaigns">
-      {/* TODO: Transform in a component */}
+    <section className="w-[90%] container px-4 mx-auto">
+      {/*Wrapper header*/}
       <div className="mt-6 md:flex md:items-center md:justify-between">
         <div className="relative flex items-center mt-4 md:mt-0">
           <span className="absolute">
@@ -78,18 +81,53 @@ export default function CampaignsPage() {
         </div>
       </div>
 
-      <TableWrapper data={state} />
-    </PageContainer>
-    <CampaignsContext.Provider
-      value={{
-        state: campaingsList,
-        setState: setCampaingsList
-      }}
-    >
-      <title>Ativação TEC | Campanhas</title>
-      <PageContainer pageTitle="Campanhas" buttonTitle="campanha">
-        <ListWrapper2 pageTitle="campanha" />
-      </PageContainer>
-    </CampaignsContext.Provider>
+      {/*Wrapper main*/}
+      <div className="flex flex-col mt-6">
+        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+            <div className="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
+                  {state && state.length === 0 ? (
+                    <tr>
+                      <td className="px-4 py-4 text-sm whitespace-nowrap">
+                        <div className="flex items-center flex-col">
+                          {/*Empty wrapper condition*/}
+                          {pageTitle === 'campanha'
+                            ? `Nenhuma ${pageTitle} adicionada.`
+                            : `Nenhum ${pageTitle} adicionado.`}
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    state &&
+                    state.map((el) => (
+                      <ListItem
+                        key={el.elementId}
+                        elementId={el.elementId}
+                        itemTitle={el.itemTitle}
+                        itemDescription={el.itemDescription}
+                      />
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/*Wrapper footer*/}
+      <div className="mt-6 sm:flex sm:items-center sm:justify-between ">
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          Página{' '}
+          <span className="font-medium text-gray-700 dark:text-gray-100">
+            1 de 1
+          </span>
+        </div>
+      </div>
+    </section>
   )
 }
+
+export default ListWrapper2
