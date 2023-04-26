@@ -7,7 +7,7 @@ export default async function CampaignLayout({
 }: {
   children: ReactNode
 }) {
-  // TODO: Virá do localStorage 
+  // TODO: Virá do localStorage
   const allCampaign = await getAllCampaigns({
     companyId: 'dfda4d4a-df82-47c3-bb5e-391cc4589ea1'
   })
@@ -25,19 +25,17 @@ export default async function CampaignLayout({
   }
 
   return (
-    <section>
-      <CampaignsContextProvider
-        listCampaigns={adapterCampaignsToList(allCampaign)}
-      >
-        <Suspense
-          fallback={
-            <div>
-              <h1>Carregando...</h1>
-            </div>
-          }
-        />
-        {children}
-      </CampaignsContextProvider>
-    </section>
+    <CampaignsContextProvider
+      listCampaigns={adapterCampaignsToList(allCampaign)}
+    >
+      <Suspense
+        fallback={
+          <div>
+            <h1>Carregando...</h1>
+          </div>
+        }
+      />
+      {children}
+    </CampaignsContextProvider>
   )
 }

@@ -3,12 +3,12 @@ type TableWrapperProps = {
 }
 export default function TableWrapper({ data }: TableWrapperProps) {
   return (
-    <section className="w-[90%] container px-4 mx-auto">
+    <section className="w-full mx-auto">
       <div className="flex flex-col mt-6">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
             <div className="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <table className=" divide-y divide-gray-200 dark:divide-gray-700 rounded-2xl">
                 <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
                   {data && !data.length && (
                     <tr className="hover:bg-slate-100 bg-white rounded-full">
@@ -32,7 +32,7 @@ export default function TableWrapper({ data }: TableWrapperProps) {
                           <td className="px-4 py-4 text-sm whitespace-nowrap">
                             <div className="flex items-center flex-col">
                               <img
-                                className="object-cover w-12 h-12 -mx-1 border-2 border-white rounded-full dark:border-gray-700"
+                                className="object-cover w-14 h-12 -mx-1 border-2 border-white rounded-full dark:border-gray-700"
                                 src={imgSource}
                                 alt={imgAlt}
                               />
