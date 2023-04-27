@@ -5,7 +5,7 @@ type TableWrapperProps = {
   data: any[]
   onDelete?: (id: string) => void
   onEdit?: (id: string) => void
-  toggleActivation?: () => void
+  toggleActivation?: (id: string) => void
 }
 export default function TableWrapper({
   data,
@@ -71,7 +71,7 @@ export default function TableWrapper({
                               {!!toggleActivation && (
                                 <ToggleInput
                                   isActive
-                                  toggleActivation={toggleActivation}
+                                  toggleActivation={() => toggleActivation(id)}
                                 />
                               )}
                               {!!onEdit && (

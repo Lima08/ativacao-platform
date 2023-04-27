@@ -2,6 +2,7 @@ import axios from 'axios'
 import Router from 'next/dist/client/router'
 import CampaignService from './campaignServices'
 import UploadService from './uploadServices'
+import TrainingService from './trainingServices'
 
 const API_ENVS = {
   production: '',
@@ -49,6 +50,7 @@ httpClient.interceptors.response.use(
 
 const httpServices = {
   campaigns: CampaignService(httpClient),
+  trainings: TrainingService(httpClient),
   upload: UploadService(httpClient)
 }
 
