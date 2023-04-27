@@ -58,10 +58,10 @@ async function getAllAnalyzes(
 
 async function updateAnalysis(
   id: string,
-  { biUrl, status }: IAnalysisModifier
+  { biUrl, status, title }: IAnalysisModifier
 ): Promise<IAnalysisCreated> {
   const updatedAnalysis = await repository
-    .update(id, { biUrl, status })
+    .update(id, { biUrl, status, title })
     .catch((error: any) => {
       const meta = error.meta
       throw new CustomError('Error to update Analysis', 400, meta)
@@ -77,10 +77,37 @@ async function deleteAnalysis(id: string): Promise<void> {
   })
 }
 
+async function done(
+  id: string,
+  { biUrl }: IAnalysisModifier
+): Promise<IAnalysisCreated> {
+  const updatedAnalysis = await repository
+    .update(id, { biUrl, status: 'done' })
+    .catch((error: any) => {
+      const meta = error.meta
+      throw new CustomError('Error to update Analysis', 400, meta)
+    })
+
+  return updatedAnalysis
+}
+
+async function rejected(id: string): Promise<IAnalysisCreated> {
+  const updatedAnalysis = await repository
+    .update(id, { status: 'rejected', biUrl: '' })
+    .catch((error: any) => {
+      const meta = error.meta
+      throw new CustomError('Error to update Analysis', 400, meta)
+    })
+
+  return updatedAnalysis
+}
+
 export {
   createAnalysis,
   getAnalysisById,
   getAllAnalyzes,
   updateAnalysis,
-  deleteAnalysis
+  deleteAnalysis,
+  done,
+  rejected
 }

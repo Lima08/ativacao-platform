@@ -17,7 +17,7 @@ export default handler.use(uploadS3Multer).post(async (req, res) => {
   const createdTraining = await createAnalysis({
     title,
     userId,
-    bucketUrl: documentUrl,
+    bucketUrl: documentUrl
   })
   res.status(201).json({ data: createdTraining })
 })
