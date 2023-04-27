@@ -21,9 +21,10 @@ model User {
 
   campaigns    Campaign[]
   trainings    Training[]
-  // analizes Analize[]
-  company      Company        @relation(fields: [companyId], references: [id])
   userTraining UserTraining[]
+  analyzes     Analysis[]
+
+  company Company @relation(fields: [companyId], references: [id])
 
   @@map("users")
 }
@@ -37,10 +38,9 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user         User[]
-  campaigns    Campaign[]
-  trainings    Training[]
-  // analizes Analize[]
+  user      User[]
+  campaigns Campaign[]
+  trainings Training[]
 
   @@map("companies")
 }
@@ -104,10 +104,10 @@ model Campaign {
 }
 
 model UserTraining {
-  id         String     @id @default(uuid())
+  id         String             @id @default(uuid())
   trainingId String
   userId     String
-  status     StatusType @default(started)
+  status     TrainingStatusType @default(started)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -118,28 +118,32 @@ model UserTraining {
   @@map("user_training")
 }
 
-enum StatusType {
+enum TrainingStatusType {
   started
   finished
 }
 
-// model Analize {
-//   id        String      @default(uuid()) @id
-//   name      String?
-//   userId     String   (pegar o email para enviar o status)
-//   companyId      String?
-//   bucketUrl      String?
-//   biUrl      String?
-//   status      enum? default = "pending"?? (pending, done, rejected)
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
+model Analysis {
+  id        String             @id @default(uuid())
+  title     String
+  userId    String
+  bucketUrl String?
+  biUrl     String?
+  status    AnalysisStatusType @default(pending)
 
-// user    User    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-//   @@map("analizes")
-// Metodos de usecases: Get, uptate, getByCompay,
+  user User @relation(fields: [userId], references: [id])
 
-// }
+  @@map("analyzes")
+}
+
+enum AnalysisStatusType {
+  pending
+  rejected
+  done
+}
 
 // model Permissions { (vide esquma de permissionamento por feat)
 //   id        String      @default(uuid()) @id

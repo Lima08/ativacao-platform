@@ -1,7 +1,6 @@
-'use client'
+import { ReactNode, Suspense } from 'react'
 import BaseNavbar from 'components/BaseNavbar'
 import AsidePanel from 'components/AsidePanel'
-import { ReactNode, Suspense } from 'react'
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
