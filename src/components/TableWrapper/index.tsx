@@ -1,7 +1,42 @@
+import Modal from 'components/MediaViewer'
+import { useState } from 'react'
+
 type TableWrapperProps = {
   data: any[]
+  setData: any
 }
-export default function TableWrapper({ data }: TableWrapperProps) {
+
+const images = [
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80',
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.2&crop&w=215&q=80'
+]
+
+export default function TableWrapper({ data, setData }: TableWrapperProps) {
+  // const [localData, setLocalData] = useState(data)
+  const [itemView, setItemView] = useState<{
+    name: string
+    description: string
+  }>()
+  const [open, setOpen] = useState(true)
+
+  function remove(value: any) {
+    const userDecision = confirm('Confirmar deleção?')
+    if (!userDecision) return
+
+    const nextState = data.filter(
+      (element: any) => String(element.id) !== value.id
+    )
+
+    setData(nextState)
+  }
+
+  function openMediaViewer(value: any) {
+    const element = data.find((element: any) => element.id === value.id)
+    if (element) setItemView(element)
+
+    setOpen(true)
+  }
+
   return (
     <section className="w-full mx-auto">
       <div className="flex flex-col mt-6">
@@ -40,10 +75,28 @@ export default function TableWrapper({ data }: TableWrapperProps) {
                           </td>
 
                           <td className="px-4 py-4 text-sm font-medium whitespace-nowrap">
+                            {itemView && (
+                              <Modal
+                                title={itemView.name}
+                                description={itemView.description}
+                                imageSource={imgSource}
+                                medias={images}
+                                open={open}
+                                setOpen={setOpen}
+                              />
+                            )}
                             <div>
-                              <h2 className="font-medium text-gray-800 dark:text-white ">
-                                {name}
-                              </h2>
+                              <a
+                                href="#"
+                                id={`${id}`}
+                                onClick={(e) =>
+                                  openMediaViewer(e.currentTarget)
+                                }
+                              >
+                                <h2 className="font-medium text-gray-800 dark:text-white ">
+                                  {name}
+                                </h2>
+                              </a>
                             </div>
                           </td>
 
@@ -63,7 +116,7 @@ export default function TableWrapper({ data }: TableWrapperProps) {
                               <button
                                 id={`${id}`}
                                 className="flex items-center justify-center w-1/2 px-5 py-2 text-sm hover:text-gray-100 border-red-600 text-gray-700 capitalize transition-colors duration-200 hover:bg-red-600 border rounded-md sm:w-auto gap-x-2  dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
-                                onClick={(e) => console.log(e.currentTarget)}
+                                onClick={(e) => remove(e.currentTarget)}
                               >
                                 Deletar
                               </button>

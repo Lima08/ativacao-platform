@@ -1,31 +1,48 @@
 import { useContext, useState } from 'react'
-import { CampaignsContext } from '../../../context'
+// import { CampaignsContext } from '../../contexts/CampaignsContext'
 import { PhotoIcon } from '@heroicons/react/24/solid'
+import { useCampaignsContext } from 'context/CampaignsContext'
 
-export default function CampaignRegister() {
-  const { state, setState } = useContext(CampaignsContext)
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
+const mediaList = [
+  'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/35788b6c4a2f2a7b2a7df1bf50c6ca7ace6da2e8d05355499a5ec68e39b381b5.golaco.jpeg'
+]
+
+type CampaingRegisterProps = {
+  isFetching: boolean
+  uploadImage: (file: File) => void
+  createCampaign: (e: React.FormEvent) => void
+  title: string
+  setTitle: (title: string) => void
+  description: string
+  setDescription: (description: string) => void
+  uploaded: object
+}
+
+export default function CampaignRegister({
+  isFetching,
+  uploadImage,
+  createCampaign,
+  title,
+  setTitle,
+  description,
+  setDescription,
+  uploaded
+}: CampaingRegisterProps) {
+  const { state, setCampaign } = useCampaignsContext()
+  // const { state, setCampaign } = useContext(CampaignsContext)
+  // const [title, setTitle] = useState('')
+  // const [description, setDescription] = useState('')
 
   function handleChange(value: string, state: string) {
     if (state === 'title') setTitle(value)
     if (state === 'description') setDescription(value)
   }
 
-  function handleSave() {
-    console.log({ hi: 'hiiiiiiii' })
-    const newItem = {
-      elementId: (Math.random() * 100).toFixed(1),
-      itemTitle: title,
-      itemDescription: description
-    }
-
-    const nextState = [...state, newItem]
-    setState(nextState)
-  }
-
   return (
-    <form className="border-grey bg-white p-5 rounded-lg mt-5 mb-5 w-10/12 mx-auto">
+    <form
+      className="border-grey bg-white p-5 rounded-lg mt-5 mb-5 w-10/12 mx-auto"
+      onSubmit={createCampaign}
+    >
       <div className="space-y-12">
         <div className="border-b border-gray-900/10 pb-8">
           <h2 className="text-base font-semibold leading-7 text-gray-900">
@@ -98,6 +115,8 @@ export default function CampaignRegister() {
                         type="file"
                         className="sr-only"
                         multiple={true}
+                        disabled={isFetching}
+                        onChange={(e) => uploadImage(e)}
                       />
                     </label>
                     <p className="pl-1">ou arrastar</p>
@@ -121,13 +140,19 @@ export default function CampaignRegister() {
           </button>
         </a>
         <button
-          type="button"
+          type="submit"
           className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          onClick={handleSave}
+          disabled={isFetching}
+          // onClick={handleSave}
         >
           Salvar
         </button>
       </div>
+      {isFetching && (
+        <div className="px-3 py-2 w-[100px] mt-3 flex items-end justify-center ml-auto rounded-lg font-semibold bg-blue-600 text-white">
+          Salvando item...
+        </div>
+      )}
     </form>
   )
 }

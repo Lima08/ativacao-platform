@@ -30,14 +30,14 @@ function ListItem({
     if (!userDecision) return
 
     const nextState = state.filter(
-      (element) => String(element.elementId) !== value.id
+      (element: any) => String(element.elementId) !== value.id
     )
 
     setState(nextState)
   }
 
   function openMediaViewer(value: any) {
-    const element = state.find((element) => element.elementId === value.id)
+    const element = state.find((element: any) => element.elementId === value.id)
     if (element) setItemView(element)
     setOpen(true)
   }
