@@ -1,4 +1,5 @@
 export interface IAnalysisModifier {
   status?: string
-  biUrl?: string,
+  biUrl?: string
+  title?: string
 }

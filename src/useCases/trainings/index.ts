@@ -68,8 +68,16 @@ async function getAllTrainings(
   filter: ITrainingFilter
 ): Promise<ITrainingCreated[]> {
   try {
-    const newTrainings = await repository.getAll(filter)
-    return newTrainings
+    const allTrainings = await repository.getAll(filter)
+    const allTrainingsWithMedia: ITrainingCreated[] = []
+
+    for (const training of allTrainings) {
+      const medias = await getMediasBy({ trainingId: training.id })
+
+      allTrainingsWithMedia.push({ ...training, medias: medias || [] })
+    }
+
+    return allTrainingsWithMedia
   } catch (error: any) {
     const meta = error.meta
     throw new CustomError('Error to get Trainings', 500, meta)
@@ -78,10 +86,10 @@ async function getAllTrainings(
 
 async function updateTraining(
   id: string,
-  { name, description, mediaIds }: modifierTrainingDto
+  { name, description, mediaIds, active }: modifierTrainingDto
 ): Promise<createdTrainingDto> {
   const updatedTraining = await repository
-    .update(id, { name, description })
+    .update(id, { name, description, active })
     .catch((error: any) => {
       const meta = error.meta
       throw new CustomError('Error to update Training', 400, meta)
@@ -103,6 +111,23 @@ async function updateTraining(
   }
 
   return { ...updatedTraining, medias }
+}
+async function toggleActive(id: string): Promise<createdTrainingDto> {
+  const training = await repository.getOneBy(id)
+
+  await repository
+    .update(id, { active: !training.active })
+    .catch((error: any) => {
+      const meta = error.meta
+      throw new CustomError('Error to update Training', 400, meta)
+    })
+
+  let medias: IMediaCreated[] = []
+  if (training) {
+    medias = await getMediasBy({ trainingId: training.id })
+  }
+
+  return { ...training, active: !training.active, medias }
 }
 
 async function deleteTraining(id: string): Promise<void> {
@@ -126,5 +151,6 @@ export {
   getTrainingById,
   getAllTrainings,
   updateTraining,
-  deleteTraining
+  deleteTraining,
+  toggleActive
 }

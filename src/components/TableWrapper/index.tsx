@@ -1,12 +1,17 @@
+import ToggleInput from 'components/ToggleInput'
+import CustomButton from 'components/CustomButton'
+
 type TableWrapperProps = {
   data: any[]
-  onDelete: (id: string) => void
-  onEdit: (id: string) => void
+  onDelete?: (id: string) => void
+  onEdit?: (id: string) => void
+  toggleActivation?: (id: string) => void
 }
 export default function TableWrapper({
   data,
   onDelete,
-  onEdit
+  onEdit,
+  toggleActivation
 }: TableWrapperProps) {
   return (
     <section className="w-[90%] container px-4 mx-auto">
@@ -26,7 +31,7 @@ export default function TableWrapper({
                     </tr>
                   )}
                   {!!data.length &&
-                    data.map(({ id, name, description }: any) => {
+                    data.map(({ id, name, description, active }: any) => {
                       const imgSource =
                         'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80'
                       const imgAlt = 'Imagem da campanha'
@@ -63,19 +68,25 @@ export default function TableWrapper({
 
                           <td className="px-4 py-4 text-sm whitespace-nowrap flex items-center justify-evenly">
                             <div className="rounded px-1 py-1 text-gray-500 flex w-[40%] gap-2 flex-grow-[2]">
-                              <button
-                                className="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md sm:w-auto gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 disabled"
-                                onClick={() => onEdit(id)}
-                              >
-                                Editar
-                              </button>
-                              <button
-                                id={`${id}`}
-                                className="flex items-center justify-center w-1/2 px-5 py-2 text-sm hover:text-gray-100 border-red-600 text-gray-700 capitalize transition-colors duration-200 hover:bg-red-600 border rounded-md sm:w-auto gap-x-2  dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
-                                onClick={() => onDelete(id)}
-                              >
-                                Deletar
-                              </button>
+                              {!!toggleActivation && (
+                                <ToggleInput
+                                  defaultActive={active}
+                                  onToggle={() => toggleActivation(id)}
+                                />
+                              )}
+                              {!!onEdit && (
+                                <CustomButton onClick={() => onEdit(id)}>
+                                  <p>Editar</p>
+                                </CustomButton>
+                              )}
+                              {!!onDelete && (
+                                <CustomButton
+                                  onClick={() => onDelete(id)}
+                                  variant="danger"
+                                >
+                                  <p>Deletar</p>
+                                </CustomButton>
+                              )}
                             </div>
                           </td>
                         </tr>

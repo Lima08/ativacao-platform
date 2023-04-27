@@ -13,12 +13,13 @@ export default handler
     res.status(200).json({ data: analysis })
   })
   .put(async (req, res) => {
-    const { status, biUrl } = req.body
+    const { status, biUrl, title } = req.body
     const id = req.query.id as string
 
     const updatedAnalysis = await updateAnalysis(id, {
       biUrl,
-      status
+      status,
+      title
     })
 
     res.status(200).json({ data: updatedAnalysis })
