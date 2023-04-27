@@ -6,12 +6,14 @@ import httpServices from 'services/http'
 
 const MOCK_DATA = {
   name: 'Campanha do cliente',
-  description: 'Campanha enviada com o fetch e upload de mídia via front '
+  description: 'Campanha enviada com o fetch e upload de mídia via front ',
+  active: false
 }
 
-type Campaign = {
+type Training = {
   name: string
   description: string
+  active: boolean
   media: string[]
 }
 
@@ -20,13 +22,13 @@ type MediaResponse = {
   url: string
   type: string
   key: string
-  campaignId?: string
   trainingId?: string
+  campaignId?: string
   createdAt: Date
   updatedAt: Date
 }
 
-export default function RegisterCampaign() {
+export default function RegisterTraining() {
   const router = useRouter()
   const [files, setFiles] = useState<MediaResponse[]>([])
   const [isFetching, setIsFetching] = useState(false)
@@ -61,22 +63,23 @@ export default function RegisterCampaign() {
     }
   }
 
-  const createCampaign = async (e: any) => {
+  // TODO: Tipar corretamente
+  const createTraining = async (e: any) => {
     e.preventDefault()
 
-    const { name, description } = MOCK_DATA
+    const { name, description, active } = MOCK_DATA
     const mediaIds = files
       .map((media) => media.id)
       .filter((id) => id) as string[]
 
     try {
       setIsFetching(true)
-      const { data, error } = await httpServices.campaigns.create({
+      const { data, error } = await httpServices.trainings.create({
         name,
         description,
         mediaIds: mediaIds || []
       })
-      console.log('🚀 ~ file: page.tsx:80 ~ createCampaign ~ {data, error}:', {
+      console.log('🚀 ~ file: page.tsx:80 ~ createTraining ~ {data, error}:', {
         data,
         error
       })
@@ -96,7 +99,7 @@ export default function RegisterCampaign() {
     <div>
       <h1>Upload</h1>
       <form
-        onSubmit={createCampaign}
+        onSubmit={createTraining}
         style={{ opacity: !isMutating ? 1 : 0.7 }}
       >
         <UploadInput disabled={isFetching} handleSetFile={uploadImage} />

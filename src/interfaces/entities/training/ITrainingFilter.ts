@@ -1,5 +1,6 @@
 export interface ITrainingFilter  {
+  companyId: string
   name?: string
   userId?: string
-  companyId: string
+  active?: boolean
 }
