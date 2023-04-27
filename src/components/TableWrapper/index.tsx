@@ -31,7 +31,7 @@ export default function TableWrapper({
                     </tr>
                   )}
                   {!!data.length &&
-                    data.map(({ id, name, description }: any) => {
+                    data.map(({ id, name, description, active }: any) => {
                       const imgSource =
                         'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80'
                       const imgAlt = 'Imagem da campanha'
@@ -70,8 +70,8 @@ export default function TableWrapper({
                             <div className="rounded px-1 py-1 text-gray-500 flex w-[40%] gap-2 flex-grow-[2]">
                               {!!toggleActivation && (
                                 <ToggleInput
-                                  isActive
-                                  toggleActivation={() => toggleActivation(id)}
+                                  defaultActive={active}
+                                  onToggle={() => toggleActivation(id)}
                                 />
                               )}
                               {!!onEdit && (

@@ -1,12 +1,23 @@
+'use client'
+import { useState, useCallback } from 'react'
+
 type ToggleInputProps = {
-  isActive: boolean
-  toggleActivation: () => void
+  defaultActive: boolean
+  onToggle: () => void
 }
 
 export default function ToggleInput({
-  isActive,
-  toggleActivation
+  defaultActive,
+  onToggle
 }: ToggleInputProps) {
+  const [isActive, setIsActive] = useState(defaultActive)
+
+  const handleToggle = useCallback(() => {
+    const newActiveState = !isActive
+    setIsActive(newActiveState)
+    onToggle()
+  }, [isActive, onToggle])
+
   return (
     <div className="flex items-center">
       <label
@@ -15,11 +26,10 @@ export default function ToggleInput({
       >
         <div className="relative">
           <input
-            id="toggle-input"
             type="checkbox"
             className="hidden"
             checked={isActive}
-            onChange={toggleActivation}
+            onChange={() => handleToggle()}
           />
           <div className="toggle__line w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
           <div className="toggle__dot absolute w-6 h-6 bg-white rounded-full shadow inset-y-0 left-0"></div>

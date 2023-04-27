@@ -42,10 +42,10 @@ export default function TrainingsPage() {
   const handleActivation = async (id: string) => {
     // TEMP: Ex de como fazer edit
     try {
-      const reponse = await httpServices.trainings.toggleActive(id)
+      const response = await httpServices.trainings.toggleActive(id)
       console.log(
-        '🚀 ~ file: page.tsx:46 ~ handleActivation ~ reponse:',
-        reponse
+        '🚀 ~ file: page.tsx:46 ~ handleActivation ~ response:',
+        response
       )
 
       // TODO: Colocar toast de sucesso
