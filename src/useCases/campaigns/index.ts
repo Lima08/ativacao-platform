@@ -68,8 +68,16 @@ async function getAllCampaigns(
   filter: ICampaignFilter
 ): Promise<ICampaignCreated[]> {
   try {
-    const newCampaigns = await repository.getAll(filter)
-    return newCampaigns
+    const allCampaigns = await repository.getAll(filter)
+    const allCampaignsWithMedia: ICampaignCreated[] = []
+
+    for (const campaign of allCampaigns) {
+      const medias = await getMediasBy({ campaignId: campaign.id })
+
+      allCampaignsWithMedia.push({ ...campaign, medias: medias || [] })
+    }
+
+    return allCampaignsWithMedia
   } catch (error: any) {
     const meta = error.meta
     throw new CustomError('Error to get campaigns', 500, meta)

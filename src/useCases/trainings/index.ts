@@ -68,8 +68,16 @@ async function getAllTrainings(
   filter: ITrainingFilter
 ): Promise<ITrainingCreated[]> {
   try {
-    const newTrainings = await repository.getAll(filter)
-    return newTrainings
+    const allTrainings = await repository.getAll(filter)
+    const allTrainingsWithMedia: ITrainingCreated[] = []
+
+    for (const training of allTrainings) {
+      const medias = await getMediasBy({ trainingId: training.id })
+
+      allTrainingsWithMedia.push({ ...training, medias: medias || [] })
+    }
+
+    return allTrainingsWithMedia
   } catch (error: any) {
     const meta = error.meta
     throw new CustomError('Error to get Trainings', 500, meta)
