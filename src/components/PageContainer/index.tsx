@@ -1,4 +1,5 @@
 'use client'
+
 import { ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import CustomButton from 'components/CustomButton'
@@ -8,6 +9,7 @@ type PageContainerProps = {
   pageTitle: string
   pageSection: string
 }
+
 export default function PageContainer({
   pageTitle,
   pageSection,
@@ -20,15 +22,14 @@ export default function PageContainer({
   }
 
   return (
-    <div className="w-full">
-      <div className="w-full flex p-[25px] items-center justify-around">
+    <div className="w-full flex flex-col py-[25px] items-center">
+      <div className="w-9/12 flex flex-row justify-around items-center">
         <h1 className="text-2xl font-medium">{pageTitle}</h1>
         <CustomButton onClick={navToCreatePage} variant="primary">
           <p>Adicionar</p>
         </CustomButton>
       </div>
-
-      <div className="w-full flex flex-col">{children}</div>
+      <div className="flex flex-col mx-auto">{children}</div>
     </div>
   )
 }

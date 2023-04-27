@@ -26,20 +26,17 @@ export default async function CampaignLayout({
   }
 
   return (
-    <section>
-      <CampaignsContextProvider
-        listCampaigns={adapterCampaignsToList(allCampaign)}
-      >
-        <Suspense
-          fallback={
-            <div>
-              <h1>Carregando...</h1>
-            </div>
-          }
-        >
-          {children}
-        </Suspense>
-      </CampaignsContextProvider>
-    </section>
+    <CampaignsContextProvider
+      listCampaigns={adapterCampaignsToList(allCampaign)}
+    >
+      <Suspense
+        fallback={
+          <div>
+            <h1>Carregando...</h1>
+          </div>
+        }
+      />
+      {children}
+    </CampaignsContextProvider>
   )
 }

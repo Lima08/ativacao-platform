@@ -1,4 +1,5 @@
 'use client'
+import CampaignRegister from 'components/CampaignRegister'
 import UploadInput from 'components/UploadInput'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
@@ -34,6 +35,9 @@ export default function RegisterTraining() {
   const [isFetching, setIsFetching] = useState(false)
   const [isPending, startTransition] = useTransition()
   const isMutating = isFetching || isPending
+  const [title, setTitle] = useState('')
+  const [description2, setDescription] = useState('')
+  const [uploaded, setUploaded] = useState({})
 
   const uploadImage = async (e: any) => {
     e.preventDefault()
@@ -68,6 +72,10 @@ export default function RegisterTraining() {
     e.preventDefault()
 
     const { name, description, active } = MOCK_DATA
+    // const { name, description } = MOCK_DATA
+    // const name = title
+    // const description = description2
+
     const mediaIds = files
       .map((media) => media.id)
       .filter((id) => id) as string[]
@@ -79,7 +87,14 @@ export default function RegisterTraining() {
         description,
         mediaIds: mediaIds || []
       })
-      console.log('🚀 ~ file: page.tsx:80 ~ createTraining ~ {data, error}:', {
+
+      setUploaded({
+        name,
+        description,
+        mediaIds: mediaIds || []
+      })
+
+      console.log('🚀 ~ file: page.tsx:80 ~ createCampaign ~ {data, error}:', {
         data,
         error
       })
@@ -96,8 +111,18 @@ export default function RegisterTraining() {
   }
 
   return (
-    <div>
-      <h1>Upload</h1>
+    <div className="w-full">
+      <CampaignRegister
+        isFetching={isFetching}
+        uploadImage={uploadImage}
+        createCampaign={createCampaign}
+        title={title}
+        setTitle={setTitle}
+        description={description2}
+        setDescription={setDescription}
+        uploaded={uploaded}
+      />
+      {/* <h1>Upload</h1>
       <form
         onSubmit={createTraining}
         style={{ opacity: !isMutating ? 1 : 0.7 }}
@@ -108,7 +133,7 @@ export default function RegisterTraining() {
         </button>
       </form>
 
-      {isFetching && <div>salvando item...</div>}
+      {isFetching && <div>salvando item...</div>} */}
     </div>
   )
 }

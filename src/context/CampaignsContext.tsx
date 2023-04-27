@@ -15,6 +15,7 @@ export interface ICampaign {
 export type CampaignsContextType = {
   state: ICampaign[]
   setCampaign: (params: ICampaign) => void
+  setData: (params: any) => void
 }
 
 interface CampaignsContextProviderProps {
@@ -24,7 +25,8 @@ interface CampaignsContextProviderProps {
 
 const initialState = {
   state: [],
-  setCampaign: (params: ICampaign) => {}
+  setCampaign: (params: ICampaign) => {},
+  setData: (params: any) => {}
   // currentCampaign: null
   // createCampaign: (params: ICampaign) => {},
   // updateCampaign: () => {},
@@ -32,8 +34,7 @@ const initialState = {
   // save: () => {},
 }
 
-const CampaignsContext =
-  createContext<CampaignsContextType>(initialState)
+const CampaignsContext = createContext<CampaignsContextType>(initialState)
 
 export function CampaignsContextProvider({
   children,
@@ -57,6 +58,7 @@ export function CampaignsContextProvider({
     <CampaignsContext.Provider
       value={{
         state: data,
+        setData: setData,
         setCampaign: handleSetCampaign
       }}
     >
