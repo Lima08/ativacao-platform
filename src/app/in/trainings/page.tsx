@@ -22,7 +22,7 @@ export default function TrainingsPage() {
   const handleEdit = async (id: string) => {
     router.push(`/in/trainings/${id}`)
   }
-  
+
   const handleActivation = async (id: string) => {
     // TEMP: Ex de como fazer edit
     try {
@@ -118,6 +118,7 @@ export default function TrainingsPage() {
         onDelete={handleDelete}
         onEdit={handleEdit}
         toggleActivation={handleActivation}
+        section="Nenhum treinamento adicionado"
       />
     </PageContainer>
   )

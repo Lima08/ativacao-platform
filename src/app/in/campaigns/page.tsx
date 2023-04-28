@@ -94,7 +94,12 @@ export default function CampaignsPage() {
           </button>
         </div>
       </div>
-      <TableWrapper data={state} onDelete={handleDelete} onEdit={handleEdit} />
+      <TableWrapper
+        data={state}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
+        section="Nenhuma campanha adicionada"
+      />
     </PageContainer>
   )
 }

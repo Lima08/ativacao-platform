@@ -1,4 +1,11 @@
-import { Dispatch, Fragment, SetStateAction, useRef, useState } from 'react'
+import {
+  Dispatch,
+  Fragment,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState
+} from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 
 interface ModalProps {
@@ -23,18 +30,37 @@ export default function Modal({
   const [index, setIndex] = useState(0)
 
   function previousItem() {
+    console.log({ previousItemIdx: index })
+    console.log({ imagem: medias[index - 1] })
+
     if (index === 0) return setIndex(medias.length - 1)
 
     return setIndex(index - 1)
   }
 
   function nextItem() {
+    console.log({ previousItemIdx: index })
+    console.log({ imagem: medias[index + 1] })
+
     if (index === medias.length - 1) return setIndex(0)
 
     return setIndex(index + 1)
   }
 
   const cancelButtonRef = useRef(null)
+
+  console.log({ OpenMediasMedias: medias })
+  console.log({ mediasIndex: medias[index] })
+
+  useEffect(() => {
+    console.log({ index })
+  }, [index])
+
+  useEffect(() => {
+    // return () => {
+    //   second
+    // }
+  }, [index])
 
   return (
     <>
@@ -100,7 +126,7 @@ export default function Modal({
                       />
                     </svg>
 
-                    <img src={medias[index]} alt="" />
+                    <img src={medias[index]} alt="" width="250px" />
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"

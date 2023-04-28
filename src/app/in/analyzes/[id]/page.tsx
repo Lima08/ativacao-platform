@@ -120,7 +120,7 @@ export default function RegisterCampaign() {
         <div className="space-y-12">
           <div className="border-b border-gray-900/10 pb-8">
             <h2 className="text-base font-semibold leading-7 text-gray-900">
-              Nova campanha
+              Nova análise
             </h2>
 
             <div className="mt-6">
