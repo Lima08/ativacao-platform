@@ -56,9 +56,7 @@ const TrainingService = (
   },
 
   getById: async (trainingId) => {
-    const response = await httpClient.get('/api/trainings', {
-      params: { trainingId }
-    })
+    const response = await httpClient.get(`/api/trainings/${trainingId}`)
 
     return response.data
   },

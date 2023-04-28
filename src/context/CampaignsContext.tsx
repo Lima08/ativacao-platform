@@ -6,6 +6,7 @@ export interface ICampaign {
   id: string
   name: string
   description: string
+  medias?: any[] // TODO: Tipar
   userId?: string
   companyId?: string
   createdAt?: string

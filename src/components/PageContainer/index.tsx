@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import CustomButton from 'components/CustomButton'
+import CustomButton from 'components/ButtonCustom'
 
 type PageContainerProps = {
   children: ReactNode

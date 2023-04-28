@@ -53,9 +53,7 @@ const CampaignService = (
   },
 
   getById: async (campaignId) => {
-    const response = await httpClient.get('/api/campaigns', {
-      params: { campaignId }
-    })
+    const response = await httpClient.get(`/api/campaigns/${campaignId}`)
 
     return response.data
   },

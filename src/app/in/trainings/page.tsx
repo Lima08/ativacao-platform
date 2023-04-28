@@ -1,14 +1,13 @@
 'use client'
-
-// import { useRouter } from 'next/navigation'
-import TableWrapper from 'components/TableWrapper'
-import PageContainer from 'components/PageContainer'
+import { useRouter } from 'next/navigation'
 import httpServices from 'services/http'
 import { useTrainingsContext } from '../../../context/TrainingsContext'
+import TableWrapper from 'components/TableWrapper'
+import PageContainer from 'components/PageContainer'
 
 export default function TrainingsPage() {
-  // const router = useRouter()
   const { state } = useTrainingsContext()
+  const router = useRouter()
 
   const handleDelete = async (id: string) => {
     try {
@@ -21,24 +20,9 @@ export default function TrainingsPage() {
     }
   }
   const handleEdit = async (id: string) => {
-    // TEMP: Ex de como fazer edit
-    try {
-      await httpServices.trainings.update(id, {
-        name: 'Treinamento editada pelo front',
-        description:
-          'Edição hardcode para exemplo de como fazer no componente register (Treinamento)',
-        active: false,
-        mediaIds: [] // Conforme o componente upload adiciona
-      })
-
-      // TODO: Colocar toast de sucesso
-    } catch (error) {
-      // TODO: Colocar toast de falha
-      console.error(error)
-    }
-    // TODO: Adiciona navegação para CampaignRegister e la utiliza o método update
-    // router.push(`/in/trainings/${id}`)
+    router.push(`/in/trainings/${id}`)
   }
+  
   const handleActivation = async (id: string) => {
     // TEMP: Ex de como fazer edit
     try {

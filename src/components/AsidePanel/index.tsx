@@ -35,11 +35,7 @@ function AsidePanel() {
                 linkSrc="/in/analyzes"
                 icon={pizzaGraph}
               />
-              <AsidePanelItem
-                title="Processos"
-                linkSrc="/in/processes"
-                icon={filesIcon}
-              />
+
               <AsidePanelItem
                 title="Mural de Avisos"
                 linkSrc="/in/communications"

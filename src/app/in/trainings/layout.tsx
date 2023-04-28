@@ -21,7 +21,8 @@ export default async function trainingLayout({
         description: training.description,
         active: training.active,
         userId: training.userId,
-        companyId: training.companyId
+        companyId: training.companyId,
+        medias: training.medias
       }
     })
   }

@@ -23,7 +23,7 @@ async function createMedia({
   if (!type) throw new CustomError('Type is required', 400)
 
   try {
-    const mediasFile = await repository.create({
+    const { mediasFile } = await repository.create({
       campaignId,
       trainingId,
       url,
@@ -53,7 +53,17 @@ async function updateMedia(
 async function getMediasBy(filter: IMediaFilter): Promise<IMediaCreated[]> {
   try {
     const mediaFiles = await repository.getAll(filter)
-    return mediaFiles
+    const filteredMediaFiles = mediaFiles.map(
+      ({ id, url, type, key, campaignId, trainingId }) => ({
+        id,
+        url,
+        type,
+        key,
+        campaignId,
+        trainingId
+      })
+    )
+    return filteredMediaFiles
   } catch (error: any) {
     const meta = error.meta
     throw new CustomError('Error to get medias', 400, meta)
