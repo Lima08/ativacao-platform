@@ -11,7 +11,7 @@ function AsidePanel() {
   return (
     <aside
       id="sidebar"
-      className="fixed hidden z-20 h-full top-0 left-0 pt-16 lg:flex flex-shrink-0 flex-col w-64 transition-width duration-75"
+      className="fixed hidden z-20 h-full top-0 left-0 pt-16 md:flex flex-shrink-0 flex-col md:w-52"
       aria-label="Sidebar"
     >
       <div className="relative flex-1 flex flex-col min-h-0 border-r border-gray-200 bg-white pt-0">
@@ -35,11 +35,7 @@ function AsidePanel() {
                 linkSrc="/in/analyzes"
                 icon={pizzaGraph}
               />
-              <AsidePanelItem
-                title="Processos"
-                linkSrc="/in/processes"
-                icon={filesIcon}
-              />
+
               <AsidePanelItem
                 title="Mural de Avisos"
                 linkSrc="/in/communications"
