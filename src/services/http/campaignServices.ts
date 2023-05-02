@@ -47,11 +47,14 @@ const CampaignService = (
   },
 
   getAll: async () => {
-    const response = await httpClient.get('/api/campaigns')
-
-    return response.data
+    try {
+      const response = await httpClient.get('/api/campaigns/getAll')
+      return response.data || []
+    } catch (error) {
+      console.error('Error fetching campaigns:', error)
+      return error
+    }
   },
-
   getById: async (campaignId) => {
     const response = await httpClient.get(`/api/campaigns/${campaignId}`)
 

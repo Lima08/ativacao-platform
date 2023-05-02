@@ -1,61 +1,23 @@
 'use client'
-import { useRouter } from 'next/navigation'
-import httpServices from 'services/http'
-import { useCampaignsContext } from '../../../context/CampaignsContext'
+
+import { useRouter } from 'next/router'
 import TableWrapper from 'components/TableWrapper'
 import PageContainer from 'components/PageContainer'
 import DashboardLayout from 'components/DashboardLayout'
-// import useSWR from 'swr'
+import useStore from 'store/useStore'
+import httpServices from 'services/http'
 
-// import { CampaignsContextProvider } from 'context/CampaignsContext'
-// import { getAllCampaigns } from 'useCases/campaigns'
-
-// const fetcher = (...args: any[]) => fetch(...args).then((res) => res.json())
-
-export default function CampaignsPage() {
-  const { state } = useCampaignsContext()
+export default function CampaignsPage({ campaigns }: { campaigns: any[] }) {
   const router = useRouter()
-
   const handleDelete = async (id: string) => {
-    try {
-      await httpServices.campaigns.delete(id)
-
-      // TODO: Colocar toast de sucesso
-    } catch (error) {
-      // TODO: Colocar toast de falha
-      console.error(error)
-    }
+    useStore.getState().deleteCampaign(id)
   }
+
   const handleEdit = async (id: string) => {
     router.push(`/in/campaigns/${id}`)
   }
-
-  // const allCampaign = useSWR('/api/profile-data', fetcher)
-
-  // TODO: Virá do localStorage
-  // const allCampaign = getAllCampaigns({
-  //   companyId: 'dfda4d4a-df82-47c3-bb5e-391cc4589ea1'
-  // }).then((obj) => obj)
-
-  // TODO: Tipar
-  function adapterCampaignsToList(campaigns: any[]) {
-    return campaigns.map((campaign) => {
-      return {
-        id: campaign.id,
-        name: campaign.name,
-        description: campaign.description,
-        userId: campaign.userId,
-        companyId: campaign.companyId,
-        medias: campaign.medias
-      }
-    })
-  }
-
   return (
     <DashboardLayout>
-      {/* <CampaignsContextProvider
-        listCampaigns={adapterCampaignsToList(allCampaign)}
-      > */}
       <PageContainer pageTitle="Campanhas" pageSection="campaigns">
         {/* TODO: Transform in a component */}
         <div className="mt-6 md:flex md:items-center md:justify-between">
@@ -127,13 +89,23 @@ export default function CampaignsPage() {
           </div>
         </div>
         <TableWrapper
-          data={state}
+          data={campaigns}
           onDelete={handleDelete}
           onEdit={handleEdit}
           section="Nenhuma campanha adicionada"
         />
       </PageContainer>
-      {/* </CampaignsContextProvider> */}
     </DashboardLayout>
   )
+}
+
+export async function getServerSideProps() {
+  useStore.getState().getAllCampaigns()
+  const response = await httpServices.campaigns.getAll()
+
+  return {
+    props: {
+      campaigns: response.data
+    }
+  }
 }

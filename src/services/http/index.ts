@@ -14,14 +14,14 @@ const httpClient = axios.create({
   baseURL: API_ENVS[process.env.NODE_ENV] || API_ENVS.development
 })
 
-httpClient.interceptors.request.use((config) => {
-  // setGlobalLoading(true)
-  const token = window.localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
+// httpClient.interceptors.request.use((config) => {
+//   // setGlobalLoading(true)
+//   const token = window.localStorage.getItem('token')
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`
+//   }
+//   return config
+// })
 
 httpClient.interceptors.response.use(
   (response) => {
@@ -31,14 +31,14 @@ httpClient.interceptors.response.use(
   (error) => {
     // setGlobalLoading(false)
     const canThrowAnError =
-      error.request.status === 0 || error.request.status === 500
+      error.request?.status === 0 || error.request?.status === 500
 
     if (canThrowAnError) {
       // setGlobalLoading(false)
       throw new Error(error.message)
     }
 
-    if (error.response.status === 401) {
+    if (error.response?.status === 401) {
       // TODO: Ver se funfa
       Router.push('/')
     }

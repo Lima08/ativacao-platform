@@ -1,10 +1,12 @@
 'use client'
-import { useEffect, useState, useTransition, useRef } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import httpServices from 'services/http'
 import FormCustom from 'components/FormCustom'
 import { PhotoIcon } from '@heroicons/react/24/solid'
 import DashboardLayout from 'components/DashboardLayout'
+import useStore from 'store/useStore'
 
 type MediaResponse = {
   id: string
@@ -15,16 +17,21 @@ type MediaResponse = {
   trainingId?: string
 }
 
-export default function RegisterCampaign() {
+export default function RegisterCampaign({
+  campaign,
+  notFound
+}: {
+  campaign: any
+  notFound: boolean
+}) {
   const [isFetching, setIsFetching] = useState(false)
-  const [isPending, startTransition] = useTransition()
   const [files, setFiles] = useState<MediaResponse[]>([])
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
-  const path = usePathname()
-  const id = useRef(path?.substring(path?.lastIndexOf('/') + 1))
   const router = useRouter()
+
   const uploadImage = async (e: any) => {
+    // TODO: Adicionar essa logica no componente de update
     e.preventDefault()
 
     const formData = new FormData()
@@ -56,64 +63,46 @@ export default function RegisterCampaign() {
     e.preventDefault()
     console.log('start submit')
 
-    const mediaIds = files
-      .map((media) => media.id)
-      .filter((id) => id) as string[]
+    const mediaIds = files && files.length ? files.map((media) => media.id) : []
+    const mediasIdsFiltered = mediaIds.filter((id) => id) as string[]
 
     try {
-      setIsFetching(true)
-      if (id.current === 'new') {
-        console.log('first, create: ', { id: id.current })
-        await httpServices.campaigns.create({
+      if (!!campaign) {
+        await useStore.getState().updateCampaign(String(campaign.id), {
           name,
           description,
-          mediaIds: mediaIds || []
+          mediaIds: mediasIdsFiltered
         })
       } else {
-        console.log('2nd update: ', { id: id.current })
-        await httpServices.campaigns.update(String(id.current), {
+        await useStore.getState().createCampaign({
           name,
           description,
-          mediaIds: mediaIds || []
+          mediaIds: mediasIdsFiltered
         })
       }
-
-      //  TODO: Toast
-      // startTransition(() => {
-      //   router.refresh()
-      // })
     } catch (error) {
       console.error(error)
+      // TODO: Colocar toast avisando que falhou ao salvar, apaga os dados e deixa o usuário tentar novamente
     } finally {
-      console.log('finally')
-      setIsFetching(false)
-      router.back()
-    }
-  }
-
-  async function fetchCampaign(id: string) {
-    try {
-      setIsFetching(true)
-      const { data } = await httpServices.campaigns.getById(id)
-      if (!data) {
-        throw new Error('Campanha não encontrada')
-      }
-      setName(data.name)
-      setDescription(data.description)
-      // TODO: Adicionar tbm as imagens em um componente a parte
-    } catch (error) {
-      console.log('🚀 ~ file: page.tsx:97 ~ fetchCampaign ~ error:', error)
-    } finally {
-      setIsFetching(false)
+      // TODO: Colocar toast com mensagem avisando que salvou com sucesso antes de redirecionar
+      router.push('/in/campaigns')
     }
   }
 
   useEffect(() => {
-    if (id.current === 'new') {
+    if (notFound) {
+      router.push('/in/campaigns')
+      // TODO: Criar pagina notfoud e redirecionar para ela
       return
     }
-    fetchCampaign(String(id.current))
-  }, [id.current])
+
+    if (campaign) {
+      setName(campaign.name)
+      setDescription(campaign.description)
+      setFiles(campaign.media)
+    }
+    // TODO: Adicionar também as imagens em um componente separado
+  }, [campaign, notFound])
 
   return (
     <DashboardLayout>
@@ -231,4 +220,33 @@ export default function RegisterCampaign() {
       </div>
     </DashboardLayout>
   )
+}
+
+export async function getServerSideProps({ params }: { params: any }) {
+  const campaignId = params?.id
+  let campaign = null
+  let notFound = false
+
+  if (campaignId === 'new') {
+    return {
+      props: {
+        campaign: null,
+        notFound: false
+      }
+    }
+  }
+
+  const response = await httpServices.campaigns.getById(campaignId)
+  if (response.data) {
+    campaign = response.data
+  } else {
+    notFound = true
+  }
+
+  return {
+    props: {
+      campaign,
+      notFound
+    }
+  }
 }
