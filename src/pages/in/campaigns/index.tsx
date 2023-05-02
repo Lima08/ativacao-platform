@@ -105,7 +105,7 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      campaigns: response.data
+      campaigns: response.data || []
     }
   }
 }
