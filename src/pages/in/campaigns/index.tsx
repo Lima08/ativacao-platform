@@ -6,12 +6,25 @@ import PageContainer from 'components/PageContainer'
 import DashboardLayout from 'components/DashboardLayout'
 import useStore from 'store/useStore'
 import httpServices from 'services/http'
+import { useEffect, useState } from 'react'
+import { ICampaignCreated } from 'interfaces/entities/campaign'
 
-export default function CampaignsPage({ campaigns }: { campaigns: any[] }) {
+export default function CampaignsPage({
+  campaigns
+}: {
+  campaigns: ICampaignCreated[]
+}) {
+  const [idToDelete, setIdToDelete] = useState<string | null>(null)
+  const [campaignsList] = useState(campaigns)
+
   const router = useRouter()
-  const handleDelete = async (id: string) => {
-    useStore.getState().deleteCampaign(id)
-  }
+  const { deleteCampaign } = useStore.getState()
+
+  useEffect(() => {
+    if (idToDelete) {
+      deleteCampaign(idToDelete)
+    }
+  }, [idToDelete])
 
   const handleEdit = async (id: string) => {
     router.push(`/in/campaigns/${id}`)
@@ -89,8 +102,8 @@ export default function CampaignsPage({ campaigns }: { campaigns: any[] }) {
           </div>
         </div>
         <TableWrapper
-          data={campaigns}
-          onDelete={handleDelete}
+          data={campaignsList}
+          onDelete={setIdToDelete}
           onEdit={handleEdit}
           section="Nenhuma campanha adicionada"
         />
@@ -100,12 +113,18 @@ export default function CampaignsPage({ campaigns }: { campaigns: any[] }) {
 }
 
 export async function getServerSideProps() {
-  useStore.getState().getAllCampaigns()
   const response = await httpServices.campaigns.getAll()
-
-  return {
-    props: {
-      campaigns: response.data || []
+  if (response.data) {
+    return {
+      props: {
+        campaigns: response.data
+      }
+    }
+  } else {
+    return {
+      props: {
+        campaigns: []
+      }
     }
   }
 }

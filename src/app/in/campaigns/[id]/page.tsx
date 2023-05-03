@@ -53,7 +53,6 @@ export default function RegisterCampaign() {
 
   const submitCampaign = async (e: any) => {
     e.preventDefault()
-    console.log('start submit')
 
     const mediaIds = files
       .map((media) => media.id)
@@ -62,14 +61,12 @@ export default function RegisterCampaign() {
     try {
       setIsFetching(true)
       if (id.current === 'new') {
-        console.log('first, create: ', { id: id.current })
         await httpServices.campaigns.create({
           name,
           description,
           mediaIds: mediaIds || []
         })
       } else {
-        console.log('2nd update: ', { id: id.current })
         await httpServices.campaigns.update(String(id.current), {
           name,
           description,
@@ -84,7 +81,6 @@ export default function RegisterCampaign() {
     } catch (error) {
       console.error(error)
     } finally {
-      console.log('finally')
       setIsFetching(false)
       router.back()
     }
@@ -101,7 +97,6 @@ export default function RegisterCampaign() {
       setDescription(data.description)
       // TODO: Adicionar tbm as imagens em um componente a parte
     } catch (error) {
-      console.log('🚀 ~ file: page.tsx:97 ~ fetchCampaign ~ error:', error)
     } finally {
       setIsFetching(false)
     }
