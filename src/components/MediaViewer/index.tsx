@@ -1,11 +1,4 @@
-import {
-  Dispatch,
-  Fragment,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState
-} from 'react'
+import { Dispatch, Fragment, SetStateAction, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 
 interface ModalProps {
@@ -48,19 +41,6 @@ export default function Modal({
   }
 
   const cancelButtonRef = useRef(null)
-
-  console.log({ OpenMediasMedias: medias })
-  console.log({ mediasIndex: medias[index] })
-
-  useEffect(() => {
-    console.log({ index })
-  }, [index])
-
-  useEffect(() => {
-    // return () => {
-    //   second
-    // }
-  }, [index])
 
   return (
     <>
