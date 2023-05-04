@@ -32,7 +32,7 @@ export default function Modal({
   }
 
   function nextItem() {
-    console.log({ previousItemIdx: index })
+    console.log({ nextItemIdx: index })
     console.log({ imagem: medias[index + 1] })
 
     if (index === medias.length - 1) return setIndex(0)
