@@ -37,40 +37,60 @@ const CampaignService = (
   httpClient: AxiosInstance
 ): CampaignServiceInterface => ({
   create: async ({ name, description, mediaIds }) => {
-    const response = await httpClient.post('/api/campaigns/create', {
-      name,
-      description,
-      mediaIds
-    })
-
-    return response.data
+    try {
+      const response = await httpClient.post('/api/campaigns/create', {
+        name,
+        description,
+        mediaIds
+      })
+      return response.data
+    } catch (error) {
+      console.error('Error to create campaign:', error)
+      return error
+    }
   },
 
   getAll: async () => {
-    const response = await httpClient.get('/api/campaigns')
-
-    return response.data
+    try {
+      const response = await httpClient.get('/api/campaigns/getAll')
+      return response.data || []
+    } catch (error) {
+      console.error('Error fetching campaigns:', error)
+      return error
+    }
   },
-
   getById: async (campaignId) => {
-    const response = await httpClient.get(`/api/campaigns/${campaignId}`)
-
-    return response.data
+    try {
+      const response = await httpClient.get(`/api/campaigns/${campaignId}`)
+      return response.data
+    } catch (error) {
+      console.error('Error to get campaign:', error)
+      return error
+    }
   },
 
   update: async (campaignId, { name, description, mediaIds }) => {
-    const response = await httpClient.put(`/api/campaigns/${campaignId}`, {
-      name,
-      description,
-      mediaIds
-    })
+    try {
+      const response = await httpClient.put(`/api/campaigns/${campaignId}`, {
+        name,
+        description,
+        mediaIds
+      })
 
-    return response.data
+      return response.data
+    } catch (error) {
+      console.error('Error to update campaign:', error)
+      return error
+    }
   },
 
   delete: async (campaignId: string) => {
-    const response = await httpClient.delete(`/api/campaigns/${campaignId}`)
-    return response.data
+    try {
+      await httpClient.delete(`/api/campaigns/${campaignId}`)
+    } catch (error) {
+      console.error('Error to delete campaign:', error)
+      // TODO: Tratar erro criando handler global
+    }
   }
 })
 
