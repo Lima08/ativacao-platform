@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import Modal from 'components/MediaViewer'
 import ToggleInput from 'components/ToggleInput'
+// DEPRECATED!!!
 
 type TableWrapperProps = {
   data: any[]

@@ -6,9 +6,10 @@ import useStore from 'store/useStore'
 import httpServices from 'services/http'
 import PageContainer from 'components/PageContainer'
 import DashboardLayout from 'components/DashboardLayout'
-import TableWrapper from 'components/TableWrapper'
 import SearchPrevNext from 'components/SearchPrevNext'
 import Modal from 'components/MediaViewer'
+import ListItem from 'components/ListItem'
+import type { DataList } from 'components/ListItem'
 import type { ICampaignCreated } from 'interfaces/entities/campaign'
 
 export default function CampaignsPage({
@@ -18,7 +19,7 @@ export default function CampaignsPage({
 }) {
   const [idToDelete, setIdToDelete] = useState<string | null>(null)
   const router = useRouter()
-  const [campaignsList] = useState(campaigns)
+  const [campaignsList, setCampaignsList] = useState<DataList[]>([])
   const [open, setOpen] = useState(false)
   const [campaign, setCampaign] = useState<{
     title: string
@@ -55,17 +56,55 @@ export default function CampaignsPage({
     return mediaURLs
   }
 
+  // TODO: Corrigir a forma que define a imagem de capa
+
+  function campaignsAdapter(campaignsList: ICampaignCreated[]) {
+    const campaignsAdapted = campaignsList.map((campaign) => {
+      return {
+        id: campaign.id,
+        name: campaign.name,
+        description: campaign.description || null,
+        img: {
+          source:
+            campaign?.medias[0]?.url ||
+            'https://lojinha-da-aletha.dooca.store/admin/assets/logo-folded.1f809cab.svg',
+          alt: 'Texto alternativo'
+        },
+        active: true
+      }
+    })
+    return campaignsAdapted
+  }
+
+  useEffect(() => {
+    if (idToDelete) {
+      deleteCampaign(idToDelete)
+    }
+  }, [idToDelete])
+
+  useEffect(() => {
+    const campaignsAdapted = campaignsAdapter(campaigns)
+    setCampaignsList(campaignsAdapted)
+  }, [campaigns])
+
   return (
     <DashboardLayout>
       <PageContainer pageTitle="Campanhas" pageSection="campaigns">
         <SearchPrevNext />
-        <TableWrapper
-          data={campaignsList}
-          onDelete={setIdToDelete}
-          onEdit={handleEdit}
-          onClickRow={onClickRow}
-          section="Nenhuma campanha adicionada"
-        />
+        {!campaignsList.length && <p>Nenhuma campanha encontrada</p>}
+        <ul className="list-none mt-8">
+          {!!campaignsList.length &&
+            campaignsList.map((campaign) => (
+              <ListItem
+                data={campaign}
+                onDelete={setIdToDelete}
+                onEdit={handleEdit}
+                onClickRow={onClickRow}
+                onClickToggle={() => console.log('clicou no toggle')}
+              />
+            ))}
+        </ul>
+
         {open && (
           <Modal
             title={campaign.title}
