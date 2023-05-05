@@ -1,16 +1,25 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import TableWrapper from 'components/TableWrapper'
-import PageContainer from 'components/PageContainer'
-import DashboardLayout from 'components/DashboardLayout'
 import useStore from 'store/useStore'
 import httpServices from 'services/http'
-import { useState } from 'react'
-import Modal from 'components/MediaViewer'
+import PageContainer from 'components/PageContainer'
+import DashboardLayout from 'components/DashboardLayout'
 import SearchPrevNext from 'components/SearchPrevNext'
+import Modal from 'components/MediaViewer'
+import ListItem from 'components/ListItem'
+import type { DataList } from 'components/ListItem'
+import type { ICampaignCreated } from 'interfaces/entities/campaign'
 
-export default function CampaignsPage({ campaigns }: { campaigns: any[] }) {
+export default function CampaignsPage({
+  campaigns
+}: {
+  campaigns: ICampaignCreated[]
+}) {
+  const [idToDelete, setIdToDelete] = useState<string | null>(null)
+  const router = useRouter()
+  const [campaignsList, setCampaignsList] = useState<DataList[]>([])
   const [open, setOpen] = useState(false)
   const [campaign, setCampaign] = useState<{
     title: string
@@ -18,11 +27,7 @@ export default function CampaignsPage({ campaigns }: { campaigns: any[] }) {
     media: string[]
   }>({ title: '', description: '', media: [] })
 
-  const router = useRouter()
-
-  const handleDelete = async (id: string) => {
-    useStore.getState().deleteCampaign(id)
-  }
+  const { deleteCampaign } = useStore.getState()
 
   const handleEdit = async (id: string) => {
     router.push(`/in/campaigns/${id}`)
@@ -30,12 +35,12 @@ export default function CampaignsPage({ campaigns }: { campaigns: any[] }) {
 
   const onClickRow = async (id: string) => {
     const campaign = campaigns.find((campaign) => campaign.id === id)
-    const media = campaign.medias
-    if (media.length === 0) return alert('Nenhuma media encontrada')
+    const media = campaign?.medias
+    if (!!media?.length) return alert('Nenhuma media encontrada')
     setCampaign({
-      title: campaign.name,
-      description: campaign.description,
-      media: mediasAdapter(campaign.medias)
+      title: campaign?.name || '',
+      description: campaign?.description || '',
+      media: mediasAdapter(campaign?.medias || [])
     })
     setOpen(true)
   }
@@ -45,17 +50,55 @@ export default function CampaignsPage({ campaigns }: { campaigns: any[] }) {
     return mediaURLs
   }
 
+// TODO: Corrigir a forma que define a imagem de capa
+
+  function campaignsAdapter(campaignsList: ICampaignCreated[]) {
+    const campaignsAdapted = campaignsList.map((campaign) => {
+      return {
+        id: campaign.id,
+        name: campaign.name,
+        description: campaign.description || null,
+        img: {
+          source:
+            campaign?.medias[0]?.url ||
+            'https://lojinha-da-aletha.dooca.store/admin/assets/logo-folded.1f809cab.svg',
+          alt: 'Texto alternativo'
+        },
+        active: true
+      }
+    })
+    return campaignsAdapted
+  }
+
+  useEffect(() => {
+    if (idToDelete) {
+      deleteCampaign(idToDelete)
+    }
+  }, [idToDelete])
+
+  useEffect(() => {
+    const campaignsAdapted = campaignsAdapter(campaigns)
+    setCampaignsList(campaignsAdapted)
+  }, [campaigns])
+
   return (
     <DashboardLayout>
       <PageContainer pageTitle="Campanhas" pageSection="campaigns">
         <SearchPrevNext />
-        <TableWrapper
-          data={campaigns}
-          onDelete={handleDelete}
-          onEdit={handleEdit}
-          onClickRow={onClickRow}
-          section="Nenhuma campanha adicionada"
-        />
+        {!campaignsList.length && <p>Nenhuma campanha encontrada</p>}
+        <ul className="list-none mt-8">
+          {!!campaignsList.length &&
+            campaignsList.map((campaign) => (
+              <ListItem
+                data={campaign}
+                onDelete={setIdToDelete}
+                onEdit={handleEdit}
+                onClickRow={onClickRow}
+                onClickToggle={() => console.log('clicou no toggle')}
+              />
+            ))}
+        </ul>
+
         {open && (
           <Modal
             title={campaign.title}
@@ -72,12 +115,18 @@ export default function CampaignsPage({ campaigns }: { campaigns: any[] }) {
 }
 
 export async function getServerSideProps() {
-  useStore.getState().getAllCampaigns()
   const response = await httpServices.campaigns.getAll()
-
-  return {
-    props: {
-      campaigns: response.data || []
+  if (response.data) {
+    return {
+      props: {
+        campaigns: response.data
+      }
+    }
+  } else {
+    return {
+      props: {
+        campaigns: []
+      }
     }
   }
 }
