@@ -29,6 +29,12 @@ export default function CampaignsPage({
 
   const { deleteCampaign } = useStore.getState()
 
+  useEffect(() => {
+    if (idToDelete) {
+      deleteCampaign(idToDelete)
+    }
+  }, [idToDelete])
+
   const handleEdit = async (id: string) => {
     router.push(`/in/campaigns/${id}`)
   }
@@ -50,7 +56,7 @@ export default function CampaignsPage({
     return mediaURLs
   }
 
-// TODO: Corrigir a forma que define a imagem de capa
+  // TODO: Corrigir a forma que define a imagem de capa
 
   function campaignsAdapter(campaignsList: ICampaignCreated[]) {
     const campaignsAdapted = campaignsList.map((campaign) => {
