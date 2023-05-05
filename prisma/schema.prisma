@@ -89,6 +89,7 @@ model Training {
 model Campaign {
   id          String  @id @default(uuid())
   name        String
+  active      Boolean @default(true)
   description String?
   userId      String
   companyId   String

@@ -56,7 +56,7 @@ export default function ListItem({
       <div className="px-4 py-4 flex gap-6 justify-evenly">
         <ToggleInput
           defaultActive={data.active}
-          onToggle={() => {
+          onClickToggle={() => {
             onClickToggle(data.id)
           }}
         />

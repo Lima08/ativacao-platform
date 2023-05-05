@@ -3,20 +3,20 @@ import { useState, useCallback } from 'react'
 
 type ToggleInputProps = {
   defaultActive: boolean
-  onToggle: () => void
+  onClickToggle: () => void
 }
 
 export default function ToggleInput({
   defaultActive,
-  onToggle
+  onClickToggle
 }: ToggleInputProps) {
   const [isActive, setIsActive] = useState(defaultActive)
 
   const handleToggle = useCallback(() => {
     const newActiveState = !isActive
     setIsActive(newActiveState)
-    onToggle()
-  }, [isActive, onToggle])
+    onClickToggle()
+  }, [isActive])
 
   return (
     <div className="flex items-center">

@@ -59,18 +59,22 @@ export default function CampaignsPage({
   // TODO: Corrigir a forma que define a imagem de capa
 
   function campaignsAdapter(campaignsList: ICampaignCreated[]) {
+    console.log(
+      '🚀 ~ file: index.tsx:62 ~ campaignsAdapter ~ campaignsList:',
+      campaignsList
+    )
     const campaignsAdapted = campaignsList.map((campaign) => {
       return {
         id: campaign.id,
         name: campaign.name,
         description: campaign.description || null,
+        active: campaign.active,
         img: {
           source:
             campaign?.medias[0]?.url ||
             'https://lojinha-da-aletha.dooca.store/admin/assets/logo-folded.1f809cab.svg',
           alt: 'Texto alternativo'
-        },
-        active: true
+        }
       }
     })
     return campaignsAdapted
@@ -96,6 +100,7 @@ export default function CampaignsPage({
           {!!campaignsList.length &&
             campaignsList.map((campaign) => (
               <ListItem
+                key={campaign.id}
                 data={campaign}
                 onDelete={setIdToDelete}
                 onEdit={handleEdit}
