@@ -40,7 +40,7 @@ export default function TableWrapper({
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
             <div className="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-              <table className=" divide-y divide-gray-200 dark:divide-gray-700 rounded-2xl">
+              <table className="divide-y divide-gray-200 dark:divide-gray-700 rounded-2xl">
                 <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
                   {inMemoryData && !inMemoryData.length && (
                     <tr className="hover:bg-slate-100 bg-white rounded-full">

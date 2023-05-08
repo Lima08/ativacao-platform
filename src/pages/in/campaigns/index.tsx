@@ -30,13 +30,16 @@ export default function CampaignsPage({ campaigns }: { campaigns: any[] }) {
 
   const onClickRow = async (id: string) => {
     const campaign = campaigns.find((campaign) => campaign.id === id)
+
     const media = campaign.medias
+
     if (media.length === 0) return alert('Nenhuma media encontrada')
     setCampaign({
       title: campaign.name,
       description: campaign.description,
       media: mediasAdapter(campaign.medias)
     })
+
     setOpen(true)
   }
 
