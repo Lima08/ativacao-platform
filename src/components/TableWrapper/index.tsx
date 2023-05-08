@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import ToggleInput from 'components/ToggleInput'
+// DEPRECATED!!!
 
 type TableWrapperProps = {
   data: any[]

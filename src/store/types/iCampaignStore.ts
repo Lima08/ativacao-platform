@@ -1,5 +1,3 @@
-import { deleteCampaign } from 'useCases/campaigns'
-
 export interface ICampaign {
   id: string
   name: string

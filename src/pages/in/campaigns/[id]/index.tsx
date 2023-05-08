@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/router'
 import httpServices from 'services/http'
 import FormCustom from 'components/FormCustom'
 import { PhotoIcon } from '@heroicons/react/24/solid'
@@ -29,6 +29,7 @@ export default function RegisterCampaign({
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const router = useRouter()
+  const campaignId = router.query.id
 
   const uploadImage = async (e: any) => {
     // TODO: Adicionar essa logica no componente de update
@@ -61,7 +62,6 @@ export default function RegisterCampaign({
 
   const submitCampaign = async (e: any) => {
     e.preventDefault()
-    console.log('start submit')
 
     const mediaIds = files && files.length ? files.map((media) => media.id) : []
     const mediasIdsFiltered = mediaIds.filter((id) => id) as string[]
@@ -90,19 +90,32 @@ export default function RegisterCampaign({
   }
 
   useEffect(() => {
-    if (notFound) {
-      router.push('/in/campaigns')
-      // TODO: Criar pagina notfoud e redirecionar para ela
-      return
+    const fetchCampaign = async () => {
+      if (!campaignId || campaignId === 'new') return
+
+      try {
+        console.log('🚀🚀 ~ file: index.tsx:97~ fetchCampaign ')
+        const response = await httpServices.campaigns.getById(
+          String(campaignId)
+        )
+
+        if (response.data) {
+          const { name, description } = response.data
+          if (!name || !description) return
+          setName(name)
+          setDescription(description)
+          // setFiles(campaign.media)
+        } else {
+          router.push('/in/campaigns')
+          // TODO: Criar página notFound e redirecionar para ela
+        }
+      } catch (error) {
+        console.error(error)
+      }
     }
 
-    if (campaign) {
-      setName(campaign.name)
-      setDescription(campaign.description)
-      setFiles(campaign.media)
-    }
-    // TODO: Adicionar também as imagens em um componente separado
-  }, [campaign, notFound])
+    fetchCampaign()
+  }, [campaignId])
 
   return (
     <DashboardLayout>
@@ -220,33 +233,4 @@ export default function RegisterCampaign({
       </div>
     </DashboardLayout>
   )
-}
-
-export async function getServerSideProps({ params }: { params: any }) {
-  const campaignId = params?.id
-  let campaign = null
-  let notFound = false
-
-  if (campaignId === 'new') {
-    return {
-      props: {
-        campaign: null,
-        notFound: false
-      }
-    }
-  }
-
-  const response = await httpServices.campaigns.getById(campaignId)
-  if (response.data) {
-    campaign = response.data
-  } else {
-    notFound = true
-  }
-
-  return {
-    props: {
-      campaign,
-      notFound
-    }
-  }
 }
