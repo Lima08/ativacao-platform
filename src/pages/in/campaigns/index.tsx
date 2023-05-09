@@ -42,7 +42,8 @@ export default function CampaignsPage({
   const onClickRow = async (id: string) => {
     const campaign = campaigns.find((campaign) => campaign.id === id)
     const media = campaign?.medias
-    if (!!media?.length) return alert('Nenhuma media encontrada')
+
+    if (!media?.length) return alert('Nenhuma media encontrada')
     setCampaign({
       title: campaign?.name || '',
       description: campaign?.description || '',
@@ -60,10 +61,6 @@ export default function CampaignsPage({
   // TODO: Corrigir a forma que define a imagem de capa
 
   function campaignsAdapter(campaignsList: ICampaignCreated[]) {
-    console.log(
-      '🚀 ~ file: index.tsx:62 ~ campaignsAdapter ~ campaignsList:',
-      campaignsList
-    )
     const campaignsAdapted = campaignsList.map((campaign) => {
       return {
         id: campaign.id,
@@ -80,12 +77,23 @@ export default function CampaignsPage({
     })
     return campaignsAdapted
   }
+  function deleteItem(id: string) {
+    const userDecision = confirm('Confirmar deleção?')
 
-  useEffect(() => {
-    if (idToDelete) {
-      deleteCampaign(idToDelete)
+    if (userDecision) {
+      const nextCampaignList = campaignsList.find(
+        (campaign) => campaign.id === id
+      )
+      setCampaignsList(nextCampaignList)
+      setIdToDelete(id)
     }
-  }, [idToDelete])
+  }
+
+  // useEffect(() => {
+  //   if (idToDelete) {
+  //     deleteCampaign(idToDelete)
+  //   }
+  // }, [idToDelete])
 
   useEffect(() => {
     const campaignsAdapted = campaignsAdapter(campaigns)
@@ -103,7 +111,7 @@ export default function CampaignsPage({
               <ListItem
                 key={campaign.id}
                 data={campaign}
-                onDelete={setIdToDelete}
+                onDelete={() => deleteItem(campaign.id)}
                 onEdit={handleEdit}
                 onClickRow={onClickRow}
                 onClickToggle={() => console.log('clicou no toggle')}

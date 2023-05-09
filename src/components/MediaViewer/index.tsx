@@ -23,6 +23,8 @@ export default function Modal({
 }: ModalProps) {
   const [index, setIndex] = useState(0)
 
+  console.log({ ModalMedias: medias })
+
   function previousItem() {
     if (index === 0) return setIndex(medias.length - 1)
 
