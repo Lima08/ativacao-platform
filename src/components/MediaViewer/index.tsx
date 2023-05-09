@@ -2,12 +2,17 @@ import { Dispatch, Fragment, SetStateAction, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import Image from 'next/image'
 
+interface mediaObject {
+  url: string
+  type: string
+}
+
 interface ModalProps {
   title?: string
   children?: React.ReactNode
   description: string
-  imageSource: string
-  medias: string[]
+  imageSource: string | mediaObject
+  medias: mediaObject[]
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
 }
@@ -22,8 +27,6 @@ export default function Modal({
   setOpen
 }: ModalProps) {
   const [index, setIndex] = useState(0)
-
-  console.log({ ModalMedias: medias })
 
   function previousItem() {
     if (index === 0) return setIndex(medias.length - 1)
@@ -105,16 +108,29 @@ export default function Modal({
                       </svg>
                     </div>
                     <div className="w-3/4 flex items-center justify-center flex-col">
-                      <a href={medias[index]} target="_blank">
-                        <Image
-                          src={medias[index]}
-                          alt=""
-                          width={300}
-                          height={100}
-                        />
+                      <a href={medias[index].url} target="_blank">
+                        {medias[index].type === 'image' ? (
+                          <Image
+                            src={medias[index].url}
+                            alt=""
+                            width={300}
+                            height={100}
+                            style={{ width: '100%', height: '400px' }}
+                          />
+                        ) : (
+                          <video
+                            controls
+                            width="640"
+                            height="360"
+                            src={medias[index].url}
+                            type="video/mp4"
+                            style={{ height: '400px' }}
+                          >
+                            Video title
+                          </video>
+                        )}
                       </a>
                     </div>
-                    {/* <img src={medias[index]} alt="" width="250px" /> */}
                     <div className="">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -134,7 +150,7 @@ export default function Modal({
                   </div>
                   <div className="font-bold my-2">
                     <p className="text-sm font-bold">
-                      Clique na mídia para zoom
+                      Clique na mídia para melhor visualização
                     </p>
                     <p>
                       {index + 1} / {medias.length}

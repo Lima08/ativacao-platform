@@ -12,28 +12,26 @@ import ListItem from 'components/ListItem'
 import type { DataList } from 'components/ListItem'
 import type { ICampaignCreated } from 'interfaces/entities/campaign'
 
+interface mediaObject {
+  url: string
+  type: string
+}
+
 export default function CampaignsPage({
   campaigns
 }: {
   campaigns: ICampaignCreated[]
 }) {
-  const [idToDelete, setIdToDelete] = useState<string | null>(null)
   const router = useRouter()
   const [campaignsList, setCampaignsList] = useState<DataList[]>([])
   const [open, setOpen] = useState(false)
   const [campaign, setCampaign] = useState<{
     title: string
     description: string
-    media: string[]
+    media: mediaObject[]
   }>({ title: '', description: '', media: [] })
 
   const { deleteCampaign } = useStore.getState()
-
-  useEffect(() => {
-    if (idToDelete) {
-      deleteCampaign(idToDelete)
-    }
-  }, [idToDelete])
 
   const handleEdit = async (id: string) => {
     router.push(`/in/campaigns/${id}`)
@@ -54,7 +52,10 @@ export default function CampaignsPage({
   }
 
   function mediasAdapter(mediasList: any[]) {
-    const mediaURLs = mediasList.map((media) => media.url)
+    const mediaURLs = mediasList.map(({ url, type }) => ({
+      url,
+      type
+    }))
     return mediaURLs
   }
 
@@ -85,7 +86,7 @@ export default function CampaignsPage({
         (campaign) => campaign.id === id
       )
       setCampaignsList(nextCampaignList)
-      setIdToDelete(id)
+      // setIdToDelete(id)
     }
   }
 
@@ -123,7 +124,11 @@ export default function CampaignsPage({
           <Modal
             title={campaign.title}
             description={campaign.description}
-            imageSource={campaign.media[0]}
+            imageSource={
+              campaign.media[0].type === 'image'
+                ? campaign.media[0]
+                : 'default img src'
+            }
             medias={campaign.media}
             open={open}
             setOpen={setOpen}
