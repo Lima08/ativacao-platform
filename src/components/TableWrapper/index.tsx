@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import Modal from 'components/MediaViewer'
 import ToggleInput from 'components/ToggleInput'
 // DEPRECATED!!!
 
@@ -13,13 +12,6 @@ type TableWrapperProps = {
   section: string
 }
 
-// const mediasMock = [
-//   'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/93e55b7409de1702cee02ccf1e2615a89c5e9cb74d84307d6d5bb2c5449ceca7.tenis1.webp',
-//   'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/47d4674a8238be821ed71baad2eb55a30cd6c020bb9af82c2a2183c295c0e0fd.tenis_2.jpg',
-//   'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/4b493e9211f72f0ab82f48d743b459a397b385e8e715f45670741465df173215.tenis3.webp',
-//   'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/e591777d57dd75d92b29fcaffc771ea74d7a604c27e45dbc661be8c42e4eb56b.tenis4.webp'
-// ]
-
 export default function TableWrapper({
   data,
   onDelete,
@@ -28,13 +20,7 @@ export default function TableWrapper({
   toggleActivation,
   section
 }: TableWrapperProps) {
-  console.log('🚀 ~ file: index.tsx:30 ~ data:', data)
   const [inMemoryData, setInMemoryData] = useState(data)
-  // const [open, setOpen] = useState(true)
-  const [itemView, setItemView] = useState<{
-    name: string
-    description: string
-  }>()
 
   function remove(id: string) {
     const userDecision = confirm('Confirmar deleção?')
@@ -47,13 +33,6 @@ export default function TableWrapper({
     setInMemoryData(nextState)
   }
 
-  // function openMediaViewer(value: any) {
-  //   const element = data.find((element: any) => element.id === value.id)
-  //   if (element) setItemView(element)
-
-  //   setOpen(true)
-  // }
-
   console.log({ data })
 
   return (
@@ -62,7 +41,7 @@ export default function TableWrapper({
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
             <div className="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-              <table className=" divide-y divide-gray-200 dark:divide-gray-700 rounded-2xl">
+              <table className="divide-y divide-gray-200 dark:divide-gray-700 rounded-2xl">
                 <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
                   {inMemoryData && !inMemoryData.length && (
                     <tr className="hover:bg-slate-100 bg-white rounded-full">

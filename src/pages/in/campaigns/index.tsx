@@ -12,28 +12,26 @@ import ListItem from 'components/ListItem'
 import type { DataList } from 'components/ListItem'
 import type { ICampaignCreated } from 'interfaces/entities/campaign'
 
+interface mediaObject {
+  url: string
+  type: string
+}
+
 export default function CampaignsPage({
   campaigns
 }: {
   campaigns: ICampaignCreated[]
 }) {
-  const [idToDelete, setIdToDelete] = useState<string | null>(null)
   const router = useRouter()
   const [campaignsList, setCampaignsList] = useState<DataList[]>([])
   const [open, setOpen] = useState(false)
   const [campaign, setCampaign] = useState<{
     title: string
     description: string
-    media: string[]
+    media: mediaObject[]
   }>({ title: '', description: '', media: [] })
 
   const { deleteCampaign } = useStore.getState()
-
-  useEffect(() => {
-    if (idToDelete) {
-      deleteCampaign(idToDelete)
-    }
-  }, [idToDelete])
 
   const handleEdit = async (id: string) => {
     router.push(`/in/campaigns/${id}`)
@@ -42,27 +40,28 @@ export default function CampaignsPage({
   const onClickRow = async (id: string) => {
     const campaign = campaigns.find((campaign) => campaign.id === id)
     const media = campaign?.medias
-    if (!!media?.length) return alert('Nenhuma media encontrada')
+
+    if (!media?.length) return alert('Nenhuma media encontrada')
     setCampaign({
       title: campaign?.name || '',
       description: campaign?.description || '',
       media: mediasAdapter(campaign?.medias || [])
     })
+
     setOpen(true)
   }
 
   function mediasAdapter(mediasList: any[]) {
-    const mediaURLs = mediasList.map((media) => media.url)
+    const mediaURLs = mediasList.map(({ url, type }) => ({
+      url,
+      type
+    }))
     return mediaURLs
   }
 
   // TODO: Corrigir a forma que define a imagem de capa
 
   function campaignsAdapter(campaignsList: ICampaignCreated[]) {
-    console.log(
-      '🚀 ~ file: index.tsx:62 ~ campaignsAdapter ~ campaignsList:',
-      campaignsList
-    )
     const campaignsAdapted = campaignsList.map((campaign) => {
       return {
         id: campaign.id,
@@ -79,12 +78,23 @@ export default function CampaignsPage({
     })
     return campaignsAdapted
   }
+  function deleteItem(id: string) {
+    const userDecision = confirm('Confirmar deleção?')
 
-  useEffect(() => {
-    if (idToDelete) {
-      deleteCampaign(idToDelete)
+    if (userDecision) {
+      const nextCampaignList = campaignsList.find(
+        (campaign) => campaign.id === id
+      )
+      setCampaignsList(nextCampaignList)
+      // setIdToDelete(id)
     }
-  }, [idToDelete])
+  }
+
+  // useEffect(() => {
+  //   if (idToDelete) {
+  //     deleteCampaign(idToDelete)
+  //   }
+  // }, [idToDelete])
 
   useEffect(() => {
     const campaignsAdapted = campaignsAdapter(campaigns)
@@ -102,7 +112,7 @@ export default function CampaignsPage({
               <ListItem
                 key={campaign.id}
                 data={campaign}
-                onDelete={setIdToDelete}
+                onDelete={() => deleteItem(campaign.id)}
                 onEdit={handleEdit}
                 onClickRow={onClickRow}
                 onClickToggle={() => console.log('clicou no toggle')}
@@ -114,7 +124,11 @@ export default function CampaignsPage({
           <Modal
             title={campaign.title}
             description={campaign.description}
-            imageSource={campaign.media[0]}
+            imageSource={
+              campaign.media[0].type === 'image'
+                ? campaign.media[0]
+                : 'default img src'
+            }
             medias={campaign.media}
             open={open}
             setOpen={setOpen}
