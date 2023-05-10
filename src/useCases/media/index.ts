@@ -23,7 +23,7 @@ async function createMedia({
   if (!type) throw new CustomError('Type is required', 400)
 
   try {
-    const { mediasFile } = await repository.create({
+    const mediasFile = await repository.create({
       campaignId,
       trainingId,
       url,

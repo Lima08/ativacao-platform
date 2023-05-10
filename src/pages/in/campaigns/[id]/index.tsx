@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
 import httpServices from 'services/http'
 import FormCustom from 'components/FormCustom'
@@ -17,21 +17,16 @@ type MediaResponse = {
   trainingId?: string
 }
 
-export default function RegisterCampaign({
-  campaign,
-  notFound
-}: {
-  campaign: any
-  notFound: boolean
-}) {
-  const [isFetching, setIsFetching] = useState(false)
-  const [files, setFiles] = useState<MediaResponse[]>([])
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
+export default function RegisterCampaign({ campaign }: { campaign: any }) {
   const router = useRouter()
   const campaignId = router.query.id
 
-  const uploadImage = async (e: any) => {
+  const [isFetching, setIsFetching] = useState(false)
+  const [campaignName, setCampaignName] = useState('')
+  const [campaignDescription, setCampaignDescription] = useState('')
+  const filesRef = useRef<MediaResponse[]>([])
+
+  const uploadFile = async (e: any) => {
     // TODO: Adicionar essa logica no componente de update
     e.preventDefault()
 
@@ -42,18 +37,14 @@ export default function RegisterCampaign({
     try {
       setIsFetching(true)
       const { data, error } = await httpServices.upload.save(formData)
-      if (!!error) {
-        throw new Error(error.message)
+      if (!!error || !data) {
+        // TODO: Colocar toaster avisando que deu erro
+        throw new Error(error?.message || 'Erro ao salvar imagem')
       }
 
-      setFiles((prev) => {
-        const newFile = data
-        if (!newFile) {
-          return prev
-        }
-        return [...prev, newFile]
-      })
+      filesRef.current.push(data)
     } catch (error) {
+      alert('Erro ao salvar imagem')
       console.error(error)
     } finally {
       setIsFetching(false)
@@ -63,25 +54,30 @@ export default function RegisterCampaign({
   const submitCampaign = async (e: any) => {
     e.preventDefault()
 
-    const mediaIds = files && files.length ? files.map((media) => media.id) : []
+    const mediaIds =
+      filesRef.current && filesRef.current.length
+        ? filesRef.current.map((media) => media.id)
+        : []
     const mediasIdsFiltered = mediaIds.filter((id) => id) as string[]
 
     try {
       if (!!campaign) {
+        // TODO: Passar pare service
         await useStore.getState().updateCampaign(String(campaign.id), {
-          name,
-          description,
+          name: campaignName,
+          description: campaignDescription,
           mediaIds: mediasIdsFiltered
         })
       } else {
         await useStore.getState().createCampaign({
-          name,
-          description,
+          name: campaignName,
+          description: campaignDescription,
           mediaIds: mediasIdsFiltered
         })
       }
     } catch (error) {
       console.error(error)
+      alert('Erro ao salvar campanha')
       // TODO: Colocar toast avisando que falhou ao salvar, apaga os dados e deixa o usuário tentar novamente
     } finally {
       // TODO: Colocar toast com mensagem avisando que salvou com sucesso antes de redirecionar
@@ -89,31 +85,33 @@ export default function RegisterCampaign({
     }
   }
 
-  useEffect(() => {
-    const fetchCampaign = async () => {
-      if (!campaignId || campaignId === 'new') return
+  const fetchCampaign = async () => {
+    if (!campaignId || campaignId === 'new') return
 
-      try {
-        console.log('🚀🚀 ~ file: index.tsx:97~ fetchCampaign ')
-        const response = await httpServices.campaigns.getById(
-          String(campaignId)
-        )
-
-        if (response.data) {
-          const { name, description } = response.data
-          if (!name || !description) return
-          setName(name)
-          setDescription(description)
-          // setFiles(campaign.media)
-        } else {
-          router.push('/in/campaigns')
-          // TODO: Criar página notFound e redirecionar para ela
-        }
-      } catch (error) {
-        console.error(error)
+    try {
+      const response = await httpServices.campaigns.getById(String(campaignId))
+      if (response.error) {
+        console.error(response.error)
+        alert('Erro ao buscar campanha')
+        return
+        // TODO: Toast error
       }
-    }
 
+      const { name, description } = response.data!
+      if (!name || !description) return
+      setCampaignName(name)
+      setCampaignDescription(description)
+      // setFiles(campaign.media)
+      // TODO: Toast de sucesso
+      router.push('/in/campaigns')
+    } catch (error) {
+      // TODO: Criar página notFound e redirecionar para ela??
+      console.error(error)
+      alert('Erro inesperado!')
+    }
+  }
+
+  useEffect(() => {
     fetchCampaign()
   }, [campaignId])
 
@@ -139,10 +137,9 @@ export default function RegisterCampaign({
                     <input
                       id="name"
                       name="name"
-                      type="name"
-                      autoComplete="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      type="text"
+                      value={campaignName}
+                      onChange={(e) => setCampaignName(e.target.value)}
                       className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset outline-none focus:ring-blue-600 sm:text-sm sm:leading-6"
                     />
                   </div>
@@ -159,9 +156,8 @@ export default function RegisterCampaign({
                     <textarea
                       id="description"
                       name="description"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      autoComplete="description"
+                      value={campaignDescription}
+                      onChange={(e) => setCampaignDescription(e.target.value)}
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                     />
                   </div>
@@ -193,7 +189,7 @@ export default function RegisterCampaign({
                             className="sr-only"
                             multiple={true}
                             disabled={isFetching}
-                            onChange={(e) => uploadImage(e)}
+                            onChange={(e) => uploadFile(e)}
                           />
                         </label>
                         {/* <p className="pl-1">ou arrastar</p> */}
