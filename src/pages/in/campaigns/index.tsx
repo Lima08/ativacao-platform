@@ -86,7 +86,6 @@ export default function CampaignsPage({
         (campaign) => campaign.id === id
       )
       setCampaignsList(nextCampaignList)
-      // setIdToDelete(id)
     }
   }
 
