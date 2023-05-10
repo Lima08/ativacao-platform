@@ -34,4 +34,4 @@ const upload = multer({
     }
   })
 })
-export const uploadS3Multer = upload.single('file')
+export const uploadS3Multer = upload.array('files', 10)
