@@ -9,16 +9,22 @@ export const config = {
 }
 
 export default handler.use(uploadS3Multer).post(async (req, res) => {
+  const filesList = []
+
   if (!req.files.length) {
     return res.status(400).json({ error: 'No files uploaded.' })
   }
 
-  const filesList = []
-
   for (const file of req.files) {
     const key = file.key
     const url = file.location
-    const createdFile = await createMedia({ type: req.type, url, key })
+    let type = file.contentType.split('/')[0]
+
+    if (type === 'application') {
+      type = 'document'
+    }
+
+    const createdFile = await createMedia({ type, url, key })
     filesList.push(createdFile)
   }
 

@@ -27,24 +27,33 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
   const filesRef = useRef<MediaResponse[]>([])
 
   const uploadFile = async (e: any) => {
-    // TODO: Adicionar essa logica no componente de update
+    // TODO: Adicionar essa logica no componente de uploader
     e.preventDefault()
+    const files = e.target.files
+
+    if (files.length > 10) {
+      alert('Limite de 10 arquivos por vez excedido!')
+      return
+    }
 
     const formData = new FormData()
-    const file = e.target.files[0]
-    formData.append('file', file)
+    for (const file of files) {
+      formData.append('files', file)
+    }
 
     try {
       setIsFetching(true)
       const { data, error } = await httpServices.upload.save(formData)
       if (!!error || !data) {
         // TODO: Colocar toaster avisando que deu erro
-        throw new Error(error?.message || 'Erro ao salvar imagem')
+        throw new Error(error?.message || 'Erro ao salvar imagem50')
       }
 
-      filesRef.current.push(data)
+      for (const image of data) {
+        filesRef.current.push(image)
+      }
     } catch (error) {
-      alert('Erro ao salvar imagem')
+      alert('Erro ao salvar imagem60')
       console.error(error)
     } finally {
       setIsFetching(false)
