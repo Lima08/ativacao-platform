@@ -10,7 +10,7 @@ export const config = {
 
 // TODO: Colocar middleware de validação
 export default handler.use(uploadS3Multer).post(async (req, res) => {
-  const documentUrl = req.file.location
+  const documentUrl = req.files[0].location
   const userId = req.userId!
   const { title } = req.body
 

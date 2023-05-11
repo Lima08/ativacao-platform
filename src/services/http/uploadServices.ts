@@ -17,7 +17,7 @@ type Error = {
 }
 
 type Create = {
-  data?: Media
+  data?: Media[]
   error?: Error | null
 }
 
