@@ -27,7 +27,7 @@ export default function ListItem({
     <li
       key={data.id}
       className="flex  md:gap10 hover:bg-slate-100 bg-white hover:cursor-pointer w-full border rounded max-h-18"
-      // onClick={() => onClickRow(data.id)}
+      onClick={() => onClickRow(data.id)}
     >
       <div className="flex justify-evenly">
         <div className="px-4 py-4 text-sm whitespace-nowrap">

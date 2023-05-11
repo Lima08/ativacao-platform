@@ -22,16 +22,17 @@ export default function CampaignsPage({
 }: {
   campaigns: ICampaignCreated[]
 }) {
+  const { deleteCampaign } = useStore.getState()
   const router = useRouter()
-  const [campaignsList, setCampaignsList] = useState<DataList[]>([])
+  const [campaignsList, setCampaignsList] = useState<DataList[]>(
+    campaignsAdapter(campaigns)
+  )
   const [open, setOpen] = useState(false)
   const [campaign, setCampaign] = useState<{
     title: string
     description: string
     media: mediaObject[]
   }>({ title: '', description: '', media: [] })
-
-  const { deleteCampaign } = useStore.getState()
 
   const handleEdit = async (id: string) => {
     router.push(`/in/campaigns/${id}`)
@@ -82,18 +83,13 @@ export default function CampaignsPage({
     const userDecision = confirm('Confirmar deleção?')
 
     if (userDecision) {
-      const nextCampaignList = campaignsList.find(
-        (campaign) => campaign.id === id
+      const nextCampaignList = campaignsList.filter(
+        (campaign) => campaign.id !== id
       )
       setCampaignsList(nextCampaignList)
+      deleteCampaign(id)
     }
   }
-
-  // useEffect(() => {
-  //   if (idToDelete) {
-  //     deleteCampaign(idToDelete)
-  //   }
-  // }, [idToDelete])
 
   useEffect(() => {
     const campaignsAdapted = campaignsAdapter(campaigns)
@@ -140,6 +136,7 @@ export default function CampaignsPage({
 
 export async function getServerSideProps() {
   const response = await httpServices.campaigns.getAll()
+
   if (response.data) {
     return {
       props: {
