@@ -30,3 +30,12 @@ body {
   @apply bg-gray-200;
   @apply text-slate-800;
 }
+
+
+/* CHECKBOX TOGGLE SWITCH */
+.toggle-checkbox:checked {
+  border-color: #68D391 !important;
+}
+/* .toggle-checkbox:checked + .toggle-label {
+  background-color: #68D391 !important;
+} */

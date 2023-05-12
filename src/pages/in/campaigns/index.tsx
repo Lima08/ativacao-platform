@@ -83,6 +83,7 @@ export default function CampaignsList() {
     })
     return campaignsAdapted
   }
+
   function deleteItem(id: string) {
     const userDecision = confirm('Confirmar deleção?')
 
@@ -125,7 +126,7 @@ export default function CampaignsList() {
                 onDelete={() => deleteItem(campaign.id)}
                 onEdit={handleEdit}
                 onClickRow={onClickRow}
-                onClickToggle={() => console.log('clicou no toggle')}
+                // onClickToggle={updateCampaignStatus}
               />
             ))}
         </ul>
