@@ -13,6 +13,7 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
   loading: false,
   error: null,
   setLoading: (isLoading) => set(() => ({ loading: isLoading })),
+  resetCurrentCampaign: () => set(() => ({ currentCampaign: null })),
   getCampaignById: async (id) => {
     set({ loading: true })
 

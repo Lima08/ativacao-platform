@@ -24,6 +24,7 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
     getCampaignById,
     createCampaign,
     updateCampaign,
+    resetCurrentCampaign,
     error,
     loading
   ] = useStore((state) => [
@@ -31,6 +32,7 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
     state.getCampaignById,
     state.createCampaign,
     state.updateCampaign,
+    state.resetCurrentCampaign,
     state.error,
     state.loading
   ])
@@ -126,6 +128,9 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
   }, [error])
 
   useEffect(() => {
+    resetCurrentCampaign()
+    setCampaignName('')
+    setCampaignDescription('')
     fetchCampaign()
   }, [campaignId])
 

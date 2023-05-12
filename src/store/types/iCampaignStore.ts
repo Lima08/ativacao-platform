@@ -21,6 +21,7 @@ export interface ICampaignStore {
   loading: boolean
   error: any
   setLoading: (isLoading: boolean) => void
+  resetCurrentCampaign: () => void
   createCampaign: (newCampaign: CreatePayloadStore) => void
   getCampaignById: (id: string) => void
   getAllCampaigns: () => void
