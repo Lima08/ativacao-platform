@@ -22,16 +22,17 @@ export default function CampaignsPage({
 }: {
   campaigns: ICampaignCreated[]
 }) {
+  const { deleteCampaign, updateCampaign } = useStore.getState()
   const router = useRouter()
-  const [campaignsList, setCampaignsList] = useState<DataList[]>([])
+  const [campaignsList, setCampaignsList] = useState<DataList[]>(
+    campaignsAdapter(campaigns)
+  )
   const [open, setOpen] = useState(false)
   const [campaign, setCampaign] = useState<{
     title: string
     description: string
     media: mediaObject[]
   }>({ title: '', description: '', media: [] })
-
-  const { deleteCampaign } = useStore.getState()
 
   const handleEdit = async (id: string) => {
     router.push(`/in/campaigns/${id}`)
@@ -78,23 +79,20 @@ export default function CampaignsPage({
     })
     return campaignsAdapted
   }
+
   function deleteItem(id: string) {
     const userDecision = confirm('Confirmar deleção?')
 
     if (userDecision) {
-      const nextCampaignList = campaignsList.find(
-        (campaign) => campaign.id === id
+      const nextCampaignList = campaignsList.filter(
+        (campaign) => campaign.id !== id
       )
       setCampaignsList(nextCampaignList)
-      // setIdToDelete(id)
+      deleteCampaign(id)
     }
   }
 
-  // useEffect(() => {
-  //   if (idToDelete) {
-  //     deleteCampaign(idToDelete)
-  //   }
-  // }, [idToDelete])
+  // async function updateCampaignStatus(id: string) {}
 
   useEffect(() => {
     const campaignsAdapted = campaignsAdapter(campaigns)
@@ -115,7 +113,7 @@ export default function CampaignsPage({
                 onDelete={() => deleteItem(campaign.id)}
                 onEdit={handleEdit}
                 onClickRow={onClickRow}
-                onClickToggle={() => console.log('clicou no toggle')}
+                // onClickToggle={updateCampaignStatus}
               />
             ))}
         </ul>
@@ -141,6 +139,7 @@ export default function CampaignsPage({
 
 export async function getServerSideProps() {
   const response = await httpServices.campaigns.getAll()
+
   if (response.data) {
     return {
       props: {

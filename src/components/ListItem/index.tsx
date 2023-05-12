@@ -13,13 +13,13 @@ type ListItemProps = {
   onDelete: (id: string) => void
   onEdit: (id: string) => void
   onClickRow: (id: string) => void
-  onClickToggle: (id: string) => void
+  // onClickToggle: (id: string) => void
 }
 
 export default function ListItem({
   data,
   onClickRow,
-  onClickToggle,
+  // onClickToggle,
   onEdit,
   onDelete
 }: ListItemProps) {
@@ -55,10 +55,11 @@ export default function ListItem({
 
       <div className="px-4 py-4 flex gap-6 justify-evenly">
         <ToggleInput
+          toggleId={data.id}
           defaultActive={data.active}
-          onClickToggle={() => {
-            onClickToggle(data.id)
-          }}
+          // onClickToggle={() => {
+          //   onClickToggle(data.id)
+          // }}
         />
         <button
           onClick={(event) => {
