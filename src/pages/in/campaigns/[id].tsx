@@ -21,12 +21,29 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
   const router = useRouter()
   const campaignId = router.query.id
 
+  const [
+    currentCampaign,
+    getCampaignById,
+    createCampaign,
+    updateCampaign,
+    error,
+    loading
+  ] = useStore((state) => [
+    state.currentCampaign,
+    state.getCampaignById,
+    state.createCampaign,
+    state.updateCampaign,
+    state.error,
+    state.loading
+  ])
+
   const [isFetching, setIsFetching] = useState(false)
   const [campaignName, setCampaignName] = useState('')
   const [campaignDescription, setCampaignDescription] = useState('')
   const filesRef = useRef<MediaResponse[]>([])
 
   const uploadFile = async (e: any) => {
+    // TODO: passar para zustand
     // TODO: Adicionar essa logica no componente de uploader
     e.preventDefault()
     const files = e.target.files
@@ -43,7 +60,9 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
 
     try {
       setIsFetching(true)
+      // TODO: passar pra zustand
       const { data, error } = await httpServices.upload.save(formData)
+
       if (!!error || !data) {
         // TODO: Colocar toaster avisando que deu erro
         throw new Error(error?.message || 'Erro ao salvar imagem50')
@@ -69,56 +88,44 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
         : []
     const mediasIdsFiltered = mediaIds.filter((id) => id) as string[]
 
-    try {
-      if (!!campaign) {
-        // TODO: Passar pare service
-        await useStore.getState().updateCampaign(String(campaign.id), {
-          name: campaignName,
-          description: campaignDescription,
-          mediaIds: mediasIdsFiltered
-        })
-      } else {
-        await useStore.getState().createCampaign({
-          name: campaignName,
-          description: campaignDescription,
-          mediaIds: mediasIdsFiltered
-        })
-      }
-    } catch (error) {
-      console.error(error)
-      alert('Erro ao salvar campanha')
-      // TODO: Colocar toast avisando que falhou ao salvar, apaga os dados e deixa o usuário tentar novamente
-    } finally {
-      // TODO: Colocar toast com mensagem avisando que salvou com sucesso antes de redirecionar
-      router.push('/in/campaigns')
+    if (!!campaign) {
+      // TODO: Passar pare service
+      updateCampaign(String(campaign.id), {
+        name: campaignName,
+        description: campaignDescription,
+        mediaIds: mediasIdsFiltered
+      })
+    } else {
+      createCampaign({
+        name: campaignName,
+        description: campaignDescription,
+        mediaIds: mediasIdsFiltered
+      })
     }
+
+    // TODO: Colocar toast avisando que falhou ao salvar, apaga os dados e deixa o usuário tentar novamente
+    // TODO: Colocar toast com mensagem avisando que salvou com sucesso antes de redirecionar
+    router.push('/in/campaigns')
   }
 
   const fetchCampaign = async () => {
     if (!campaignId || campaignId === 'new') return
 
-    try {
-      const response = await httpServices.campaigns.getById(String(campaignId))
-      if (response.error) {
-        console.error(response.error)
-        alert('Erro ao buscar campanha')
-        return
-        // TODO: Toast error
-      }
-
-      const { name, description } = response.data!
-      if (!name || !description) return
-      setCampaignName(name)
-      setCampaignDescription(description)
-      // setFiles(campaign.media)
-      // TODO: Toast de sucesso
-      router.push('/in/campaigns')
-    } catch (error) {
-      // TODO: Criar página notFound e redirecionar para ela??
-      console.error(error)
-      alert('Erro inesperado!')
-    }
+    getCampaignById(String(campaignId))
   }
+
+  useEffect(() => {
+    if (!currentCampaign) return
+    setCampaignName(currentCampaign.name)
+    setCampaignDescription(currentCampaign.description)
+    // TODO: colocar os files e o active tbm
+  }, [currentCampaign])
+
+  useEffect(() => {
+    if (!error) return
+    alert('Erro ao salvar campanha')
+    router.push('/in/campaigns')
+  }, [error])
 
   useEffect(() => {
     fetchCampaign()
@@ -197,7 +204,7 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
                             type="file"
                             className="sr-only"
                             multiple={true}
-                            disabled={isFetching}
+                            disabled={loading || isFetching}
                             onChange={(e) => uploadFile(e)}
                           />
                         </label>
@@ -224,7 +231,7 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
             <button
               type="submit"
               className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              disabled={isFetching}
+              disabled={loading || isFetching}
             >
               Salvar
             </button>
