@@ -22,7 +22,7 @@ export default function CampaignsPage({
 }: {
   campaigns: ICampaignCreated[]
 }) {
-  const { deleteCampaign } = useStore.getState()
+  const { deleteCampaign, updateCampaign } = useStore.getState()
   const router = useRouter()
   const [campaignsList, setCampaignsList] = useState<DataList[]>(
     campaignsAdapter(campaigns)
@@ -79,6 +79,7 @@ export default function CampaignsPage({
     })
     return campaignsAdapted
   }
+
   function deleteItem(id: string) {
     const userDecision = confirm('Confirmar deleção?')
 
@@ -90,6 +91,8 @@ export default function CampaignsPage({
       deleteCampaign(id)
     }
   }
+
+  // async function updateCampaignStatus(id: string) {}
 
   useEffect(() => {
     const campaignsAdapted = campaignsAdapter(campaigns)
@@ -110,7 +113,7 @@ export default function CampaignsPage({
                 onDelete={() => deleteItem(campaign.id)}
                 onEdit={handleEdit}
                 onClickRow={onClickRow}
-                onClickToggle={() => console.log('clicou no toggle')}
+                // onClickToggle={updateCampaignStatus}
               />
             ))}
         </ul>

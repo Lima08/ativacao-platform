@@ -36,6 +36,6 @@ body {
 .toggle-checkbox:checked {
   border-color: #68D391 !important;
 }
-.toggle-checkbox:checked + .toggle-label {
+/* .toggle-checkbox:checked + .toggle-label {
   background-color: #68D391 !important;
-}
+} */
