@@ -39,7 +39,6 @@ type TableCustomProps = {
 // Função onClickRow
 // Pode ter ou não link clicável
 export default function TableCustom({ data, headersName }: TableCustomProps) {
-  console.log('🚀 ~ file: index.tsx:13 ~ TableCustom ~ data:', data)
   const headers = Object.keys(data[0])
   return (
     <table>

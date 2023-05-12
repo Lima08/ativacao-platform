@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import useStore from 'store/useStore'
-import httpServices from 'services/http'
 import PageContainer from 'components/PageContainer'
 import DashboardLayout from 'components/DashboardLayout'
 import SearchPrevNext from 'components/SearchPrevNext'
@@ -17,15 +16,20 @@ interface mediaObject {
   type: string
 }
 
-export default function CampaignsPage({
-  campaigns
-}: {
-  campaigns: ICampaignCreated[]
-}) {
-  const { deleteCampaign, updateCampaign } = useStore.getState()
+export default function CampaignsList() {
   const router = useRouter()
-  const [campaignsList, setCampaignsList] = useState<DataList[]>(
-    campaignsAdapter(campaigns)
+
+  const [campaignsList, getAllCampaigns, deleteCampaign, error, loading] =
+    useStore((state) => [
+      state.campaignsList,
+      state.getAllCampaigns,
+      state.deleteCampaign,
+      state.error,
+      state.loading
+    ])
+
+  const [campaignsListAdapted, setCampaignsListAdapted] = useState<DataList[]>(
+    []
   )
   const [open, setOpen] = useState(false)
   const [campaign, setCampaign] = useState<{
@@ -39,7 +43,7 @@ export default function CampaignsPage({
   }
 
   const onClickRow = async (id: string) => {
-    const campaign = campaigns.find((campaign) => campaign.id === id)
+    const campaign = campaignsList.find((campaign) => campaign.id === id)
     const media = campaign?.medias
 
     if (!media?.length) return alert('Nenhuma media encontrada')
@@ -84,29 +88,38 @@ export default function CampaignsPage({
     const userDecision = confirm('Confirmar deleção?')
 
     if (userDecision) {
-      const nextCampaignList = campaignsList.filter(
-        (campaign) => campaign.id !== id
-      )
-      setCampaignsList(nextCampaignList)
       deleteCampaign(id)
     }
   }
 
-  // async function updateCampaignStatus(id: string) {}
+  useEffect(() => {
+    if (campaignsList.length > 0) return
+
+    getAllCampaigns()
+  }, [])
 
   useEffect(() => {
-    const campaignsAdapted = campaignsAdapter(campaigns)
-    setCampaignsList(campaignsAdapted)
-  }, [campaigns])
+    if (!error) return
+    alert('Erro ao carregar campanhas')
+  }, [error])
+
+  useEffect(() => {
+    if (!campaignsList) return
+    const campaignsAdapted = campaignsAdapter(campaignsList)
+    setCampaignsListAdapted(campaignsAdapted)
+  }, [campaignsList])
 
   return (
     <DashboardLayout>
       <PageContainer pageTitle="Campanhas" pageSection="campaigns">
         <SearchPrevNext />
-        {!campaignsList.length && <p>Nenhuma campanha encontrada</p>}
+        {loading && <p>Carregando...</p>}
+        {!loading && !campaignsListAdapted.length && (
+          <p>Nenhuma campanha encontrada</p>
+        )}
         <ul className="list-none mt-8">
-          {!!campaignsList.length &&
-            campaignsList.map((campaign) => (
+          {!!campaignsListAdapted.length &&
+            campaignsListAdapted.map((campaign) => (
               <ListItem
                 key={campaign.id}
                 data={campaign}
@@ -135,22 +148,4 @@ export default function CampaignsPage({
       </PageContainer>
     </DashboardLayout>
   )
-}
-
-export async function getServerSideProps() {
-  const response = await httpServices.campaigns.getAll()
-
-  if (response.data) {
-    return {
-      props: {
-        campaigns: response.data
-      }
-    }
-  } else {
-    return {
-      props: {
-        campaigns: []
-      }
-    }
-  }
 }

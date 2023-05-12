@@ -1,3 +1,5 @@
+import { ICampaignCreated } from 'interfaces/entities/campaign'
+
 export interface ICampaign {
   id: string
   name: string
@@ -14,14 +16,15 @@ export type CreatePayloadStore = {
 }
 
 export interface ICampaignStore {
-  campaigns: ICampaign[]
+  currentCampaign: ICampaignCreated | null
+  campaignsList: ICampaignCreated[]
   loading: boolean
   error: any
-  createCampaign: (newCampaign: CreatePayloadStore) => Promise<void>
+  setLoading: (isLoading: boolean) => void
+  resetCurrentCampaign: () => void
+  createCampaign: (newCampaign: CreatePayloadStore) => void
+  getCampaignById: (id: string) => void
   getAllCampaigns: () => void
-  deleteCampaign: (id: string) => Promise<void>
-  updateCampaign: (
-    id: string,
-    updatedCampaign: CreatePayloadStore
-  ) => Promise<void>
+  deleteCampaign: (id: string) => void
+  updateCampaign: (id: string, updatedCampaign: CreatePayloadStore) => void
 }

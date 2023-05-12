@@ -1,14 +1,6 @@
 import { AxiosInstance } from 'axios'
 import { ApiResponse } from '../../../types'
-
-type Campaign = {
-  id: string
-  name: string
-  description: string
-  media: string[]
-  createdAt: string
-  updatedAt: string
-}
+import { ICampaignCreated } from 'interfaces/entities/campaign'
 
 type CreatePayload = {
   name: string
@@ -23,13 +15,13 @@ type ModifierPayload = {
 }
 
 export interface CampaignServiceInterface {
-  create(payload: CreatePayload): Promise<ApiResponse<Campaign>>
-  getById(campaignId: string): Promise<ApiResponse<Campaign>>
-  getAll(): Promise<ApiResponse<Campaign[]>>
+  create(payload: CreatePayload): Promise<ApiResponse<ICampaignCreated>>
+  getById(campaignId: string): Promise<ApiResponse<ICampaignCreated>>
+  getAll(): Promise<ApiResponse<ICampaignCreated[]>>
   update(
     campaignId: string,
     payload: ModifierPayload
-  ): Promise<ApiResponse<Campaign>>
+  ): Promise<ApiResponse<ICampaignCreated>>
   delete(campaignId: string): Promise<void>
 }
 
