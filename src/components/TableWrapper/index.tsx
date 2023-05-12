@@ -33,7 +33,6 @@ export default function TableWrapper({
     setInMemoryData(nextState)
   }
 
-  console.log({ data })
 
   return (
     <section className="w-full mx-auto">
