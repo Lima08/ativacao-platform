@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
 import httpServices from 'services/http'
@@ -117,7 +115,7 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
   useEffect(() => {
     if (!currentCampaign) return
     setCampaignName(currentCampaign.name)
-    setCampaignDescription(currentCampaign.description)
+    setCampaignDescription(currentCampaign?.description || '')
     // TODO: colocar os files e o active tbm
   }, [currentCampaign])
 

@@ -5,6 +5,7 @@ import {
   ICampaign,
   ICampaignStore
 } from '../types/iCampaignStore'
+import { ICampaignCreated } from 'interfaces/entities/campaign'
 
 const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
   currentCampaign: null,
@@ -25,13 +26,13 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
   },
   getAllCampaigns: async () => {
     set({ loading: true })
-
+    
     const response = await httpServices.campaigns.getAll()
     set((state) => ({
       ...state,
       loading: false,
-      error: response.error,
-      campaigns: response.data
+      campaignsList: response.data,
+      error: response.error
     }))
   },
   createCampaign: async (newCampaign: CreatePayloadStore) => {
@@ -42,7 +43,7 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
       ...state,
       loading: false,
       error: response.error,
-      campaigns: [...state.campaignsList, response.data as ICampaign]
+      campaignsList: [...state.campaignsList, response.data as ICampaignCreated]
     }))
   },
   updateCampaign: async (id: string, updatedCampaign: CreatePayloadStore) => {
@@ -53,8 +54,8 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
       ...state,
       loading: false,
       error: response.error,
-      campaigns: state.campaignsList.map((c) =>
-        c.id === id ? (response.data as ICampaign) : c
+      campaignsList: state.campaignsList.map((c) =>
+        c.id === id ? (response.data as ICampaignCreated) : c
       )
     }))
   },
@@ -65,7 +66,7 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
     set((state) => ({
       ...state,
       loading: false,
-      campaigns: state.campaignsList.filter((c) => c.id !== id)
+      campaignsList: state.campaignsList.filter((c) => c.id !== id)
     }))
   }
 })

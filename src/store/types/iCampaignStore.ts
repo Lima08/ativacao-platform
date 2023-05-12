@@ -1,3 +1,5 @@
+import { ICampaignCreated } from 'interfaces/entities/campaign'
+
 export interface ICampaign {
   id: string
   name: string
@@ -14,8 +16,8 @@ export type CreatePayloadStore = {
 }
 
 export interface ICampaignStore {
-  currentCampaign: ICampaign | null
-  campaignsList: ICampaign[]
+  currentCampaign: ICampaignCreated | null
+  campaignsList: ICampaignCreated[]
   loading: boolean
   error: any
   setLoading: (isLoading: boolean) => void
