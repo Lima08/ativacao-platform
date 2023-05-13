@@ -83,7 +83,7 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
     e.preventDefault()
 
     const mediaIds =
-      filesRef.current && filesRef.current.length
+      filesRef.current && filesRef.current?.length
         ? filesRef.current.map((media) => media.id)
         : []
     const mediasIdsFiltered = mediaIds.filter((id) => id) as string[]

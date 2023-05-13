@@ -118,7 +118,8 @@ export default function CampaignsList() {
           <p>Nenhuma campanha encontrada</p>
         )}
         <ul className="list-none mt-8">
-          {!!campaignsListAdapted.length &&
+          {!loading &&
+            !!campaignsListAdapted?.length &&
             campaignsListAdapted.map((campaign) => (
               <ListItem
                 key={campaign.id}
