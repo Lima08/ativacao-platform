@@ -17,7 +17,7 @@ export type CreatePayloadStore = {
 
 export interface ITrainingStore {
   currentTraining: ITrainingCreated | null
-  TrainingsList: ITrainingCreated[]
+  trainingsList: ITrainingCreated[]
   loading: boolean
   error: any
   setLoading: (isLoading: boolean) => void

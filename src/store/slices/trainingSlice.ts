@@ -9,7 +9,7 @@ import { ITrainingCreated } from 'interfaces/entities/training'
 
 const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
   currentTraining: null,
-  TrainingsList: [],
+  trainingsList: [],
   loading: false,
   error: null,
   setLoading: (isLoading) => set(() => ({ loading: isLoading })),
@@ -45,7 +45,7 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
       ...state,
       loading: false,
       error: response.error,
-      trainingsList: [...state.TrainingsList, response.data as ITrainingCreated]
+      trainingsList: [...state.trainingsList, response.data as ITrainingCreated]
     }))
   },
   updateTraining: async (id: string, updatedTraining: CreatePayloadStore) => {
@@ -56,7 +56,7 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
       ...state,
       loading: false,
       error: response.error,
-      trainingsList: state.TrainingsList.map((c) =>
+      trainingsList: state.trainingsList.map((c) =>
         c.id === id ? (response.data as ITrainingCreated) : c
       )
     }))
@@ -68,7 +68,7 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
     set((state) => ({
       ...state,
       loading: false,
-      trainingsList: state.TrainingsList.filter((c) => c.id !== id)
+      trainingsList: state.trainingsList.filter((c) => c.id !== id)
     }))
   }
 })

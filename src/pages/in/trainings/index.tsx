@@ -1,5 +1,8 @@
 'use client'
+
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import useStore from 'store/useStore'
 import PageContainer from 'components/PageContainer'
 import DashboardLayout from 'components/DashboardLayout'
 import SearchPrevNext from 'components/SearchPrevNext'
@@ -7,44 +10,6 @@ import Modal from 'components/MediaViewer'
 import ListItem from 'components/ListItem'
 import type { DataList } from 'components/ListItem'
 import type { ITrainingCreated } from 'interfaces/entities/training'
-import { useEffect, useState } from 'react'
-import useStore from 'store/useStore'
-
-const trainingsMOCK = [
-  {
-    id: '48e79836-b76d-4c8f-b264-0e32830fc14e',
-    name: 'Training 2025',
-    description: 'Descrição Training 2025',
-    active: true,
-    img: {
-      source:
-        'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/17f79061c2f027f3fa66a4d4a84408a59336728c7c73c2e7236f9c9c646605b5.fat_batman.jpg',
-      alt: 'Texto alternativo'
-    }
-  },
-  {
-    id: 'fecbae7b-693b-44e8-9355-f6b79b78613a',
-    name: 'App',
-    description: 'Testes',
-    active: true,
-    img: {
-      source:
-        'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/28a7a0a7a6d83becf6c144603c15e6f485df79b9b897fb0fc2d878fff32187ab.google_fb_hear_you.jpg',
-      alt: 'Texto alternativo'
-    }
-  },
-  {
-    id: 'c379fe52-03c1-40ed-99cd-378d6385712e',
-    name: 'Training 2025',
-    description: '123456789',
-    active: true,
-    img: {
-      source:
-        'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/42db7ddedc4efcac5d1991f1369853c376e14ad1dc26d17977e5bd4adf22376c.my_parents_me.jpg',
-      alt: 'Texto alternativo'
-    }
-  }
-]
 
 interface mediaObject {
   url: string
@@ -54,9 +19,9 @@ interface mediaObject {
 export default function TrainingsPage() {
   const router = useRouter()
 
-  const [TrainingsList, getAllTrainings, deleteTraining, error, loading] =
+  const [trainingsList, getAllTrainings, deleteTraining, error, loading] =
     useStore.Training((state) => [
-      state.TrainingsList,
+      state.trainingsList,
       state.getAllTrainings,
       state.deleteTraining,
       state.error,
@@ -76,7 +41,7 @@ export default function TrainingsPage() {
   }
 
   const onClickRow = async (id: string) => {
-    const training = TrainingsList.find((training) => training.id === id)
+    const training = trainingsList.find((training) => training.id === id)
     const media = training?.medias
 
     if (!media?.length) return alert('Nenhuma media encontrada')
@@ -126,7 +91,7 @@ export default function TrainingsPage() {
   }
 
   useEffect(() => {
-    if (TrainingsList.length > 0) return
+    if (trainingsList.length > 0) return
 
     getAllTrainings()
   }, [])
@@ -137,17 +102,17 @@ export default function TrainingsPage() {
   }, [error])
 
   useEffect(() => {
-    if (TrainingsList.length === 0) return
-    const trainingAdapted = trainingsAdapter(TrainingsList)
+    if (trainingsList.length === 0) return
+    const trainingAdapted = trainingsAdapter(trainingsList)
     console.log(
       '🚀 ~ file: index.tsx:142 ~ useEffect ~ trainingAdapted:',
       trainingAdapted
     )
     setTrainingListAdapted(trainingAdapted)
-  }, [TrainingsList])
+  }, [trainingsList])
   console.log(
-    '🚀 ~ file: index.tsx:148 ~ useEffect ~ TrainingsList:',
-    TrainingsList
+    '🚀 ~ file: index.tsx:148 ~ useEffect ~ trainingsList:',
+    trainingsList
   )
 
   return (
@@ -191,3 +156,39 @@ export default function TrainingsPage() {
     </DashboardLayout>
   )
 }
+
+// const trainingsMOCK = [
+//   {
+//     id: '48e79836-b76d-4c8f-b264-0e32830fc14e',
+//     name: 'Training 2025',
+//     description: 'Descrição Training 2025',
+//     active: true,
+//     img: {
+//       source:
+//         'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/17f79061c2f027f3fa66a4d4a84408a59336728c7c73c2e7236f9c9c646605b5.fat_batman.jpg',
+//       alt: 'Texto alternativo'
+//     }
+//   },
+//   {
+//     id: 'fecbae7b-693b-44e8-9355-f6b79b78613a',
+//     name: 'App',
+//     description: 'Testes',
+//     active: true,
+//     img: {
+//       source:
+//         'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/28a7a0a7a6d83becf6c144603c15e6f485df79b9b897fb0fc2d878fff32187ab.google_fb_hear_you.jpg',
+//       alt: 'Texto alternativo'
+//     }
+//   },
+//   {
+//     id: 'c379fe52-03c1-40ed-99cd-378d6385712e',
+//     name: 'Training 2025',
+//     description: '123456789',
+//     active: true,
+//     img: {
+//       source:
+//         'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/42db7ddedc4efcac5d1991f1369853c376e14ad1dc26d17977e5bd4adf22376c.my_parents_me.jpg',
+//       alt: 'Texto alternativo'
+//     }
+//   }
+// ]
