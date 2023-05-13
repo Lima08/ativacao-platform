@@ -117,7 +117,9 @@ export default function CampaignsList() {
         <SearchPrevNext />
         {loading && <p>Carregando...</p>}
         {!loading && !campaignsListAdapted.length && (
-          <p>Nenhuma campanha encontrada</p>
+          <li className="flex items-center justify-center mt-5 bg-white h-12 w-full border rounded">
+            Nenhuma campanha encontrada
+          </li>
         )}
         <ul className="list-none mt-8">
           {!!campaignsListAdapted.length &&

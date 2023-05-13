@@ -113,7 +113,9 @@ export default function TrainingsPage() {
         <SearchPrevNext />
         {loading && <p>Carregando...</p>}
         {!loading && !trainingListAdapted.length && (
-          <p>Nenhum treinamento encontrado</p>
+          <li className="flex items-center justify-center mt-5 bg-white h-12 w-full border rounded">
+            Nenhum treinamento encontrado
+          </li>
         )}
 
         <ul className="list-none mt-8">
