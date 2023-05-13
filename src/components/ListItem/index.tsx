@@ -13,13 +13,13 @@ type ListItemProps = {
   onDelete: (id: string) => void
   onEdit: (id: string) => void
   onClickRow: (id: string) => void
-  // onClickToggle: (id: string) => void
+  onClickToggle: (id: string, active: boolean) => void
 }
 
 export default function ListItem({
   data,
   onClickRow,
-  // onClickToggle,
+  onClickToggle,
   onEdit,
   onDelete
 }: ListItemProps) {
@@ -57,9 +57,7 @@ export default function ListItem({
         <ToggleInput
           toggleId={data.id}
           defaultActive={data.active}
-          // onClickToggle={() => {
-          //   onClickToggle(data.id)
-          // }}
+          onClickToggle={onClickToggle}
         />
         <button
           onClick={(event) => {

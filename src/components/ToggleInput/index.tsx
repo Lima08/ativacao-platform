@@ -1,24 +1,24 @@
 // 'use client'
-import { useState, useCallback, useRef } from 'react'
+import { useState, useRef } from 'react'
 
 type ToggleInputProps = {
   toggleId: string
   defaultActive: boolean
-  // onClickToggle: () => void
+  onClickToggle: (id: string, active: boolean) => void
 }
 
 export default function ToggleInput({
   toggleId,
-  defaultActive
-}: // onClickToggle
-ToggleInputProps) {
+  defaultActive,
+  onClickToggle
+}: ToggleInputProps) {
   const [isActive, setIsActive] = useState(defaultActive)
 
-  const handleToggle = useCallback(() => {
+  const handleToggle = () => {
     const newActiveState = !isActive
     setIsActive(newActiveState)
-    // onClickToggle(toggleId)
-  }, [isActive])
+    onClickToggle(toggleId, !defaultActive)
+  }
 
   function handleClick() {
     checkboxRef.current.blur()

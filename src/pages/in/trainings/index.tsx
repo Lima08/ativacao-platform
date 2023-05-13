@@ -19,22 +19,30 @@ interface mediaObject {
 export default function TrainingsPage() {
   const router = useRouter()
 
-  const [trainingsList, getAllTrainings, deleteTraining, error, loading] =
-    useStore.Training((state) => [
-      state.trainingsList,
-      state.getAllTrainings,
-      state.deleteTraining,
-      state.error,
-      state.loading
-    ])
+  const [
+    trainingsList,
+    getAllTrainings,
+    handleTrainingActive,
+    deleteTraining,
+    error,
+    loading
+  ] = useStore.Training((state) => [
+    state.trainingsList,
+    state.getAllTrainings,
+    state.handleTrainingActive,
+    state.deleteTraining,
+    state.error,
+    state.loading
+  ])
 
   const [trainingListAdapted, setTrainingListAdapted] = useState<DataList[]>([])
   const [open, setOpen] = useState(false)
   const [training, setTraining] = useState<{
     title: string
+    active: boolean
     description: string
     media: mediaObject[]
-  }>({ title: '', description: '', media: [] })
+  }>({ title: '', active: true, description: '', media: [] })
 
   const handleEdit = async (id: string) => {
     router.push(`/in/trainings/${id}`)
@@ -47,6 +55,7 @@ export default function TrainingsPage() {
     if (!media?.length) return alert('Nenhuma media encontrada')
     setTraining({
       title: training?.name || '',
+      active: training?.active || false,
       description: training?.description || '',
       media: mediasAdapter(training?.medias || [])
     })
@@ -90,6 +99,10 @@ export default function TrainingsPage() {
     }
   }
 
+  function handleTrainingStatus(id: string, active: boolean) {
+    handleTrainingActive(id, active)
+  }
+
   useEffect(() => {
     if (trainingsList.length > 0) return
 
@@ -102,7 +115,7 @@ export default function TrainingsPage() {
   }, [error])
 
   useEffect(() => {
-    if (!trainingsList) return
+    if (!trainingsList || trainingsList.length === 0) return
     const trainingAdapted = trainingsAdapter(trainingsList)
     setTrainingListAdapted(trainingAdapted)
   }, [trainingsList])
@@ -127,7 +140,7 @@ export default function TrainingsPage() {
                 onDelete={() => deleteItem(training.id)}
                 onEdit={handleEdit}
                 onClickRow={onClickRow}
-                // onClickToggle={updatetrainingStatus}
+                onClickToggle={handleTrainingStatus}
               />
             ))}
         </ul>

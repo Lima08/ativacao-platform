@@ -28,4 +28,5 @@ export interface ITrainingStore {
   getAllTrainings: () => void
   deleteTraining: (id: string) => void
   updateTraining: (id: string, updatedTraining: modifierTrainingDto) => void
+  handleTrainingActive: (id: string, status: boolean) => void
 }
