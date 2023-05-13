@@ -20,7 +20,7 @@ export default function CampaignsList() {
   const router = useRouter()
 
   const [campaignsList, getAllCampaigns, deleteCampaign, error, loading] =
-    useStore((state) => [
+    useStore.Campaign((state) => [
       state.campaignsList,
       state.getAllCampaigns,
       state.deleteCampaign,
@@ -108,6 +108,8 @@ export default function CampaignsList() {
     const campaignsAdapted = campaignsAdapter(campaignsList)
     setCampaignsListAdapted(campaignsAdapted)
   }, [campaignsList])
+
+  console.log('campaignsListAdapted: ', campaignsListAdapted)
 
   return (
     <DashboardLayout>

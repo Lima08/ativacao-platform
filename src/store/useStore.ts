@@ -2,8 +2,18 @@ import { create } from 'zustand'
 import createCampaignsSlice from './slices/campaignSlice'
 import { ICampaignStore } from './types/iCampaignStore'
 
-const useStore = create<ICampaignStore>((...a) => ({
+import createTrainingsSlice from './slices/trainingSlice'
+import { ITrainingStore } from './types/iTrainingStore'
+
+const Campaign = create<ICampaignStore>((...a) => ({
   ...createCampaignsSlice(...a)
 }))
 
-export default useStore
+const Training = create<ITrainingStore>((...a) => ({
+  ...createTrainingsSlice(...a)
+}))
+
+export default {
+  Campaign,
+  Training
+}

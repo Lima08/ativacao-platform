@@ -1,15 +1,17 @@
 import { AxiosInstance } from 'axios'
 import { ApiResponse } from '../../../types'
+import { ITrainingCreated } from 'interfaces/entities/training'
 
-type Training = {
-  id: string
-  name: string
-  description: string
-  active: boolean
-  media: string[]
-  createdAt: string
-  updatedAt: string
-}
+
+// type Training = {
+//   id: string
+//   name: string
+//   description: string
+//   active: boolean
+//   media: string[]
+//   createdAt: string
+//   updatedAt: string
+// }
 
 type CreatePayload = {
   name: string
@@ -25,56 +27,80 @@ type ModifierPayload = {
 }
 
 export interface TrainingServiceInterface {
-  create(payload: CreatePayload): Promise<ApiResponse<Training>>
-  getById(trainingId: string): Promise<ApiResponse<Training>>
-  getAll(): Promise<ApiResponse<Training[]>>
+  create(payload: CreatePayload): Promise<ApiResponse<ITrainingCreated>>
+  getById(trainingId: string): Promise<ApiResponse<ITrainingCreated>>
+  getAll(): Promise<ApiResponse<ITrainingCreated>>
   update(
     trainingId: string,
     payload: ModifierPayload
-  ): Promise<ApiResponse<Training>>
+  ): Promise<ApiResponse<ITrainingCreated>>
   delete(trainingId: string): Promise<void>
-  toggleActive(trainingId: string): Promise<Training>
+  toggleActive(trainingId: string): Promise<ITrainingCreated>
 }
 
 const TrainingService = (
   httpClient: AxiosInstance
 ): TrainingServiceInterface => ({
   create: async ({ name, description, mediaIds }) => {
-    const response = await httpClient.post('/api/trainings/create', {
-      name,
-      description,
-      mediaIds
-    })
-
-    return response.data
+    try {
+      const response = await httpClient.post('/api/trainings/create', {
+        name,
+        description,
+        mediaIds
+      })
+  
+      return response.data
+    } catch (error) {
+      console.error('Error to create training:', error)
+      return error
+    }
   },
 
   getAll: async () => {
-    const response = await httpClient.get('/api/trainings')
-
-    return response.data
+    try {
+      const response = await httpClient.get('/api/trainings/getAll')
+  
+      return response.data
+    } catch (error) {
+      console.error('Error fetching trainings:', error)
+      return error
+    }
   },
 
   getById: async (trainingId) => {
-    const response = await httpClient.get(`/api/trainings/${trainingId}`)
-
-    return response.data
+    try {
+      const response = await httpClient.get(`/api/trainings/${trainingId}`)
+  
+      return response.data
+    } catch (error) {
+      console.error('Error to get training:', error)
+      return error
+    }
   },
 
   update: async (trainingId, { name, description, active, mediaIds }) => {
-    const response = await httpClient.put(`/api/trainings/${trainingId}`, {
-      name,
-      description,
-      active,
-      mediaIds
-    })
-
-    return response.data
+    try {
+      const response = await httpClient.put(`/api/trainings/${trainingId}`, {
+        name,
+        description,
+        active,
+        mediaIds
+      })
+  
+      return response.data
+    } catch (error) {
+      console.error('Error to update training:', error)
+      return error
+    }
   },
 
   delete: async (trainingId: string) => {
-    const response = await httpClient.delete(`/api/trainings/${trainingId}`)
-    return response.data
+    try {
+      const response = await httpClient.delete(`/api/trainings/${trainingId}`)
+      return response.data
+    } catch (error) {
+      console.error('Error to delete training:', error)
+    }
   },
 
   toggleActive: async (trainingId: string) => {

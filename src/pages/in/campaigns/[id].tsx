@@ -27,7 +27,7 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
     resetCurrentCampaign,
     error,
     loading
-  ] = useStore((state) => [
+  ] = useStore.Campaign((state) => [
     state.currentCampaign,
     state.getCampaignById,
     state.createCampaign,

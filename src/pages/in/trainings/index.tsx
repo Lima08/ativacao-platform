@@ -1,127 +1,192 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import httpServices from 'services/http'
-import { useTrainingsContext } from '../../../context/TrainingsContext'
-import TableWrapper from 'components/TableWrapper'
 import PageContainer from 'components/PageContainer'
 import DashboardLayout from 'components/DashboardLayout'
+import SearchPrevNext from 'components/SearchPrevNext'
+import Modal from 'components/MediaViewer'
+import ListItem from 'components/ListItem'
+import type { DataList } from 'components/ListItem'
+import type { ITrainingCreated } from 'interfaces/entities/training'
+import { useEffect, useState } from 'react'
+import useStore from 'store/useStore'
+
+const trainingsMOCK = [
+  {
+    id: '48e79836-b76d-4c8f-b264-0e32830fc14e',
+    name: 'Training 2025',
+    description: 'Descrição Training 2025',
+    active: true,
+    img: {
+      source:
+        'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/17f79061c2f027f3fa66a4d4a84408a59336728c7c73c2e7236f9c9c646605b5.fat_batman.jpg',
+      alt: 'Texto alternativo'
+    }
+  },
+  {
+    id: 'fecbae7b-693b-44e8-9355-f6b79b78613a',
+    name: 'App',
+    description: 'Testes',
+    active: true,
+    img: {
+      source:
+        'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/28a7a0a7a6d83becf6c144603c15e6f485df79b9b897fb0fc2d878fff32187ab.google_fb_hear_you.jpg',
+      alt: 'Texto alternativo'
+    }
+  },
+  {
+    id: 'c379fe52-03c1-40ed-99cd-378d6385712e',
+    name: 'Training 2025',
+    description: '123456789',
+    active: true,
+    img: {
+      source:
+        'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/42db7ddedc4efcac5d1991f1369853c376e14ad1dc26d17977e5bd4adf22376c.my_parents_me.jpg',
+      alt: 'Texto alternativo'
+    }
+  }
+]
+
+interface mediaObject {
+  url: string
+  type: string
+}
 
 export default function TrainingsPage() {
-  const { state } = useTrainingsContext()
   const router = useRouter()
 
-  const handleDelete = async (id: string) => {
-    try {
-      await httpServices.trainings.delete(id)
+  const [TrainingsList, getAllTrainings, deleteTraining, error, loading] =
+    useStore.Training((state) => [
+      state.TrainingsList,
+      state.getAllTrainings,
+      state.deleteTraining,
+      state.error,
+      state.loading
+    ])
 
-      // TODO: Colocar toast de sucesso
-    } catch (error) {
-      // TODO: Colocar toast de falha
-      console.error(error)
-    }
-  }
+  const [trainingListAdapted, setTrainingListAdapted] = useState<DataList[]>([])
+  const [open, setOpen] = useState(false)
+  const [training, setTraining] = useState<{
+    title: string
+    description: string
+    media: mediaObject[]
+  }>({ title: '', description: '', media: [] })
+
   const handleEdit = async (id: string) => {
-    router.push(`/in/trainings/${id}`)
+    router.push(`/in/training/${id}`)
   }
 
-  const handleActivation = async (id: string) => {
-    // TEMP: Ex de como fazer edit
-    try {
-      const response = await httpServices.trainings.toggleActive(id)
-      console.log(
-        '🚀 ~ file: page.tsx:46 ~ handleActivation ~ response:',
-        response
-      )
+  const onClickRow = async (id: string) => {
+    const training = TrainingsList.find((training) => training.id === id)
+    const media = training?.medias
 
-      // TODO: Colocar toast de sucesso
-    } catch (error) {
-      // TODO: Colocar toast de falha
-      console.error(error)
+    if (!media?.length) return alert('Nenhuma media encontrada')
+    setTraining({
+      title: training?.name || '',
+      description: training?.description || '',
+      media: mediasAdapter(training?.medias || [])
+    })
+
+    setOpen(true)
+  }
+
+  function mediasAdapter(mediasList: any[]) {
+    const mediaURLs = mediasList.map(({ url, type }) => ({
+      url,
+      type
+    }))
+    return mediaURLs
+  }
+
+  // TODO: Corrigir a forma que define a imagem de capa
+
+  function trainingsAdapter(trainingList: ITrainingCreated[]) {
+    const trainingsAdapted = trainingList.map((training) => {
+      return {
+        id: training.id,
+        name: training.name,
+        description: training.description || null,
+        active: training.active,
+        img: {
+          source:
+            training?.medias[0]?.url ||
+            'https://lojinha-da-aletha.dooca.store/admin/assets/logo-folded.1f809cab.svg',
+          alt: 'Texto alternativo'
+        }
+      }
+    })
+    return trainingsAdapted
+  }
+
+  function deleteItem(id: string) {
+    const userDecision = confirm('Confirmar deleção?')
+
+    if (userDecision) {
+      deleteTraining(id)
     }
-    // TODO: Adiciona navegação para CampaignRegister e la utiliza o método update
-    // router.push(`/in/trainings/${id}`)
   }
+
+  useEffect(() => {
+    if (TrainingsList.length > 0) return
+
+    getAllTrainings()
+  }, [])
+
+  useEffect(() => {
+    if (!error) return
+    alert('Erro ao carregar treinamentos')
+  }, [error])
+
+  useEffect(() => {
+    if (TrainingsList.length === 0) return
+    const trainingAdapted = trainingsAdapter(TrainingsList)
+    console.log(
+      '🚀 ~ file: index.tsx:142 ~ useEffect ~ trainingAdapted:',
+      trainingAdapted
+    )
+    setTrainingListAdapted(trainingAdapted)
+  }, [TrainingsList])
+  console.log(
+    '🚀 ~ file: index.tsx:148 ~ useEffect ~ TrainingsList:',
+    TrainingsList
+  )
 
   return (
     <DashboardLayout>
       <PageContainer pageTitle="Treinamentos" pageSection="trainings">
-        {/* TODO: Transform in a component */}
-        <div className="mt-6 md:flex md:items-center md:justify-between">
-          <div className="relative flex items-center mt-4 md:mt-0">
-            <span className="absolute">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-5 h-5 mx-3 text-gray-400 dark:text-gray-600"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
-            </span>
+        <SearchPrevNext />
+        {loading && <p>Carregando...</p>}
+        {!loading && !trainingListAdapted.length && (
+          <p>Nenhum treinamento encontrado</p>
+        )}
 
-            <input
-              type="text"
-              placeholder="Busca por título"
-              className="block w-full py-1.5 pr-5 text-gray-700 bg-white border border-gray-200 rounded-lg md:w-80 placeholder-gray-400/70 pl-11 rtl:pr-11 rtl:pl-5 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-            />
-          </div>
-          <div className="flex items-center mt-4 gap-x-4 sm:mt-0">
-            <button
-              className="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md sm:w-auto gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
-              disabled={false}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-5 h-5 rtl:-scale-x-100"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18"
-                />
-              </svg>
+        <ul className="list-none mt-8">
+          {!!trainingListAdapted.length &&
+            trainingListAdapted.map((training) => (
+              <ListItem
+                key={training.id}
+                data={training}
+                onDelete={() => deleteItem(training.id)}
+                onEdit={handleEdit}
+                onClickRow={onClickRow}
+                // onClickToggle={updatetrainingStatus}
+              />
+            ))}
+        </ul>
 
-              <span>Anterior</span>
-            </button>
-
-            <button className="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md sm:w-auto gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
-              <span>Próximo</span>
-
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-5 h-5 rtl:-scale-x-100"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <TableWrapper
-          data={state}
-          onDelete={handleDelete}
-          onEdit={handleEdit}
-          toggleActivation={handleActivation}
-          section="Nenhum treinamento adicionado"
-        />
+        {open && (
+          <Modal
+            title={training.title}
+            description={training.description}
+            imageSource={
+              training.media[0].type === 'image'
+                ? training.media[0]
+                : 'default img src'
+            }
+            medias={training.media}
+            open={open}
+            setOpen={setOpen}
+          />
+        )}
       </PageContainer>
     </DashboardLayout>
   )
