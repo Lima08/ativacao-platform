@@ -73,7 +73,7 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
         filesRef.current.push(image)
       }
     } catch (error) {
-      alert('Erro ao salvar imagem60')
+      alert('Erro ao salvar imagem')
       console.error(error)
     } finally {
       setIsFetching(false)
@@ -107,6 +107,13 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
     // TODO: Colocar toast avisando que falhou ao salvar, apaga os dados e deixa o usuário tentar novamente
     // TODO: Colocar toast com mensagem avisando que salvou com sucesso antes de redirecionar
     router.push('/in/campaigns')
+    resetState()
+  }
+
+  const resetState = () => {
+    setCampaignName('')
+    setCampaignDescription('')
+    filesRef.current = []
   }
 
   const fetchCampaign = async () => {

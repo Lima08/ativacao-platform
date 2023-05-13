@@ -56,7 +56,7 @@ export default function TableWrapper({
                         const imgSource =
                           !!medias[0]?.url && medias[0]?.type === 'image'
                             ? medias[0]?.url
-                            : 'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/93e55b7409de1702cee02ccf1e2615a89c5e9cb74d84307d6d5bb2c5449ceca7.tenis1.webp'
+                            : '/logo-ativacao.png'
                         const imgAlt = 'imagem ícone'
                         // TODO: Passar o componente que vai ser renderizado para não travar esse destruction
                         return (

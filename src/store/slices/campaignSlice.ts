@@ -40,10 +40,18 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
     set({ loading: true })
 
     const response = await httpServices.campaigns.create(newCampaign)
+
+    if (response.error || !response.data) {
+      set((state) => ({
+        ...state,
+        loading: false,
+        error: response.error
+      }))
+      return
+    }
     set((state) => ({
       ...state,
       loading: false,
-      error: response.error,
       campaignsList: [...state.campaignsList, response.data as ICampaignCreated]
     }))
   },
@@ -62,13 +70,13 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
   },
   deleteCampaign: async (id: string) => {
     set({ loading: true })
-
-    await httpServices.campaigns.delete(id)
     set((state) => ({
       ...state,
-      loading: false,
       campaignsList: state.campaignsList.filter((c) => c.id !== id)
     }))
+
+    await httpServices.campaigns.delete(id)
+    set({ loading: false })
   }
 })
 

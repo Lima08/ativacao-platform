@@ -39,7 +39,6 @@ async function createCampaign({
     await Promise.all(promises)
       .then((files) => (medias = files))
       .catch((error: any) => {
-        console.log('🚀 ~ file: index.ts:40 ~ error:', error)
         const meta = error.meta
         throw new CustomError('Error in creating campaign media', 400, {
           ...meta,
