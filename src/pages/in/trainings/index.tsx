@@ -37,7 +37,7 @@ export default function TrainingsPage() {
   }>({ title: '', description: '', media: [] })
 
   const handleEdit = async (id: string) => {
-    router.push(`/in/training/${id}`)
+    router.push(`/in/trainings/${id}`)
   }
 
   const onClickRow = async (id: string) => {
@@ -102,18 +102,10 @@ export default function TrainingsPage() {
   }, [error])
 
   useEffect(() => {
-    if (trainingsList.length === 0) return
+    if (!trainingsList) return
     const trainingAdapted = trainingsAdapter(trainingsList)
-    console.log(
-      '🚀 ~ file: index.tsx:142 ~ useEffect ~ trainingAdapted:',
-      trainingAdapted
-    )
     setTrainingListAdapted(trainingAdapted)
   }, [trainingsList])
-  console.log(
-    '🚀 ~ file: index.tsx:148 ~ useEffect ~ trainingsList:',
-    trainingsList
-  )
 
   return (
     <DashboardLayout>
@@ -156,39 +148,3 @@ export default function TrainingsPage() {
     </DashboardLayout>
   )
 }
-
-// const trainingsMOCK = [
-//   {
-//     id: '48e79836-b76d-4c8f-b264-0e32830fc14e',
-//     name: 'Training 2025',
-//     description: 'Descrição Training 2025',
-//     active: true,
-//     img: {
-//       source:
-//         'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/17f79061c2f027f3fa66a4d4a84408a59336728c7c73c2e7236f9c9c646605b5.fat_batman.jpg',
-//       alt: 'Texto alternativo'
-//     }
-//   },
-//   {
-//     id: 'fecbae7b-693b-44e8-9355-f6b79b78613a',
-//     name: 'App',
-//     description: 'Testes',
-//     active: true,
-//     img: {
-//       source:
-//         'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/28a7a0a7a6d83becf6c144603c15e6f485df79b9b897fb0fc2d878fff32187ab.google_fb_hear_you.jpg',
-//       alt: 'Texto alternativo'
-//     }
-//   },
-//   {
-//     id: 'c379fe52-03c1-40ed-99cd-378d6385712e',
-//     name: 'Training 2025',
-//     description: '123456789',
-//     active: true,
-//     img: {
-//       source:
-//         'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/42db7ddedc4efcac5d1991f1369853c376e14ad1dc26d17977e5bd4adf22376c.my_parents_me.jpg',
-//       alt: 'Texto alternativo'
-//     }
-//   }
-// ]
