@@ -1,10 +1,10 @@
-'use client'
-import { useEffect, useState, useTransition, useRef } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState, useRef } from 'react'
+import { useRouter } from 'next/router'
 import httpServices from 'services/http'
 import FormCustom from 'components/FormCustom'
 import { PhotoIcon } from '@heroicons/react/24/solid'
 import DashboardLayout from 'components/DashboardLayout'
+import useStore from 'store/useStore'
 
 type MediaResponse = {
   id: string
@@ -15,36 +15,63 @@ type MediaResponse = {
   campaignId?: string
 }
 
-export default function RegisterTraining() {
-  const [isFetching, setIsFetching] = useState(false)
-  const [isPending, startTransition] = useTransition()
-  const [files, setFiles] = useState<MediaResponse[]>([])
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const path = usePathname()
-  const id = useRef(path?.substring(path?.lastIndexOf('/') + 1))
+export default function RegisterTraining({ training }: { training: any }) {
   const router = useRouter()
+  const trainingId = router.query.id
+
+  const [
+    currentTraining,
+    getTrainingById,
+    createTraining,
+    updateTraining,
+    resetCurrentTraining,
+    error,
+    loading
+  ] = useStore.Training((state) => [
+    state.currentTraining,
+    state.getTrainingById,
+    state.createTraining,
+    state.updateTraining,
+    state.resetCurrentTraining,
+    state.error,
+    state.loading
+  ])
+
+  const [isFetching, setIsFetching] = useState(false)
+  const [trainingName, setTrainingName] = useState('')
+  const [trainingDescription, setTrainingDescription] = useState('')
+  const filesRef = useRef<MediaResponse[]>([])
+
   const uploadImage = async (e: any) => {
+    // TODO: passar para zustand
+    // TODO: Adicionar essa logica no componente de uploader
     e.preventDefault()
+    const files = e.target.files
+
+    if (files.length > 10) {
+      alert('Limite de 10 arquivos por vez excedido!')
+      return
+    }
 
     const formData = new FormData()
-    const file = e.target.files[0]
-    formData.append('file', file)
+    for (const file of files) {
+      formData.append('files', file)
+    }
 
     try {
       setIsFetching(true)
+      // TODO: passar pra zustand
+
       const { data, error } = await httpServices.upload.save(formData)
-      if (!!error) {
-        throw new Error(error.message)
+
+      if (!!error || !data) {
+        // TODO: Colocar toaster avisando que deu erro
+        throw new Error(error?.message || 'Erro ao salvar imagem50')
       }
 
-      setFiles((prev) => {
-        const newFile = data
-        if (!newFile) {
-          return prev
-        }
-        return [...prev, newFile]
-      })
+      for (const image of data) {
+        filesRef.current.push(image)
+      }
     } catch (error) {
       console.error(error)
     } finally {
@@ -52,66 +79,61 @@ export default function RegisterTraining() {
     }
   }
 
-  // TODO: Tipar corretamente
   const submitTraining = async (e: any) => {
     e.preventDefault()
 
-    const mediaIds = files
-      .map((media) => media.id)
-      .filter((id) => id) as string[]
+    const mediaIds =
+      filesRef.current && filesRef.current.length
+        ? filesRef.current.map((media) => media.id)
+        : []
 
-    try {
-      setIsFetching(true)
-      if (id.current === 'new') {
-        await httpServices.trainings.create({
-          name,
-          description,
-          mediaIds: mediaIds || []
-        })
-      } else {
-        await httpServices.trainings.update(String(id.current), {
-          name,
-          description,
-          mediaIds: mediaIds || []
-        })
-      }
-      //  TODO: Toast
+    const mediasIdsFiltered = mediaIds.filter((id) => id) as string[]
 
-      // startTransition(() => {
-      //   router.refresh()
-      // })
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setIsFetching(false)
-      router.back()
+    if (!!training) {
+      // TODO: Passar pare service
+      updateTraining(String(training.id), {
+        name: trainingName,
+        description: trainingDescription,
+        mediaIds: mediasIdsFiltered
+      })
+    } else {
+      createTraining({
+        name: trainingName,
+        description: trainingDescription,
+        mediaIds: mediasIdsFiltered
+      })
     }
+
+    // TODO: Colocar toast avisando que falhou ao salvar, apaga os dados e deixa o usuário tentar novamente
+    // TODO: Colocar toast com mensagem avisando que salvou com sucesso antes de redirecionar
+    router.push('/in/trainings')
   }
 
-  async function fetchTrainings(id: string) {
-    try {
-      setIsFetching(true)
-      const { data } = await httpServices.trainings.getById(id)
-      console.log('🚀 ~ file: page.tsx:94 ~ fetchTrainings ~ data:', data)
-      if (!data) {
-        throw new Error('Treinamento não encontrado')
-      }
-      setName(data.name)
-      setDescription(data.description)
-      // TODO: Adicionar tbm as imagens em um componente a parte
-    } catch (error) {
-      console.log('🚀 ~ file: page.tsx:97 ~ fetchTrainings ~ error:', error)
-    } finally {
-      setIsFetching(false)
-    }
+  const fetchTraining = async () => {
+    if (!trainingId || trainingId === 'new') return
+
+    getTrainingById(String(trainingId))
   }
 
   useEffect(() => {
-    if (id.current === 'new') {
-      return
-    }
-    fetchTrainings(String(id.current))
-  }, [id.current])
+    if (!currentTraining) return
+    setTrainingName(currentTraining.name)
+    setTrainingDescription(currentTraining?.description || '')
+    // TODO: colocar os files e o active tbm
+  }, [currentTraining])
+
+  useEffect(() => {
+    if (!error) return
+    alert('Erro ao salvar treinamento')
+    router.push('/in/trainings')
+  }, [error])
+
+  useEffect(() => {
+    resetCurrentTraining()
+    setTrainingName('')
+    setTrainingDescription('')
+    fetchTraining()
+  }, [trainingId])
 
   // TODO: Adicionar compo de atitive e inative + função
   return (
@@ -138,8 +160,8 @@ export default function RegisterTraining() {
                       name="name"
                       type="name"
                       autoComplete="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      value={trainingName}
+                      onChange={(e) => setTrainingName(e.target.value)}
                       className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset outline-none focus:ring-blue-600 sm:text-sm sm:leading-6"
                     />
                   </div>
@@ -156,8 +178,8 @@ export default function RegisterTraining() {
                     <textarea
                       id="description"
                       name="description"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
+                      value={trainingDescription}
+                      onChange={(e) => setTrainingDescription(e.target.value)}
                       autoComplete="description"
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                     />
@@ -205,7 +227,7 @@ export default function RegisterTraining() {
             </div>
           </div>
           <div className="mt-6 flex items-center justify-end gap-x-6">
-            <a href="/in/campaigns">
+            <a href="/in/trainings">
               <button
                 type="button"
                 className="text-sm font-semibold leading-6 text-gray-900"
@@ -216,7 +238,7 @@ export default function RegisterTraining() {
             <button
               type="submit"
               className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              disabled={isFetching}
+              disabled={loading || isFetching}
             >
               Salvar
             </button>

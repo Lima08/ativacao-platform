@@ -61,6 +61,7 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
     try {
       setIsFetching(true)
       // TODO: passar pra zustand
+
       const { data, error } = await httpServices.upload.save(formData)
 
       if (!!error || !data) {
