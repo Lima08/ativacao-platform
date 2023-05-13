@@ -77,11 +77,9 @@ export default function TableWrapper({
 
                             <td className="px-4 py-4 text-sm font-medium whitespace-nowrap">
                               <div>
-                                {/* <a href="#" id={`${id}`}> */}
                                 <h2 className="font-medium text-gray-800 dark:text-white ">
                                   {name}
                                 </h2>
-                                {/* </a> */}
                               </div>
                             </td>
 

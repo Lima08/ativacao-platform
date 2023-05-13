@@ -28,9 +28,10 @@ async function createCampaign({
       throw new CustomError('Error creating campaign', 400, meta)
     })
 
-  let medias: IMediaCreated[] = []
+  if (!newCampaign) throw new CustomError('Error creating campaign', 400)
 
-  if (newCampaign && !!mediaIds?.length) {
+  let medias: IMediaCreated[] = []
+  if (mediaIds && mediaIds.length) {
     const promises = mediaIds.map((mediaId) =>
       updateMedia(mediaId, { campaignId: newCampaign.id })
     )
