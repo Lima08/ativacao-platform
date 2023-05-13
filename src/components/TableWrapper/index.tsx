@@ -33,7 +33,6 @@ export default function TableWrapper({
     setInMemoryData(nextState)
   }
 
-
   return (
     <section className="w-full mx-auto">
       <div className="flex flex-col mt-6">
@@ -99,7 +98,8 @@ export default function TableWrapper({
                                 {!!toggleActivation && (
                                   <ToggleInput
                                     defaultActive={active}
-                                    onToggle={() => toggleActivation(id)}
+                                    toggleId={id}
+                                    // onToggle={() => toggleActivation(id)}
                                   />
                                 )}
                                 {!!onEdit && (

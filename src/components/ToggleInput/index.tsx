@@ -21,7 +21,8 @@ ToggleInputProps) {
   }, [isActive])
 
   function handleClick() {
-    checkboxRef.current.blur()
+    // if (!checkboxRef.current) return
+    // checkboxRef.current.blur()
   }
 
   const checkboxRef = useRef(null)

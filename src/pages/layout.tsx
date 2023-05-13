@@ -1,10 +1,10 @@
 'use client'
 
-import './globals.css'
 import { ReactNode } from 'react'
 // import { checkIdPublicRoute } from 'functions'
 // import { usePathname } from 'next/navigation'
 // import { PrivateRoute } from 'components/PrivateRoute'
+// import './globals.css'
 
 
 export default function RootLayout({ children }: { children: ReactNode }) {

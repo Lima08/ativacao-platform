@@ -123,7 +123,6 @@ export default function Modal({
                             width="640"
                             height="360"
                             src={medias[index].url}
-                            type="video/mp4"
                             style={{ height: '400px' }}
                           >
                             Video title
