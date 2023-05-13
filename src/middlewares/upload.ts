@@ -9,22 +9,9 @@ dotenv.config()
 const upload = multer({
   storage: multerS3({
     s3: getS3Client(),
-    bucket: (req, file, cb) => {
-      let bucketName: string
-
-      const type = file.mimetype.split('/')[0]
-      if (['image', 'video'].includes(type)) {
-        bucketName = process.env.AWS_BUCKET_MEDIA!
-        // @ts-ignore
-        req.type = type
-      }
-
-      if (type === 'application' && file.mimetype.endsWith('sheet')) {
-        bucketName = process.env.AWS_BUCKET_DOC!
-        // @ts-ignore
-        req.type = 'document'
-      }
-      // @ts-ignore
+    bucket: (_req, _files, cb) => {
+      // TODO: Separar buckets para document
+      let bucketName = process.env.AWS_BUCKET_MEDIA!
       cb(null, bucketName)
     },
     contentType: multerS3.AUTO_CONTENT_TYPE,
@@ -34,4 +21,4 @@ const upload = multer({
     }
   })
 })
-export const uploadS3Multer = upload.single('file')
+export const uploadS3Multer = upload.array('files', 10)

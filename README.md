@@ -37,9 +37,13 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-
 TODO:
+
 - [ ] Adicionar configurações Docker
 - [ ] Adicionar configurações Prisma + doc (studio, migrations, seeder)
 - [ ] Uso do next
 - [ ] Uso do tailwind
+
+## Run migration
+
+- npx prisma migrate dev

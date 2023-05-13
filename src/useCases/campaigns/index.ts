@@ -86,10 +86,10 @@ async function getAllCampaigns(
 
 async function updateCampaign(
   id: string,
-  { name, description, mediaIds }: modifierCampaignDto
+  { name, description, active, mediaIds }: modifierCampaignDto
 ): Promise<createdCampaignDto> {
   const updatedCampaign = await repository
-    .update(id, { name, description })
+    .update(id, { name, description, active })
     .catch((error: any) => {
       const meta = error.meta
       throw new CustomError('Error to update campaign', 400, meta)

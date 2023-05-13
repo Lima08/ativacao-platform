@@ -13,12 +13,13 @@ export default handler
     res.status(200).json({ data: campaign })
   })
   .put(async (req, res) => {
-    const { name, description, mediaIds } = req.body
+    const { name, description, active, mediaIds } = req.body
     const id = req.query.id as string
 
     const updatedCampaign = await updateCampaign(id, {
       name,
       description,
+      active,
       mediaIds
     })
 

@@ -1,4 +1,4 @@
-export default function index() {
+export default function SearchPrevNext() {
   return (
     <div className="mt-6 md:flex md:items-center md:justify-between">
       <div className="relative flex items-center mt-4 md:mt-0">
