@@ -4,14 +4,8 @@ import CampaignService from './campaignServices'
 import UploadService from './uploadServices'
 import TrainingService from './trainingServices'
 
-const API_ENVS = {
-  production: '',
-  development: 'http://localhost:3000',
-  test: ''
-}
-
 const httpClient = axios.create({
-  baseURL: API_ENVS[process.env.NODE_ENV] || API_ENVS.development
+  baseURL: process.env.VERCEL_URL || process.env.DEVELOPMENT_URL
 })
 
 // httpClient.interceptors.request.use((config) => {
