@@ -6,6 +6,7 @@ import {
   ICampaignStore
 } from '../types/iCampaignStore'
 import { ICampaignCreated } from 'interfaces/entities/campaign'
+import { modifierCampaignDto } from 'useCases/campaigns/dto'
 
 const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
   currentCampaign: null,
@@ -47,7 +48,7 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
       campaignsList: [...state.campaignsList, response.data as ICampaignCreated]
     }))
   },
-  updateCampaign: async (id: string, updatedCampaign: CreatePayloadStore) => {
+  updateCampaign: async (id: string, updatedCampaign: modifierCampaignDto) => {
     set({ loading: true })
 
     const response = await httpServices.campaigns.update(id, updatedCampaign)
@@ -56,6 +57,19 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
       loading: false,
       error: response.error,
       campaignsList: state.campaignsList.map((c) =>
+        c.id === id ? (response.data as ICampaignCreated) : c
+      )
+    }))
+  },
+  handleCampaignActive: async (id: string, status: boolean) => {
+    set({ loading: true })
+
+    const response = await httpServices.trainings.update(id, { active: status })
+    set((state) => ({
+      ...state,
+      loading: false,
+      error: response.error,
+      trainingsList: state.campaignsList.map((c) =>
         c.id === id ? (response.data as ICampaignCreated) : c
       )
     }))

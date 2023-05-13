@@ -1,4 +1,5 @@
 import { ICampaignCreated } from 'interfaces/entities/campaign'
+import { modifierCampaignDto } from 'useCases/campaigns/dto'
 
 export interface ICampaign {
   id: string
@@ -26,5 +27,5 @@ export interface ICampaignStore {
   getCampaignById: (id: string) => void
   getAllCampaigns: () => void
   deleteCampaign: (id: string) => void
-  updateCampaign: (id: string, updatedCampaign: CreatePayloadStore) => void
+  updateCampaign: (id: string, updatedCampaign: modifierCampaignDto) => void
 }

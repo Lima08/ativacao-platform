@@ -1,11 +1,8 @@
 import { StateCreator } from 'zustand'
 import httpServices from 'services/http'
-import {
-  CreatePayloadStore,
-  ITraining,
-  ITrainingStore
-} from '../types/iTrainingStore'
+import { CreatePayloadStore, ITrainingStore } from '../types/iTrainingStore'
 import { ITrainingCreated } from 'interfaces/entities/training'
+import { modifierTrainingDto } from 'useCases/trainings/dto'
 
 const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
   currentTraining: null,
@@ -27,9 +24,9 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
   },
   getAllTrainings: async () => {
     set({ loading: true })
-    
+
     const response = await httpServices.trainings.getAll()
-    console.log({responseData: response })
+    console.log({ responseData: response })
     set((state) => ({
       ...state,
       loading: false,
@@ -48,10 +45,23 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
       trainingsList: [...state.trainingsList, response.data as ITrainingCreated]
     }))
   },
-  updateTraining: async (id: string, updatedTraining: CreatePayloadStore) => {
+  updateTraining: async (id: string, updatedTraining: modifierTrainingDto) => {
     set({ loading: true })
 
     const response = await httpServices.trainings.update(id, updatedTraining)
+    set((state) => ({
+      ...state,
+      loading: false,
+      error: response.error,
+      trainingsList: state.trainingsList.map((c) =>
+        c.id === id ? (response.data as ITrainingCreated) : c
+      )
+    }))
+  },
+  handleTrainingActive: async (id: string, status: boolean) => {
+    set({ loading: true })
+
+    const response = await httpServices.trainings.update(id, { active: status })
     set((state) => ({
       ...state,
       loading: false,

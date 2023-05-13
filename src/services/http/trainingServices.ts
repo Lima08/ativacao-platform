@@ -2,17 +2,6 @@ import { AxiosInstance } from 'axios'
 import { ApiResponse } from '../../../types'
 import { ITrainingCreated } from 'interfaces/entities/training'
 
-
-// type Training = {
-//   id: string
-//   name: string
-//   description: string
-//   active: boolean
-//   media: string[]
-//   createdAt: string
-//   updatedAt: string
-// }
-
 type CreatePayload = {
   name: string
   description?: string
@@ -29,7 +18,7 @@ type ModifierPayload = {
 export interface TrainingServiceInterface {
   create(payload: CreatePayload): Promise<ApiResponse<ITrainingCreated>>
   getById(trainingId: string): Promise<ApiResponse<ITrainingCreated>>
-  getAll(): Promise<ApiResponse<ITrainingCreated>>
+  getAll(): Promise<ApiResponse<ITrainingCreated[]>>
   update(
     trainingId: string,
     payload: ModifierPayload

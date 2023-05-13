@@ -1,4 +1,5 @@
 import { ITrainingCreated } from 'interfaces/entities/training'
+import { modifierTrainingDto } from 'useCases/trainings/dto'
 
 export interface ITraining {
   id: string
@@ -26,5 +27,5 @@ export interface ITrainingStore {
   getTrainingById: (id: string) => void
   getAllTrainings: () => void
   deleteTraining: (id: string) => void
-  updateTraining: (id: string, updatedTraining: CreatePayloadStore) => void
+  updateTraining: (id: string, updatedTraining: modifierTrainingDto) => void
 }
