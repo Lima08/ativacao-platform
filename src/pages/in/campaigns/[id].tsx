@@ -102,13 +102,13 @@ export default function RegisterCampaign() {
 
     if (!campaignId || campaignId === 'new') {
       // TODO: Passar pare service
-      updateCampaign(String(campaignId), {
+      createCampaign({
         name: campaignName,
         description: campaignDescription,
         mediaIds: mediasIdsFiltered
       })
     } else {
-      createCampaign({
+      updateCampaign(String(campaignId), {
         name: campaignName,
         description: campaignDescription,
         mediaIds: mediasIdsFiltered
