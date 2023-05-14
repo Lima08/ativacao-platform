@@ -5,5 +5,5 @@ export default handler.get(async (req, res) => {
   const companyId = req.companyId!
 
   const allCampaigns = await getAllCampaigns({ companyId })
-  res.status(200).json({ data: allCampaigns })
+  return res.status(200).json({ data: allCampaigns })
 })

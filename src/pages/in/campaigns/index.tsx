@@ -106,10 +106,7 @@ export default function CampaignsList() {
     const campaignsAdapted = campaignsAdapter(campaignsList)
     setCampaignsListAdapted(campaignsAdapted)
   }, [campaignsList])
-  console.log(
-    '🚀 ~ file: index.tsx:111 ~ CampaignsList ~ campaignsList:',
-    campaignsList
-  )
+
 
   return (
     <DashboardLayout>

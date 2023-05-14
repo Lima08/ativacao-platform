@@ -10,7 +10,7 @@ export default handler
     const id = req.query.id as string
 
     const analysis = await getAnalysisById(id)
-    res.status(200).json({ data: analysis })
+    return res.status(200).json({ data: analysis })
   })
   .put(async (req, res) => {
     const { status, biUrl, title } = req.body
@@ -22,11 +22,11 @@ export default handler
       title
     })
 
-    res.status(200).json({ data: updatedAnalysis })
+    return res.status(200).json({ data: updatedAnalysis })
   })
   .delete(async (req, res) => {
     const id = req.query.id as string
 
     await deleteAnalysis(id)
-    res.status(204).end()
+    return res.status(204).end()
   })

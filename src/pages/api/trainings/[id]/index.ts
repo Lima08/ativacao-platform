@@ -10,7 +10,7 @@ export default handler
     const id = req.query.id as string
 
     const training = await getTrainingById(id)
-    res.status(200).json({ data: training })
+    return res.status(200).json({ data: training })
   })
   .put(async (req, res) => {
     const { name, description, mediaIds, active } = req.body
@@ -23,11 +23,11 @@ export default handler
       active
     })
 
-    res.status(200).json({ data: updatedTraining })
+    return res.status(200).json({ data: updatedTraining })
   })
   .delete(async (req, res) => {
     const id = req.query.id as string
 
     await deleteTraining(id)
-    res.status(204).end()
+    return res.status(204).end()
   })

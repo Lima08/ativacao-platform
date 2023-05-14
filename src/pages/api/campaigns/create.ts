@@ -15,5 +15,5 @@ export default handler.post(async (req, res) => {
     companyId,
     mediaIds
   })
-  res.status(201).json({ data: createdCampaign })
+  return res.status(201).json({ data: createdCampaign })
 })

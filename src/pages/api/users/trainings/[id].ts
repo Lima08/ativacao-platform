@@ -9,5 +9,5 @@ export default handler.put(async (req, res) => {
     status
   })
 
-  res.status(200).json({ data: updatedTraining })
+  return res.status(200).json({ data: updatedTraining })
 })

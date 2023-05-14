@@ -5,5 +5,5 @@ export default handler.delete(async (req, res) => {
   const id = req.query.id as string
 
   await deleteMedia(id)
-  res.status(204).end()
+  return res.status(204).end()
 })

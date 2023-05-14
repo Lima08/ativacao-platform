@@ -6,5 +6,5 @@ export default handler.put(async (req, res) => {
 
   const updatedTraining = await toggleActive(id)
 
-  res.status(200).json({ data: updatedTraining })
+  return res.status(200).json({ data: updatedTraining })
 })

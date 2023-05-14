@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
 import httpServices from 'services/http'
@@ -16,7 +18,7 @@ type MediaResponse = {
   trainingId?: string
 }
 
-export default function RegisterCampaign({ campaign }: { campaign: any }) {
+export default function RegisterCampaign() {
   const router = useRouter()
   const campaignId = router.query.id
 
@@ -80,6 +82,15 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
     }
   }
 
+  const resetState = () => {
+    return () => {
+      setCampaignName('')
+      setCampaignDescription('')
+      filesRef.current = []
+      resetCurrentCampaign()
+    }
+  }
+
   const submitCampaign = async (e: any) => {
     e.preventDefault()
 
@@ -89,9 +100,9 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
         : []
     const mediasIdsFiltered = mediaIds.filter((id) => id) as string[]
 
-    if (!!campaign) {
+    if (!campaignId || campaignId === 'new') {
       // TODO: Passar pare service
-      updateCampaign(String(campaign.id), {
+      updateCampaign(String(campaignId), {
         name: campaignName,
         description: campaignDescription,
         mediaIds: mediasIdsFiltered
@@ -103,17 +114,10 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
         mediaIds: mediasIdsFiltered
       })
     }
-
     // TODO: Colocar toast avisando que falhou ao salvar, apaga os dados e deixa o usuário tentar novamente
     // TODO: Colocar toast com mensagem avisando que salvou com sucesso antes de redirecionar
     router.push('/in/campaigns')
     resetState()
-  }
-
-  const resetState = () => {
-    setCampaignName('')
-    setCampaignDescription('')
-    filesRef.current = []
   }
 
   const fetchCampaign = async () => {
@@ -136,9 +140,7 @@ export default function RegisterCampaign({ campaign }: { campaign: any }) {
   }, [error])
 
   useEffect(() => {
-    resetCurrentCampaign()
-    setCampaignName('')
-    setCampaignDescription('')
+    resetState()
     fetchCampaign()
   }, [campaignId])
 

@@ -6,5 +6,5 @@ export default handler.put(async (req, res) => {
 
   const rejectedAnalysis = await rejected(id)
 
-  res.status(200).json({ data: rejectedAnalysis })
+  return res.status(200).json({ data: rejectedAnalysis })
 })
