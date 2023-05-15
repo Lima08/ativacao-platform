@@ -97,7 +97,7 @@ export default function TableWrapper({
                                   <ToggleInput
                                     defaultActive={active}
                                     toggleId={id}
-                                    // onToggle={() => toggleActivation(id)}
+                                    onClickToggle={() => toggleActivation(id)}
                                   />
                                 )}
                                 {!!onEdit && (
