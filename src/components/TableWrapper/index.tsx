@@ -33,7 +33,6 @@ export default function TableWrapper({
     setInMemoryData(nextState)
   }
 
-
   return (
     <section className="w-full mx-auto">
       <div className="flex flex-col mt-6">
@@ -57,7 +56,7 @@ export default function TableWrapper({
                         const imgSource =
                           !!medias[0]?.url && medias[0]?.type === 'image'
                             ? medias[0]?.url
-                            : 'https://ativacao-bucket-s3-homolog.s3.us-east-1.amazonaws.com/93e55b7409de1702cee02ccf1e2615a89c5e9cb74d84307d6d5bb2c5449ceca7.tenis1.webp'
+                            : '/logo-ativacao.png'
                         const imgAlt = 'imagem ícone'
                         // TODO: Passar o componente que vai ser renderizado para não travar esse destruction
                         return (
@@ -78,11 +77,9 @@ export default function TableWrapper({
 
                             <td className="px-4 py-4 text-sm font-medium whitespace-nowrap">
                               <div>
-                                {/* <a href="#" id={`${id}`}> */}
                                 <h2 className="font-medium text-gray-800 dark:text-white ">
                                   {name}
                                 </h2>
-                                {/* </a> */}
                               </div>
                             </td>
 
@@ -99,7 +96,8 @@ export default function TableWrapper({
                                 {!!toggleActivation && (
                                   <ToggleInput
                                     defaultActive={active}
-                                    onToggle={() => toggleActivation(id)}
+                                    toggleId={id}
+                                    // onToggle={() => toggleActivation(id)}
                                   />
                                 )}
                                 {!!onEdit && (

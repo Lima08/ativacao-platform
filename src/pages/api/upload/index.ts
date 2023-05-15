@@ -28,5 +28,5 @@ export default handler.use(uploadS3Multer).post(async (req, res) => {
     filesList.push(createdFile)
   }
 
-  res.status(201).json({ data: filesList })
+  return res.status(201).json({ data: filesList })
 })

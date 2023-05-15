@@ -19,5 +19,5 @@ export default handler.use(uploadS3Multer).post(async (req, res) => {
     userId,
     bucketUrl: documentUrl
   })
-  res.status(201).json({ data: createdTraining })
+  return res.status(201).json({ data: createdTraining })
 })

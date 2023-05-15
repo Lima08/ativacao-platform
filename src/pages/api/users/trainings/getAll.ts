@@ -5,5 +5,5 @@ export default handler.get(async (req, res) => {
   const userId = req.userId!
 
   const userTrainings = await getAllBy({ userId })
-  res.status(200).json({ data: userTrainings })
+  return res.status(200).json({ data: userTrainings })
 })

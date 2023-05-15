@@ -14,5 +14,5 @@ export default handler.post(async (req, res) => {
     companyId,
     mediaIds
   })
-  res.status(201).json({ data: createdTraining })
+  return res.status(201).json({ data: createdTraining })
 })

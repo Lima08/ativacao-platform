@@ -6,5 +6,5 @@ export default handler.get(async (req, res) => {
   const { status } = req.body
 
   const user = await getAllAnalyzes({ status, userId })
-  res.status(200).json({ data: user })
+  return res.status(200).json({ data: user })
 })

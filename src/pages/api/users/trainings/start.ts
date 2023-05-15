@@ -9,5 +9,5 @@ export default handler.post(async (req, res) => {
     trainingId,
     userId
   })
-  res.status(201).json({ data: createdTraining })
+  return res.status(201).json({ data: createdTraining })
 })

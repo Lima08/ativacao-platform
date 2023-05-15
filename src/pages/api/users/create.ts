@@ -22,5 +22,5 @@ export default handler.use(uploadS3Multer).post(async (req, res) => {
     imageUrl
   })
 
-  res.status(201).json({ data: createdUser })
+  return res.status(201).json({ data: createdUser })
 })

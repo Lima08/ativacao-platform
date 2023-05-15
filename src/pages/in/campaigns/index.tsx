@@ -74,9 +74,7 @@ export default function CampaignsList() {
         description: campaign.description || null,
         active: campaign.active,
         img: {
-          source:
-            campaign?.medias[0]?.url ||
-            'https://lojinha-da-aletha.dooca.store/admin/assets/logo-folded.1f809cab.svg',
+          source: campaign?.medias[0]?.url || '/logo-ativacao.png',
           alt: 'Texto alternativo'
         }
       }
@@ -109,7 +107,6 @@ export default function CampaignsList() {
     setCampaignsListAdapted(campaignsAdapted)
   }, [campaignsList])
 
-  console.log('campaignsListAdapted: ', campaignsListAdapted)
 
   return (
     <DashboardLayout>
@@ -122,7 +119,7 @@ export default function CampaignsList() {
           </li>
         )}
         <ul className="list-none mt-8">
-          {!!campaignsListAdapted.length &&
+          {!!campaignsListAdapted?.length &&
             campaignsListAdapted.map((campaign) => (
               <ListItem
                 key={campaign.id}

@@ -9,5 +9,5 @@ export default handler.put(async (req, res) => {
     biUrl
   })
 
-  res.status(200).json({ data: doneAnalysis })
+  return res.status(200).json({ data: doneAnalysis })
 })

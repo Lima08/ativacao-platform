@@ -10,7 +10,7 @@ export default handler
     const id = req.query.id as string
 
     const campaign = await getCampaignById(id)
-    res.status(200).json({ data: campaign })
+    return res.status(200).json({ data: campaign })
   })
   .put(async (req, res) => {
     const { name, description, active, mediaIds } = req.body
@@ -23,11 +23,11 @@ export default handler
       mediaIds
     })
 
-    res.status(200).json({ data: updatedCampaign })
+    return res.status(200).json({ data: updatedCampaign })
   })
   .delete(async (req, res) => {
     const id = req.query.id as string
 
     await deleteCampaign(id)
-    res.status(204).end()
+    return res.status(204).end()
   })
