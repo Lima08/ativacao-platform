@@ -1,9 +1,9 @@
+import { IMediaCreated } from 'interfaces/entities/media'
 import {
   ITraining,
   ITrainingCreated,
   ITrainingModifier
 } from 'interfaces/entities/training'
-import { IMediaCreated } from 'interfaces/entities/media'
 
 export interface newTrainingDto extends ITraining {
   mediaIds?: string[]

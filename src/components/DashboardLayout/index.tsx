@@ -1,6 +1,7 @@
-import { ReactNode, Suspense } from 'react'
-import BaseNavbar from 'components/BaseNavbar'
+import { ReactNode } from 'react'
+
 import AsidePanel from 'components/AsidePanel'
+import BaseNavbar from 'components/BaseNavbar'
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (

@@ -1,10 +1,11 @@
 import { create } from 'zustand'
-import createGlobalSlice from './slices/globalSlice'
+
 import createCampaignsSlice from './slices/campaignSlice'
+import createGlobalSlice from './slices/globalSlice'
 import createTrainingsSlice from './slices/trainingSlice'
 import { ICampaignStore } from './types/iCampaignStore'
-import { ITrainingStore } from './types/iTrainingStore'
 import { IGlobalStore } from './types/iGlobalStore'
+import { ITrainingStore } from './types/iTrainingStore'
 
 const Global = create<IGlobalStore>((...a) => ({
   ...createGlobalSlice(...a)

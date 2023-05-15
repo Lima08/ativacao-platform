@@ -1,14 +1,14 @@
-import dotenv from 'dotenv'
-import { prisma } from 'lib/prisma'
-import { Media } from 'models/Media'
-import s3Service from 'services/s3Service'
 import CustomError from 'constants/errors/CustoError'
+import dotenv from 'dotenv'
 import {
   IMedia,
   IMediaCreated,
   IMediaFilter,
   IMediaModifier
 } from 'interfaces/entities/media'
+import { prisma } from 'lib/prisma'
+import { Media } from 'models/Media'
+import s3Service from 'services/s3Service'
 
 dotenv.config()
 const repository = Media.of(prisma)

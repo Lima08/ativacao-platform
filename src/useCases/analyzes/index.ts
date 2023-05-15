@@ -1,6 +1,3 @@
-import { prisma } from 'lib/prisma'
-import { Analysis } from 'models/Analysis'
-import { updateMedia, getMediasBy, deleteMedia } from '../media'
 import CustomError from 'constants/errors/CustoError'
 import {
   IAnalysis,
@@ -8,7 +5,9 @@ import {
   IAnalysisFilter,
   IAnalysisModifier
 } from 'interfaces/entities/analysis'
-import { IMediaCreated } from 'interfaces/entities/media'
+import { prisma } from 'lib/prisma'
+import { Analysis } from 'models/Analysis'
+
 
 const repository = Analysis.of(prisma)
 

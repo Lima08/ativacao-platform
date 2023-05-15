@@ -1,13 +1,13 @@
+import CustomError from 'constants/errors/CustoError'
 import dotenv from 'dotenv'
-import { prisma } from 'lib/prisma'
-import { User } from 'models/User'
 import type {
   IUser,
   IUserCreated,
   IUserFilter,
   IUserModifier
 } from 'interfaces/entities/user'
-import CustomError from 'constants/errors/CustoError'
+import { prisma } from 'lib/prisma'
+import { User } from 'models/User'
 
 dotenv.config()
 const repository = User.of(prisma)

@@ -1,6 +1,7 @@
 import { AxiosInstance } from 'axios'
-import { ApiResponse } from '../../../types'
 import { ITrainingCreated } from 'interfaces/entities/training'
+
+import { ApiResponse } from '../../../types'
 
 type CreatePayload = {
   name: string
