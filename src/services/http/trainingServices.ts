@@ -24,7 +24,6 @@ export interface TrainingServiceInterface {
     payload: ModifierPayload
   ): Promise<ApiResponse<ITrainingCreated>>
   delete(trainingId: string): Promise<void>
-  toggleActive(trainingId: string): Promise<ITrainingCreated>
 }
 
 const TrainingService = (
@@ -37,7 +36,7 @@ const TrainingService = (
         description,
         mediaIds
       })
-  
+
       return response.data
     } catch (error) {
       console.error('Error to create training:', error)
@@ -48,7 +47,7 @@ const TrainingService = (
   getAll: async () => {
     try {
       const response = await httpClient.get('/api/trainings/getAll')
-  
+
       return response.data
     } catch (error) {
       console.error('Error fetching trainings:', error)
@@ -59,7 +58,7 @@ const TrainingService = (
   getById: async (trainingId) => {
     try {
       const response = await httpClient.get(`/api/trainings/${trainingId}`)
-  
+
       return response.data
     } catch (error) {
       console.error('Error to get training:', error)
@@ -75,7 +74,7 @@ const TrainingService = (
         active,
         mediaIds
       })
-  
+
       return response.data
     } catch (error) {
       console.error('Error to update training:', error)
@@ -90,13 +89,6 @@ const TrainingService = (
     } catch (error) {
       console.error('Error to delete training:', error)
     }
-  },
-
-  toggleActive: async (trainingId: string) => {
-    const response = await httpClient.put(
-      `/api/trainings/${trainingId}/toggleActive`
-    )
-    return response.data
   }
 })
 

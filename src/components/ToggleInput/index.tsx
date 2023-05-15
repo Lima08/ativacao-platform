@@ -17,7 +17,7 @@ export default function ToggleInput({
   const handleToggle = () => {
     const newActiveState = !isActive
     setIsActive(newActiveState)
-    onClickToggle(toggleId, !defaultActive)
+    onClickToggle(toggleId, newActiveState)
   }
 
   function handleClick() {

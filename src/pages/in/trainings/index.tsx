@@ -81,9 +81,7 @@ export default function TrainingsPage() {
         description: training.description || null,
         active: training.active,
         img: {
-          source:
-            training?.medias[0]?.url ||
-            'https://lojinha-da-aletha.dooca.store/admin/assets/logo-folded.1f809cab.svg',
+          source: training?.medias[0]?.url || '/logo-ativacao.png',
           alt: 'Texto alternativo'
         }
       }
@@ -130,7 +128,6 @@ export default function TrainingsPage() {
             Nenhum treinamento encontrado
           </li>
         )}
-
         <ul className="list-none mt-8">
           {!!trainingListAdapted.length &&
             trainingListAdapted.map((training) => (

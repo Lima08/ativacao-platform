@@ -19,14 +19,21 @@ interface mediaObject {
 export default function CampaignsList() {
   const router = useRouter()
 
-  const [campaignsList, getAllCampaigns, deleteCampaign, error, loading] =
-    useStore.Campaign((state) => [
-      state.campaignsList,
-      state.getAllCampaigns,
-      state.deleteCampaign,
-      state.error,
-      state.loading
-    ])
+  const [
+    campaignsList,
+    getAllCampaigns,
+    handleCampaignActive,
+    deleteCampaign,
+    error,
+    loading
+  ] = useStore.Campaign((state) => [
+    state.campaignsList,
+    state.getAllCampaigns,
+    state.handleCampaignActive,
+    state.deleteCampaign,
+    state.error,
+    state.loading
+  ])
 
   const [campaignsListAdapted, setCampaignsListAdapted] = useState<DataList[]>(
     []
@@ -79,6 +86,7 @@ export default function CampaignsList() {
         }
       }
     })
+    console.log('🚀 ~ file: index.tsx:89 ~ campaignsAdapted ~ campaignsAdapted:', campaignsAdapted)
     return campaignsAdapted
   }
 
@@ -90,9 +98,12 @@ export default function CampaignsList() {
     }
   }
 
-  useEffect(() => {
-    if (campaignsList.length > 0) return
+  function handleCampaignStatus(id: string, active: boolean) {
+    handleCampaignActive(id, active)
+  }
 
+  useEffect(() => {
+    console.log('useEffect')
     getAllCampaigns()
   }, [])
 
@@ -106,7 +117,6 @@ export default function CampaignsList() {
     const campaignsAdapted = campaignsAdapter(campaignsList)
     setCampaignsListAdapted(campaignsAdapted)
   }, [campaignsList])
-
 
   return (
     <DashboardLayout>
@@ -127,11 +137,10 @@ export default function CampaignsList() {
                 onDelete={() => deleteItem(campaign.id)}
                 onEdit={handleEdit}
                 onClickRow={onClickRow}
-                // onClickToggle={updateCampaignStatus}
+                onClickToggle={handleCampaignStatus}
               />
             ))}
         </ul>
-
         {open && (
           <Modal
             title={campaign.title}

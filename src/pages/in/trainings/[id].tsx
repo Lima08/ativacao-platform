@@ -15,7 +15,7 @@ type MediaResponse = {
   campaignId?: string
 }
 
-export default function RegisterTraining({ training }: { training: any }) {
+export default function RegisterTraining() {
   const router = useRouter()
   const trainingId = router.query.id
 
@@ -89,15 +89,15 @@ export default function RegisterTraining({ training }: { training: any }) {
 
     const mediasIdsFiltered = mediaIds.filter((id) => id) as string[]
 
-    if (!!training) {
+    if (!trainingId || trainingId === 'new') {
       // TODO: Passar pare service
-      updateTraining(String(training.id), {
+      createTraining({
         name: trainingName,
         description: trainingDescription,
         mediaIds: mediasIdsFiltered
       })
     } else {
-      createTraining({
+      updateTraining(String(trainingId), {
         name: trainingName,
         description: trainingDescription,
         mediaIds: mediasIdsFiltered
