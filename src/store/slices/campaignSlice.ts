@@ -1,11 +1,8 @@
 import { StateCreator } from 'zustand'
 import httpServices from 'services/http'
-import {
-  CreatePayloadStore,
-  ICampaign,
-  ICampaignStore
-} from '../types/iCampaignStore'
+import { CreatePayloadStore, ICampaignStore } from '../types/iCampaignStore'
 import { ICampaignCreated } from 'interfaces/entities/campaign'
+import { modifierCampaignDto } from 'useCases/campaigns/dto'
 
 const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
   currentCampaign: null,
@@ -21,27 +18,34 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
     set((state) => ({
       ...state,
       loading: false,
-      currentCampaign: response.data,
-      error: response.error
+      currentCampaign: response?.data,
+      error: response?.error
     }))
   },
   getAllCampaigns: async () => {
     set({ loading: true })
-    
+
     const response = await httpServices.campaigns.getAll()
-    set((state) => ({
-      ...state,
-      loading: false,
-      campaignsList: response.data,
-      error: response.error
-    }))
+    if (response && response.error) {
+      set((state) => ({
+        ...state,
+        loading: false,
+        error: response.error
+      }))
+    }
+    if (response.data) {
+      set((state) => ({
+        ...state,
+        loading: false,
+        campaignsList: response.data
+      }))
+    }
   },
   createCampaign: async (newCampaign: CreatePayloadStore) => {
     set({ loading: true })
 
     const response = await httpServices.campaigns.create(newCampaign)
-
-    if (response.error || !response.data) {
+    if (response && response.error) {
       set((state) => ({
         ...state,
         loading: false,
@@ -49,34 +53,69 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
       }))
       return
     }
-    set((state) => ({
-      ...state,
-      loading: false,
-      campaignsList: [...state.campaignsList, response.data as ICampaignCreated]
-    }))
+    if (response && response.data) {
+      set((state) => ({
+        ...state,
+        loading: false,
+        campaignsList: [
+          ...state.campaignsList,
+          response.data as ICampaignCreated
+        ]
+      }))
+    }
   },
-  updateCampaign: async (id: string, updatedCampaign: CreatePayloadStore) => {
+  updateCampaign: async (id: string, updatedCampaign: modifierCampaignDto) => {
     set({ loading: true })
 
     const response = await httpServices.campaigns.update(id, updatedCampaign)
-    set((state) => ({
-      ...state,
-      loading: false,
-      error: response.error,
-      campaignsList: state.campaignsList.map((c) =>
-        c.id === id ? (response.data as ICampaignCreated) : c
-      )
-    }))
+    if (response && response.error) {
+      set((state) => ({
+        ...state,
+        loading: false,
+        error: response.error
+      }))
+    }
+
+    if (response && response.data) {
+      set((state) => ({
+        ...state,
+        loading: false,
+        campaignsList: state.campaignsList.map((c) =>
+          c.id === id ? (response.data as ICampaignCreated) : c
+        )
+      }))
+    }
+  },
+  handleCampaignActive: async (id: string, status: boolean) => {
+    set({ loading: true })
+
+    const response = await httpServices.campaigns.update(id, { active: status })
+    if (response && response.error) {
+      set((state) => ({
+        ...state,
+        loading: false,
+        error: response.error
+      }))
+      return
+    }
+
+    if (response && response.data) {
+      set((state) => ({
+        ...state,
+        loading: false,
+        trainingsList: state.campaignsList.map((c) =>
+          c.id === id ? (response.data as ICampaignCreated) : c
+        )
+      }))
+    }
   },
   deleteCampaign: async (id: string) => {
-    set({ loading: true })
     set((state) => ({
       ...state,
       campaignsList: state.campaignsList.filter((c) => c.id !== id)
     }))
 
     await httpServices.campaigns.delete(id)
-    set({ loading: false })
   }
 })
 

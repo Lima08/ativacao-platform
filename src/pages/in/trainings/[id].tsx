@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
 import httpServices from 'services/http'
@@ -7,45 +5,44 @@ import FormCustom from 'components/FormCustom'
 import { PhotoIcon } from '@heroicons/react/24/solid'
 import DashboardLayout from 'components/DashboardLayout'
 import useStore from 'store/useStore'
-import Link from 'next/link'
 
 type MediaResponse = {
   id: string
   url: string
   type: string
   key: string
-  campaignId?: string
   trainingId?: string
+  campaignId?: string
 }
 
-export default function RegisterCampaign() {
+export default function RegisterTraining() {
   const router = useRouter()
-  const campaignId = router.query.id
+  const trainingId = router.query.id
 
   const [
-    currentCampaign,
-    getCampaignById,
-    createCampaign,
-    updateCampaign,
-    resetCurrentCampaign,
+    currentTraining,
+    getTrainingById,
+    createTraining,
+    updateTraining,
+    resetCurrentTraining,
     error,
     loading
-  ] = useStore.Campaign((state) => [
-    state.currentCampaign,
-    state.getCampaignById,
-    state.createCampaign,
-    state.updateCampaign,
-    state.resetCurrentCampaign,
+  ] = useStore.Training((state) => [
+    state.currentTraining,
+    state.getTrainingById,
+    state.createTraining,
+    state.updateTraining,
+    state.resetCurrentTraining,
     state.error,
     state.loading
   ])
 
   const [isFetching, setIsFetching] = useState(false)
-  const [campaignName, setCampaignName] = useState('')
-  const [campaignDescription, setCampaignDescription] = useState('')
+  const [trainingName, setTrainingName] = useState('')
+  const [trainingDescription, setTrainingDescription] = useState('')
   const filesRef = useRef<MediaResponse[]>([])
 
-  const uploadFile = async (e: any) => {
+  const uploadImage = async (e: any) => {
     // TODO: passar para zustand
     // TODO: Adicionar essa logica no componente de uploader
     e.preventDefault()
@@ -76,83 +73,77 @@ export default function RegisterCampaign() {
         filesRef.current.push(image)
       }
     } catch (error) {
-      alert('Erro ao salvar imagem')
       console.error(error)
     } finally {
       setIsFetching(false)
     }
   }
 
-  const resetState = () => {
-    return () => {
-      setCampaignName('')
-      setCampaignDescription('')
-      filesRef.current = []
-      resetCurrentCampaign()
-    }
-  }
-
-  const submitCampaign = async (e: any) => {
+  const submitTraining = async (e: any) => {
     e.preventDefault()
 
     const mediaIds =
-      filesRef.current && filesRef.current?.length
+      filesRef.current && filesRef.current.length
         ? filesRef.current.map((media) => media.id)
         : []
+
     const mediasIdsFiltered = mediaIds.filter((id) => id) as string[]
 
-    if (!campaignId || campaignId === 'new') {
+    if (!trainingId || trainingId === 'new') {
       // TODO: Passar pare service
-      createCampaign({
-        name: campaignName,
-        description: campaignDescription,
+      createTraining({
+        name: trainingName,
+        description: trainingDescription,
         mediaIds: mediasIdsFiltered
       })
     } else {
-      updateCampaign(String(campaignId), {
-        name: campaignName,
-        description: campaignDescription,
+      updateTraining(String(trainingId), {
+        name: trainingName,
+        description: trainingDescription,
         mediaIds: mediasIdsFiltered
       })
     }
+
     // TODO: Colocar toast avisando que falhou ao salvar, apaga os dados e deixa o usuário tentar novamente
     // TODO: Colocar toast com mensagem avisando que salvou com sucesso antes de redirecionar
-    router.push('/in/campaigns')
-    resetState()
+    router.push('/in/trainings')
   }
 
-  const fetchCampaign = async () => {
-    if (!campaignId || campaignId === 'new') return
+  const fetchTraining = async () => {
+    if (!trainingId || trainingId === 'new') return
 
-    getCampaignById(String(campaignId))
+    getTrainingById(String(trainingId))
   }
 
   useEffect(() => {
-    if (!currentCampaign) return
-    setCampaignName(currentCampaign.name)
-    setCampaignDescription(currentCampaign?.description || '')
+    if (!currentTraining) return
+    setTrainingName(currentTraining.name)
+    setTrainingDescription(currentTraining?.description || '')
     // TODO: colocar os files e o active tbm
-  }, [currentCampaign])
+  }, [currentTraining])
 
   useEffect(() => {
     if (!error) return
-    alert('Erro ao salvar campanha')
-    router.push('/in/campaigns')
+    alert('Erro ao salvar treinamento')
+    router.push('/in/trainings')
   }, [error])
 
   useEffect(() => {
-    resetState()
-    fetchCampaign()
-  }, [campaignId])
+    resetCurrentTraining()
+    setTrainingName('')
+    setTrainingDescription('')
+    fetchTraining()
+  }, [trainingId])
 
+  // TODO: Adicionar compo de atitive e inative + função
   return (
     <DashboardLayout>
       <div className="container flex items-center justify-start">
-        <FormCustom submitForm={submitCampaign}>
+        <FormCustom submitForm={submitTraining}>
           <div className="space-y-12">
             <div className="border-b border-gray-900/10 pb-8">
               <h2 className="text-base font-semibold leading-7 text-gray-900">
-                Nova campanha
+                Novo treinamento
               </h2>
 
               <div className="mt-6">
@@ -167,9 +158,10 @@ export default function RegisterCampaign() {
                     <input
                       id="name"
                       name="name"
-                      type="text"
-                      value={campaignName}
-                      onChange={(e) => setCampaignName(e.target.value)}
+                      type="name"
+                      autoComplete="name"
+                      value={trainingName}
+                      onChange={(e) => setTrainingName(e.target.value)}
                       className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset outline-none focus:ring-blue-600 sm:text-sm sm:leading-6"
                     />
                   </div>
@@ -186,8 +178,9 @@ export default function RegisterCampaign() {
                     <textarea
                       id="description"
                       name="description"
-                      value={campaignDescription}
-                      onChange={(e) => setCampaignDescription(e.target.value)}
+                      value={trainingDescription}
+                      onChange={(e) => setTrainingDescription(e.target.value)}
+                      autoComplete="description"
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                     />
                   </div>
@@ -218,8 +211,8 @@ export default function RegisterCampaign() {
                             type="file"
                             className="sr-only"
                             multiple={true}
-                            disabled={loading || isFetching}
-                            onChange={(e) => uploadFile(e)}
+                            disabled={isFetching}
+                            onChange={(e) => uploadImage(e)}
                           />
                         </label>
                         {/* <p className="pl-1">ou arrastar</p> */}
@@ -234,14 +227,14 @@ export default function RegisterCampaign() {
             </div>
           </div>
           <div className="mt-6 flex items-center justify-end gap-x-6">
-            <Link href="/in/campaigns">
+            <a href="/in/trainings">
               <button
                 type="button"
                 className="text-sm font-semibold leading-6 text-gray-900"
               >
                 Cancelar
               </button>
-            </Link>
+            </a>
             <button
               type="submit"
               className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

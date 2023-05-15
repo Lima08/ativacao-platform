@@ -13,20 +13,20 @@ type ListItemProps = {
   onDelete: (id: string) => void
   onEdit: (id: string) => void
   onClickRow: (id: string) => void
-  // onClickToggle: (id: string) => void
+  onClickToggle: (id: string, active: boolean) => void
 }
 
 export default function ListItem({
   data,
   onClickRow,
-  // onClickToggle,
+  onClickToggle,
   onEdit,
   onDelete
 }: ListItemProps) {
   return (
     <li
       key={data.id}
-      className="flex  md:gap10 hover:bg-slate-100 bg-white hover:cursor-pointer w-full border rounded max-h-18"
+      className="flex md:gap10 hover:bg-slate-100 bg-white hover:cursor-pointer w-full border rounded max-h-18"
       onClick={() => onClickRow(data.id)}
     >
       <div className="flex justify-evenly">
@@ -57,9 +57,7 @@ export default function ListItem({
         <ToggleInput
           toggleId={data.id}
           defaultActive={data.active}
-          // onClickToggle={() => {
-          //   onClickToggle(data.id)
-          // }}
+          onClickToggle={onClickToggle}
         />
         <button
           onClick={(event) => {
