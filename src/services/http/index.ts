@@ -17,30 +17,30 @@ const httpClient = axios.create({
 //   return config
 // })
 
-httpClient.interceptors.response.use(
-  (response) => {
-    // setGlobalLoading(false)
-    return response
-  },
-  (error) => {
-    // setGlobalLoading(false)
-    const canThrowAnError =
-      error.request?.status === 0 || error.request?.status === 500
+// httpClient.interceptors.response.use(
+//   (response) => {
+//     // setGlobalLoading(false)
+//     return response
+//   },
+//   (error) => {
+//     // setGlobalLoading(false)
+//     const canThrowAnError =
+//       error.request?.status === 0 || error.request?.status === 500
 
-    if (canThrowAnError) {
-      // setGlobalLoading(false)
-      throw new Error(error.message)
-    }
+//     if (canThrowAnError) {
+//       // setGlobalLoading(false)
+//       throw new Error(error.message)
+//     }
 
-    if (error.response?.status === 401) {
-      // TODO: Ver se funfa
-      Router.push('/')
-    }
+//     if (error.response?.status === 401) {
+//       // TODO: Ver se funfa
+//       Router.push('/')
+//     }
 
-    // setGlobalLoading(false)
-    return error
-  }
-)
+//     // setGlobalLoading(false)
+//     return error
+//   }
+// )
 
 const httpServices = {
   campaigns: CampaignService(httpClient),

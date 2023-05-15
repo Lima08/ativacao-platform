@@ -11,6 +11,7 @@ type CreatePayload = {
 type ModifierPayload = {
   name?: string
   description?: string
+  active?: boolean
   mediaIds?: string[] | []
 }
 
@@ -61,11 +62,12 @@ const CampaignService = (
     }
   },
 
-  update: async (campaignId, { name, description, mediaIds }) => {
+  update: async (campaignId, { name, description, active, mediaIds }) => {
     try {
       const response = await httpClient.put(`/api/campaigns/${campaignId}`, {
         name,
         description,
+        active,
         mediaIds
       })
 
