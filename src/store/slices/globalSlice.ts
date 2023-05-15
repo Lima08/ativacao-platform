@@ -1,5 +1,5 @@
-import { StateCreator } from 'zustand'
 import { IGlobalStore } from 'store/types/iGlobalStore'
+import { StateCreator } from 'zustand'
 
 const createGlobalSlice: StateCreator<IGlobalStore> = (set) => ({
   loading: false,

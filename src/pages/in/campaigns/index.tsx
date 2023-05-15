@@ -1,15 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+
+import type { ICampaignCreated } from 'interfaces/entities/campaign'
 import useStore from 'store/useStore'
-import PageContainer from 'components/PageContainer'
+
 import DashboardLayout from 'components/DashboardLayout'
-import SearchPrevNext from 'components/SearchPrevNext'
-import Modal from 'components/MediaViewer'
 import ListItem from 'components/ListItem'
 import type { DataList } from 'components/ListItem'
-import type { ICampaignCreated } from 'interfaces/entities/campaign'
+import Modal from 'components/MediaViewer'
+import PageContainer from 'components/PageContainer'
+import SearchPrevNext from 'components/SearchPrevNext'
 
 interface mediaObject {
   url: string
@@ -86,7 +88,10 @@ export default function CampaignsList() {
         }
       }
     })
-    console.log('🚀 ~ file: index.tsx:89 ~ campaignsAdapted ~ campaignsAdapted:', campaignsAdapted)
+    console.log(
+      '🚀 ~ file: index.tsx:89 ~ campaignsAdapted ~ campaignsAdapted:',
+      campaignsAdapted
+    )
     return campaignsAdapted
   }
 

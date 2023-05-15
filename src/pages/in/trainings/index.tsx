@@ -1,15 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+
+import type { ITrainingCreated } from 'interfaces/entities/training'
 import useStore from 'store/useStore'
-import PageContainer from 'components/PageContainer'
+
 import DashboardLayout from 'components/DashboardLayout'
-import SearchPrevNext from 'components/SearchPrevNext'
-import Modal from 'components/MediaViewer'
 import ListItem from 'components/ListItem'
 import type { DataList } from 'components/ListItem'
-import type { ITrainingCreated } from 'interfaces/entities/training'
+import Modal from 'components/MediaViewer'
+import PageContainer from 'components/PageContainer'
+import SearchPrevNext from 'components/SearchPrevNext'
 
 interface mediaObject {
   url: string

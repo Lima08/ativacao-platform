@@ -1,8 +1,9 @@
-import { StateCreator } from 'zustand'
-import httpServices from 'services/http'
-import { CreatePayloadStore, ITrainingStore } from '../types/iTrainingStore'
 import { ITrainingCreated } from 'interfaces/entities/training'
+import httpServices from 'services/http'
 import { modifierTrainingDto } from 'useCases/trainings/dto'
+import { StateCreator } from 'zustand'
+
+import { CreatePayloadStore, ITrainingStore } from '../types/iTrainingStore'
 
 const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
   currentTraining: null,

@@ -1,12 +1,12 @@
+import CustomError from 'constants/errors/CustoError'
 import dotenv from 'dotenv'
-import { prisma } from 'lib/prisma'
 import type {
   IUserTraining,
   IUserTrainingCreated,
   IUserTrainingFilter,
   IUserTrainingModifier
 } from 'interfaces/entities/userTraining'
-import CustomError from 'constants/errors/CustoError'
+import { prisma } from 'lib/prisma'
 import { UserTraining } from 'models/UserTraining '
 
 dotenv.config()
@@ -18,7 +18,7 @@ async function start({
 }: IUserTraining): Promise<IUserTrainingCreated> {
   const allStartedTrainings = await repository.getAll({ trainingId, userId })
 
-  if (!!allStartedTrainings.length) {
+  if (allStartedTrainings.length) {
     throw new CustomError('Training already started', 403)
   }
 

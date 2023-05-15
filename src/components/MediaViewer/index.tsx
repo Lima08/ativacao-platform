@@ -1,6 +1,7 @@
-import { Dispatch, Fragment, SetStateAction, useRef, useState } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
 import Image from 'next/image'
+import { Dispatch, Fragment, SetStateAction, useRef, useState } from 'react'
+
+import { Dialog, Transition } from '@headlessui/react'
 
 interface mediaObject {
   url: string
@@ -108,7 +109,11 @@ export default function Modal({
                       </svg>
                     </div>
                     <div className="w-3/4 flex items-center justify-center flex-col">
-                      <a href={medias[index].url} target="_blank">
+                      <a
+                        href={medias[index].url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         {medias[index].type === 'image' ? (
                           <Image
                             src={medias[index].url}

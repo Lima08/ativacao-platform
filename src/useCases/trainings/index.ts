@@ -1,10 +1,11 @@
+import CustomError from 'constants/errors/CustoError'
+import { IMediaCreated } from 'interfaces/entities/media'
+import { ITrainingCreated, ITrainingFilter } from 'interfaces/entities/training'
 import { prisma } from 'lib/prisma'
 import { Training } from 'models/Training'
+
 import { updateMedia, getMediasBy, deleteMedia } from '../media'
-import CustomError from 'constants/errors/CustoError'
-import { ITrainingCreated, ITrainingFilter } from 'interfaces/entities/training'
 import { createdTrainingDto, newTrainingDto, modifierTrainingDto } from './dto'
-import { IMediaCreated } from 'interfaces/entities/media'
 
 const repository = Training.of(prisma)
 
@@ -97,7 +98,7 @@ async function updateTraining(
 
   let medias: IMediaCreated[] = []
 
-  if (!!mediaIds?.length) {
+  if (mediaIds?.length) {
     const promises = mediaIds.map((id) =>
       updateMedia(id, { trainingId: updatedTraining.id })
     )
@@ -132,7 +133,7 @@ async function toggleActive(id: string): Promise<createdTrainingDto> {
 
 async function deleteTraining(id: string): Promise<void> {
   const allMedias = await getMediasBy({ trainingId: id })
-  if (!!allMedias.length) {
+  if (allMedias.length) {
     const promises = allMedias.map((media) => deleteMedia(media.id))
     await Promise.all(promises).catch((error: any) => {
       const meta = error.meta

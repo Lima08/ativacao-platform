@@ -1,11 +1,10 @@
 import AsidePanelItem from 'components/AsidePanelItem'
 
-import pizzaGraph from '../../../images/icons/pizzaGraph'
 import fourSquares from '../../../images/icons/fourSquares'
-import megaphoneIcon from '../../../images/icons/megaphoneIcon'
 import homeIcon from '../../../images/icons/homeIcon'
-import filesIcon from '../../../images/icons/filesIcon'
 import inboxIcon from '../../../images/icons/inboxIcon'
+import megaphoneIcon from '../../../images/icons/megaphoneIcon'
+import pizzaGraph from '../../../images/icons/pizzaGraph'
 
 function AsidePanel() {
   return (

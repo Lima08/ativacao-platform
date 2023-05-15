@@ -42,11 +42,14 @@ export default function TableCustom({ data, headersName }: TableCustomProps) {
   const headers = Object.keys(data[0])
   return (
     <table>
-      <Head keys={headers} headersName={headersName} />
+      {headers && <Head keys={headers} headersName={headersName} />}
       <tbody>
-        {data.map((rowData) => (
-          <Row contents={rowData} />
-        ))}
+        {data &&
+          data.map((rowData, index) => (
+            <div key={index}>
+              <Row contents={rowData} />
+            </div>
+          ))}
       </tbody>
     </table>
   )

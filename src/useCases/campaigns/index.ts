@@ -1,10 +1,11 @@
-import { prisma } from 'lib/prisma'
-import { Campaign } from 'models/Campaign'
-import { updateMedia, getMediasBy, deleteMedia } from '../media'
 import CustomError from 'constants/errors/CustoError'
 import { ICampaignCreated, ICampaignFilter } from 'interfaces/entities/campaign'
-import { createdCampaignDto, newCampaignDto, modifierCampaignDto } from './dto'
 import { IMediaCreated } from 'interfaces/entities/media'
+import { prisma } from 'lib/prisma'
+import { Campaign } from 'models/Campaign'
+
+import { updateMedia, getMediasBy, deleteMedia } from '../media'
+import { createdCampaignDto, newCampaignDto, modifierCampaignDto } from './dto'
 
 const repository = Campaign.of(prisma)
 
@@ -99,7 +100,7 @@ async function updateCampaign(
 
   let medias: IMediaCreated[] = []
 
-  if (!!mediaIds?.length) {
+  if (mediaIds?.length) {
     const promises = mediaIds.map((id) =>
       updateMedia(id, { campaignId: updatedCampaign.id })
     )
@@ -117,7 +118,7 @@ async function updateCampaign(
 
 async function deleteCampaign(id: string): Promise<void> {
   const allMedias = await getMediasBy({ campaignId: id })
-  if (!!allMedias.length) {
+  if (allMedias.length) {
     const promises = allMedias.map((media) => deleteMedia(media.id))
     await Promise.all(promises).catch((error: any) => {
       const meta = error.meta

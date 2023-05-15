@@ -7,9 +7,10 @@ import {
   DeleteObjectCommand,
   PutObjectOutput
 } from '@aws-sdk/client-s3'
-import { getS3Client } from '../lib/s3'
-import { IPutObject, IDeleteObject } from 'interfaces/services/'
 import CustomError from 'constants/errors/CustoError'
+import { IPutObject, IDeleteObject } from 'interfaces/services/'
+
+import { getS3Client } from '../lib/s3'
 
 export default class s3Service {
   private static instance: s3Service
@@ -32,6 +33,10 @@ export default class s3Service {
     try {
       return this.s3Client.send(command)
     } catch (error) {
+      console.log(
+        '🚀 ~ file: s3Service.ts:36 ~ s3Service ~ getObject ~ error:',
+        error
+      )
       throw error
     }
   }
@@ -46,6 +51,10 @@ export default class s3Service {
     try {
       return this.s3Client.send(command)
     } catch (error) {
+      console.log(
+        '🚀 ~ file: s3Service.ts:54 ~ s3Service ~ putObject ~ error:',
+        error
+      )
       throw error
     }
   }

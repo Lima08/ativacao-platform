@@ -1,8 +1,9 @@
-import { StateCreator } from 'zustand'
-import httpServices from 'services/http'
-import { CreatePayloadStore, ICampaignStore } from '../types/iCampaignStore'
 import { ICampaignCreated } from 'interfaces/entities/campaign'
+import httpServices from 'services/http'
 import { modifierCampaignDto } from 'useCases/campaigns/dto'
+import { StateCreator } from 'zustand'
+
+import { CreatePayloadStore, ICampaignStore } from '../types/iCampaignStore'
 
 const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
   currentCampaign: null,
