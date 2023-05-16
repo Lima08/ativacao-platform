@@ -3,11 +3,8 @@ import { done } from 'useCases/analyzes'
 
 export default handler.put(async (req, res) => {
   const id = req.query.id as string
-  const { biUrl } = req.body
+  const biUrl = req.body.biUrl as string
 
-  const doneAnalysis = await done(id, {
-    biUrl
-  })
-
-  return res.status(200).json({ data: doneAnalysis })
+  const data = await done(id, { biUrl })
+  return res.status(200).json({ data })
 })
