@@ -1,21 +1,17 @@
-import handler from 'handler'
 import {
   updateTraining,
   deleteTraining,
   getTrainingById
 } from 'useCases/trainings'
 
-export default handler
-  .get(async (req, res) => {
-    const id = req.query.id as string
-
+export default async function handler(req: any, res: any) {
+  const id = req.query.id as string
+  if (req.method === 'GET') {
     const training = await getTrainingById(id)
     return res.status(200).json({ data: training })
-  })
-  .put(async (req, res) => {
+  }
+  if (req.method === 'PUT') {
     const { name, description, mediaIds, active } = req.body
-    const id = req.query.id as string
-
     const updatedTraining = await updateTraining(id, {
       name,
       description,
@@ -24,10 +20,9 @@ export default handler
     })
 
     return res.status(200).json({ data: updatedTraining })
-  })
-  .delete(async (req, res) => {
-    const id = req.query.id as string
-
+  }
+  if (req.method === 'DELETE') {
     await deleteTraining(id)
     return res.status(204).end()
-  })
+  }
+}
