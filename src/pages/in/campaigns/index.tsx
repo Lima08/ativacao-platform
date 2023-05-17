@@ -88,10 +88,7 @@ export default function CampaignsList() {
         }
       }
     })
-    console.log(
-      '🚀 ~ file: index.tsx:89 ~ campaignsAdapted ~ campaignsAdapted:',
-      campaignsAdapted
-    )
+
     return campaignsAdapted
   }
 
@@ -108,9 +105,8 @@ export default function CampaignsList() {
   }
 
   useEffect(() => {
-    console.log('useEffect')
     getAllCampaigns()
-  }, [])
+  }, [getAllCampaigns])
 
   useEffect(() => {
     if (!error) return
@@ -128,12 +124,12 @@ export default function CampaignsList() {
       <PageContainer pageTitle="Campanhas" pageSection="campaigns">
         <SearchPrevNext />
         {loading && <p>Carregando...</p>}
-        {!loading && !campaignsListAdapted.length && (
-          <li className="flex items-center justify-center mt-5 bg-white h-12 w-full border rounded">
-            Nenhuma campanha encontrada
-          </li>
-        )}
         <ul className="list-none mt-8">
+          {!loading && !campaignsListAdapted.length && (
+            <li className="flex items-center justify-center mt-5 bg-white h-12 w-full border rounded">
+              Nenhuma campanha encontrada
+            </li>
+          )}
           {!!campaignsListAdapted?.length &&
             campaignsListAdapted.map((campaign) => (
               <ListItem
