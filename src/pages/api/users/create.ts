@@ -1,6 +1,6 @@
 import handler from 'handler'
-import { createUser } from 'useCases/users'
 import { uploadS3Multer } from 'middlewares/upload'
+import { createUser } from 'useCases/users'
 
 export const config = {
   api: {
