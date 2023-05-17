@@ -1,23 +1,15 @@
-import handler from 'handler'
-import { uploadS3Multer } from 'middlewares/upload'
 import { createAnalysis } from 'useCases/analyzes'
 
-export const config = {
-  api: {
-    bodyParser: false
+export default async function handler(req: any, res: any) {
+  if (req.method === 'POST') {
+    const userId = '4181b23f-c4a8-47d1-99c8-2db883d84eb3'
+    const { title, bucketUrl } = req.body
+
+    const createdTraining = await createAnalysis({
+      title,
+      userId,
+      bucketUrl
+    })
+    return res.status(201).json({ data: createdTraining })
   }
 }
-
-// TODO: Colocar middleware de validação
-export default handler.use(uploadS3Multer).post(async (req, res) => {
-  const documentUrl = req.files[0].location
-  const userId = req.userId!
-  const { title } = req.body
-
-  const createdTraining = await createAnalysis({
-    title,
-    userId,
-    bucketUrl: documentUrl
-  })
-  return res.status(201).json({ data: createdTraining })
-})
