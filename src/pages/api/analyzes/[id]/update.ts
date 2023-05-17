@@ -1,32 +1,15 @@
 import handler from 'handler'
-import {
-  updateAnalysis,
-  deleteAnalysis,
-  getAnalysisById
-} from 'useCases/analyzes'
+import { updateAnalysis } from 'useCases/analyzes'
 
-export default handler
-  .get(async (req, res) => {
-    const id = req.query.id as string
+export default handler.put(async (req, res) => {
+  const { status, biUrl, title } = req.body
+  const id = req.query.id as string
 
-    const analysis = await getAnalysisById(id)
-    return res.status(200).json({ data: analysis })
+  const updatedAnalysis = await updateAnalysis(id, {
+    biUrl,
+    status,
+    title
   })
-  .put(async (req, res) => {
-    const { status, biUrl, title } = req.body
-    const id = req.query.id as string
 
-    const updatedAnalysis = await updateAnalysis(id, {
-      biUrl,
-      status,
-      title
-    })
-
-    return res.status(200).json({ data: updatedAnalysis })
-  })
-  .delete(async (req, res) => {
-    const id = req.query.id as string
-
-    await deleteAnalysis(id)
-    return res.status(204).end()
-  })
+  return res.status(200).json({ data: updatedAnalysis })
+})
