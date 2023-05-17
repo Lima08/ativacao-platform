@@ -1,13 +1,12 @@
-import handler from 'handler'
 import { done } from 'useCases/analyzes'
 
-export default handler.put(async (req, res) => {
+export default async function handler(req: any, res: any) {
   const id = req.query.id as string
-  const { biUrl } = req.body
 
-  const doneAnalysis = await done(id, {
-    biUrl
-  })
+  if (req.method === 'PUT') {
+    const biUrl = req.body.biUrl as string
 
-  return res.status(200).json({ data: doneAnalysis })
-})
+    const data = await done(id, { biUrl })
+    return res.status(200).json({ data })
+  }
+}
