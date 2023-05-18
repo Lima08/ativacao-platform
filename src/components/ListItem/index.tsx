@@ -26,7 +26,7 @@ export default function ListItem({
   return (
     <li
       key={data.id}
-      className="flex md:gap10 hover:bg-slate-100 bg-white hover:cursor-pointer w-full border rounded max-h-18"
+      className="flex md:gap-10 hover:bg-slate-100 bg-white hover:cursor-pointer w-full border rounded max-h-18"
       onClick={() => onClickRow(data.id)}
     >
       <div className="flex justify-evenly">
@@ -34,14 +34,14 @@ export default function ListItem({
           <div className="flex items-center flex-col">
             {/* TODO: Ter ícone padrão para colocar no logar da imagem quando vier vzo */}
             <img
-              className="object-fill w-14 h-12 -mx-1  rounded"
+              className="object-fill w-14 h-12 -mx-1 rounded"
               src={data.img.source}
               alt={data.img.alt}
             />
           </div>
         </div>
-        <div className="px-4 py-4 text-sm font-medium items-center w-40 md:w-80 hidden sm:flex justify-start ">
-          <h2 className="font-medium text-gray-800 dark:text-white ">
+        <div className="px-4 py-4 text-sm font-medium items-center w-40 md:w-80 hidden sm:flex justify-start">
+          <h2 className="font-medium text-gray-800 dark:text-white">
             {data.name}
           </h2>
         </div>

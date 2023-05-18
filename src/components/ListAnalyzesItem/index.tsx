@@ -1,3 +1,5 @@
+import { ReactNode } from 'react'
+
 export type AnalyzesDataList = {
   id: string
   title: string
@@ -10,37 +12,67 @@ type ListItemProps = {
   data: AnalyzesDataList
 }
 
+const STATUS: { [key: string]: ReactNode } = {
+  pending: (
+    <span className="flex w-6 h-6 bg-gray-200 rounded-full text-center text-sm text-white">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="w-6 h-6"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
+      </svg>
+    </span>
+  ),
+  done: (
+    <span className="flex w-6 h-6 bg-green-500 rounded-full text-center text-sm text-white">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="w-6 h-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M4.5 12.75l6 6 9-13.5"
+        />
+      </svg>
+    </span>
+  ),
+  rejected: (
+    <span className="flex w-6 h-6 bg-red-500 rounded-full text-center text-white">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="w-6 h-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    </span>
+  )
+}
+
 export default function ListAnalyzesItem({ data }: ListItemProps) {
   return (
-    <div className="flex md:gap10 hover:bg-slate-100 bg-white hover:cursor-pointer w-full border rounded max-h-18">
-      <div className="flex justify-evenly">
-        <div className="px-4 py-4 flex gap-6 justify-evenly">
-          {/* TODO: Colocar logica para trocar de cor confirme status e habilitar o click apenas se estiver done */}
-          <button
-            disabled={!data.biUrl}
-            className={`flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md sm:w-auto gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 ${
-              !data.biUrl ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            <a target="_blank" href={data.biUrl} rel="noreferrer">
-              {data.status}
-            </a>
-          </button>
-        </div>
-        <div className="px-4 py-4 text-sm font-medium items-center w-40 md:w-80 hidden sm:flex justify-start ">
-          <h2 className="font-medium text-gray-800 dark:text-white ">
-            {data.title}
-          </h2>
-        </div>
-        <div className="px-4 py-4 text-sm whitespace-nowrap">
-          {/* TODO: Colocar tamanho maximo para não quebrar a visualização */}
-          <div className="flex items-center flex-col">
-            <a target="_blank" href={data.bucketUrl} rel="noreferrer">
-              {data.bucketUrl}
-            </a>
-          </div>
-        </div>
-      </div>
+    <div className="flex px-4 py-4 justify-center gap-4 items-center w-full">
+      <h2 className="font-medium text-gray-800 dark:text-white w-1/2">
+        {data.title}
+      </h2>
+      <div className="font-medium text-slate-500 w-1/4">01/01/2022</div>
+      <div className="w-1/4 flex justify-end">{STATUS[data.status]}</div>
     </div>
   )
 }
