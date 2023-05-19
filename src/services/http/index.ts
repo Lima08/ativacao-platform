@@ -6,9 +6,7 @@ import CampaignService from './campaignServices'
 import TrainingService from './trainingServices'
 import UploadService from './uploadServices'
 
-const httpClient = axios.create({
-  baseURL: process.env.VERCEL_URL || process.env.DEVELOPMENT_URL
-})
+const httpClient = axios.create()
 
 // httpClient.interceptors.request.use((config) => {
 //   // setGlobalLoading(true)
