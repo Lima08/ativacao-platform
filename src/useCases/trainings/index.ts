@@ -25,7 +25,7 @@ async function createTraining({
       userId
     })
     .catch((error: any) => {
-      const meta = error.meta
+      const meta = error.meta || error.message
       throw new CustomError(
         'Error creating Training',
         HTTP_STATUS.BAD_REQUEST,
@@ -43,7 +43,7 @@ async function createTraining({
     await Promise.all(promises)
       .then((files) => (medias = files))
       .catch((error: any) => {
-        const meta = error.meta
+        const meta = error.meta || error.message
         throw new CustomError(
           'Error in creating Training media',
           HTTP_STATUS.BAD_REQUEST,
@@ -69,7 +69,7 @@ async function getTrainingById(id: string): Promise<createdTrainingDto> {
 
     return { ...training, medias }
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError(
       'Error to get Training',
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -93,7 +93,7 @@ async function getAllTrainings(
 
     return allTrainingsWithMedia
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError(
       'Error to get Trainings',
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -109,7 +109,7 @@ async function updateTraining(
   const updatedTraining = await repository
     .update(id, { name, description, active })
     .catch((error: any) => {
-      const meta = error.meta
+      const meta = error.meta || error.message
       throw new CustomError(
         'Error to update Training',
         HTTP_STATUS.BAD_REQUEST,
@@ -127,7 +127,7 @@ async function updateTraining(
     await Promise.all(promises)
       .then((files) => (medias = files))
       .catch((error: any) => {
-        const meta = error.meta
+        const meta = error.meta || error.message
         throw new CustomError(
           'Error to update Training media',
           HTTP_STATUS.BAD_REQUEST,
@@ -144,7 +144,7 @@ async function toggleActive(id: string): Promise<createdTrainingDto> {
   await repository
     .update(id, { active: !training.active })
     .catch((error: any) => {
-      const meta = error.meta
+      const meta = error.meta || error.message
       throw new CustomError(
         'Error to update Training',
         HTTP_STATUS.BAD_REQUEST,
@@ -165,7 +165,7 @@ async function deleteTraining(id: string): Promise<void> {
   if (allMedias.length) {
     const promises = allMedias.map((media) => deleteMedia(media.id))
     await Promise.all(promises).catch((error: any) => {
-      const meta = error.meta
+      const meta = error.meta || error.message
       throw new CustomError(
         'Error to delete Training media',
         HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -175,7 +175,7 @@ async function deleteTraining(id: string): Promise<void> {
   }
 
   await repository.delete(id).catch((error: any) => {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError(
       'Error to delete Training',
       HTTP_STATUS.BAD_REQUEST,

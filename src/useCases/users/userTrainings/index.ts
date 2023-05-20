@@ -26,7 +26,7 @@ async function start({
   const userTraining = await repository
     .start({ trainingId, userId })
     .catch((error: any) => {
-      const meta = error.meta
+      const meta = error.meta || error.message
       throw new CustomError(
         'Error to start the training',
         HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -44,7 +44,7 @@ async function getAllBy(
     const allStartedTrainings = await repository.getAll(filter)
     return allStartedTrainings
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError(
       'Error to get trainings',
       HTTP_STATUS.BAD_REQUEST,
@@ -67,7 +67,7 @@ async function updateStatus(
     const updatedUserTraining = await repository.update(id, params)
     return updatedUserTraining
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError(
       `Error to update training status`,
       HTTP_STATUS.BAD_REQUEST,

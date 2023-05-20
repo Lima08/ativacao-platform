@@ -40,7 +40,9 @@ async function loginUser({
     }
 
     if (!user.isActive) {
-      throw new Error('User is not active. Contact the administrator')
+      throw new Error(
+        'This user is not active. Please contact the administrator'
+      )
     }
 
     const isMatch = await bcrypt.compare(password, user.password)
@@ -59,7 +61,7 @@ async function loginUser({
       },
       process.env.JWT_SECRET!,
       {
-        expiresIn: '1h' // TODO: passar para 7 dias
+        expiresIn: '1d'
       }
     )
 
@@ -75,7 +77,7 @@ async function getUsers(filter: IUserFilter): Promise<IUserCreated[]> {
     const users = await repository.getAll(filter)
     return users
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError('Error to get users', HTTP_STATUS.BAD_REQUEST, meta)
   }
 }
@@ -85,7 +87,7 @@ async function getUserById(id: string): Promise<IUserCreated> {
     const user = await repository.getOneBy({ id })
     return user
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError(`Error to get user`, HTTP_STATUS.BAD_REQUEST, meta)
   }
 }
@@ -98,7 +100,7 @@ async function updateUser(
     const updatedUser = await repository.update(id, params)
     return updatedUser
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError(`Error to update user`, HTTP_STATUS.BAD_REQUEST, meta)
   }
 }
@@ -107,7 +109,7 @@ async function deleteUser(id: string): Promise<void> {
   try {
     await repository.delete(id)
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError(`Error to delete user`, HTTP_STATUS.BAD_REQUEST, meta)
   }
 }

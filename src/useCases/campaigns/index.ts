@@ -25,7 +25,7 @@ async function createCampaign({
       userId
     })
     .catch((error: any) => {
-      const meta = error.meta
+      const meta = error.meta || error.message
       throw new CustomError(
         'Error creating campaign',
         HTTP_STATUS.BAD_REQUEST,
@@ -45,7 +45,7 @@ async function createCampaign({
     await Promise.all(promises)
       .then((files) => (medias = files))
       .catch((error: any) => {
-        const meta = error.meta
+        const meta = error.meta || error.message
         throw new CustomError(
           'Error in creating campaign media',
           HTTP_STATUS.BAD_REQUEST,
@@ -71,7 +71,7 @@ async function getCampaignById(id: string): Promise<createdCampaignDto> {
 
     return { ...campaign, medias }
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError(
       'Error to get campaign',
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -95,7 +95,7 @@ async function getAllCampaigns(
 
     return allCampaignsWithMedia
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError(
       'Error to get campaigns',
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -111,7 +111,7 @@ async function updateCampaign(
   const updatedCampaign = await repository
     .update(id, { name, description, active })
     .catch((error: any) => {
-      const meta = error.meta
+      const meta = error.meta || error.message
       throw new CustomError(
         'Error to update campaign',
         HTTP_STATUS.BAD_REQUEST,
@@ -129,7 +129,7 @@ async function updateCampaign(
     await Promise.all(promises)
       .then((files) => (medias = files))
       .catch((error: any) => {
-        const meta = error.meta
+        const meta = error.meta || error.message
         throw new CustomError(
           'Error to update campaign media',
           HTTP_STATUS.BAD_REQUEST,
@@ -146,7 +146,7 @@ async function deleteCampaign(id: string): Promise<void> {
   if (allMedias.length) {
     const promises = allMedias.map((media) => deleteMedia(media.id))
     await Promise.all(promises).catch((error: any) => {
-      const meta = error.meta
+      const meta = error.meta || error.message
       throw new CustomError(
         'Error to delete campaign media',
         HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -156,7 +156,7 @@ async function deleteCampaign(id: string): Promise<void> {
   }
 
   await repository.delete(id).catch((error: any) => {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError(
       'Error to delete campaign',
       HTTP_STATUS.BAD_REQUEST,

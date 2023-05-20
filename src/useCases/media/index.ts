@@ -1,5 +1,5 @@
-import CustomError from 'constants/errors/CustoError'
 import dotenv from 'dotenv'
+import CustomError from 'errors/CustomError'
 import {
   IMedia,
   IMediaCreated,
@@ -32,7 +32,7 @@ async function createMedia({
     })
     return mediasFile
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError('Error creating media', 400, meta)
   }
 }
@@ -45,7 +45,7 @@ async function updateMedia(
     const updatedMedia = await repository.update(id, params)
     return updatedMedia
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError('Error to update media file', 400, meta)
   }
 }
@@ -65,7 +65,7 @@ async function getMediasBy(filter: IMediaFilter): Promise<IMediaCreated[]> {
     )
     return filteredMediaFiles
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError('Error to get medias', 400, meta)
   }
 }
