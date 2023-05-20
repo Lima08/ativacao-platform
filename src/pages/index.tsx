@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import React from 'react'
 
+import LoginForm from 'components/LoginForm'
+
 export default function Homepage() {
   return (
     <main className="container h-screen w-screen mx-auto flex flex-col items-center justify-center">
@@ -16,6 +18,7 @@ export default function Homepage() {
           }
         ></Suspense> */}
         <h1>Pagina inicial | Login </h1>
+        <LoginForm />
       </div>
     </main>
   )

@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react'
 
 import type { ICampaignCreated } from 'interfaces/entities/campaign'
 import useStore from 'store/useStore'
+import DashboardLayout from 'wrappers/DashboardLayout'
 
-import DashboardLayout from 'components/DashboardLayout'
 import ListItem from 'components/ListItem'
 import type { DataList } from 'components/ListItem'
 import Modal from 'components/MediaViewer'

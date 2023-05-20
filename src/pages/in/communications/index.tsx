@@ -1,4 +1,4 @@
-import DashboardLayout from 'components/DashboardLayout'
+import DashboardLayout from 'wrappers/DashboardLayout'
 
 export default function Communications() {
   return (

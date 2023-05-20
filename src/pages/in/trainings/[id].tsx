@@ -4,8 +4,8 @@ import { useEffect, useState, useRef } from 'react'
 import { PhotoIcon } from '@heroicons/react/24/solid'
 import httpServices from 'services/http'
 import useStore from 'store/useStore'
+import DashboardLayout from 'wrappers/DashboardLayout'
 
-import DashboardLayout from 'components/DashboardLayout'
 import FormCustom from 'components/FormCustom'
 
 type MediaResponse = {

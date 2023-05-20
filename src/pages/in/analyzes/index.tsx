@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react'
 
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
 import useStore from 'store/useStore'
+import DashboardLayout from 'wrappers/DashboardLayout'
 
-import DashboardLayout from 'components/DashboardLayout'
 import ListAnalyzesItem from 'components/ListAnalyzesItem'
 import PageContainer from 'components/PageContainer'
 import SearchPrevNext from 'components/SearchPrevNext'
@@ -24,9 +24,9 @@ type AnalyzesObject = {
 export default function AnalyzesTable() {
   const router = useRouter()
 
-  const [analyzesList, getAllByOwner, loading] = useStore.Analysis((state) => [
+  const [analyzesList, getAll, loading] = useStore.Analysis((state) => [
     state.analyzesList,
-    state.getAllByOwner,
+    state.getAll,
     state.loading
   ])
   const [analyzesListAdapted, setAnalyzesListAdapted] = useState<any>([])
@@ -51,8 +51,8 @@ export default function AnalyzesTable() {
   }
 
   useEffect(() => {
-    getAllByOwner()
-  }, [getAllByOwner])
+    getAll()
+  }, [getAll])
 
   useEffect(() => {
     if (!analyzesList.length) return
