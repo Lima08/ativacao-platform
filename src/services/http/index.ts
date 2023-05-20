@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 // import Router from 'next/dist/client/router'
+import AnalysisService from './analysisServices '
 import CampaignService from './campaignServices'
 import TrainingService from './trainingServices'
 import UploadService from './uploadServices'
@@ -44,6 +45,7 @@ const httpClient = axios.create()
 const httpServices = {
   campaigns: CampaignService(httpClient),
   trainings: TrainingService(httpClient),
+  analysis: AnalysisService(httpClient),
   upload: UploadService(httpClient)
 }
 
