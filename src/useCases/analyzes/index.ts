@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import CustomError from 'errors/CustomError'
 import {
   IAnalysis,
@@ -27,20 +28,28 @@ async function createAnalysis({
     })
     .catch((error: any) => {
       const meta = error.meta || error.message
-      throw new CustomError('Error creating Analysis', 500, meta)
+      throw new CustomError(
+        'Error creating Analysis',
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        meta
+      )
     })
 
   return newAnalysis
 }
 
-async function getAnalysisBy(filterData: IAnalysisFilter): Promise<IAnalysisCreated> {
+async function getAnalysisBy(id: string): Promise<IAnalysisCreated> {
   try {
-    const analysis = await repository.getOneBy(filterData)
+    const analysis = await repository.getOneBy(id)
 
     return analysis
   } catch (error: any) {
     const meta = error.meta || error.message
-    throw new CustomError('Error to get Analysis', 500, meta)
+    throw new CustomError(
+      'Error to get Analysis',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      meta
+    )
   }
 }
 
@@ -52,7 +61,11 @@ async function getAllAnalyzes(
     return newAnalyzes
   } catch (error: any) {
     const meta = error.meta || error.message
-    throw new CustomError('Error to get Analyzes', 500, meta)
+    throw new CustomError(
+      'Error to get Analyzes',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      meta
+    )
   }
 }
 
@@ -60,26 +73,30 @@ async function updateAnalysis(
   id: string,
   modifierData: IAnalysisModifier
 ): Promise<IAnalysisCreated> {
-  const updatedAnalysis = await repository
-    .update(id, modifierData)
-    .catch((error: any) => {
-      const meta = error.meta || error.message
-      throw new CustomError('Error to update Analysis', 400, meta)
-    })
-
-  return updatedAnalysis
+  try {
+    const updatedAnalysis = await repository.update(id, modifierData)
+    return updatedAnalysis
+  } catch (error: any) {
+    throw new Error(error)
+  }
 }
 
 async function deleteAnalysis(id: string): Promise<void> {
-  await repository.delete(id).catch((error: any) => {
+  try {
+    await repository.delete(id)
+  } catch (error: any) {
     const meta = error.meta || error.message
-    throw new CustomError('Error to delete Analysis', 400, meta)
-  })
+    throw new CustomError(
+      'Error to delete Analysis',
+      HTTP_STATUS.BAD_REQUEST,
+      meta
+    )
+  }
 }
 
 export {
   createAnalysis,
-  getAnalysisById,
+  getAnalysisBy,
   getAllAnalyzes,
   updateAnalysis,
   deleteAnalysis

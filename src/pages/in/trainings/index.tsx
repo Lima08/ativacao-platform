@@ -100,7 +100,6 @@ export default function TrainingsPage() {
   }
 
   function handleTrainingStatus(id: string, active: boolean) {
-    console.log('🚀 ~ file: index.tsx:103 ~ handleTrainingStatus ~ id:', id)
     handleTrainingActive(id, active)
   }
 

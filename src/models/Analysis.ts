@@ -28,7 +28,7 @@ export class Analysis {
     return newAnalysis
   }
 
-  async getAllBy(filter: IAnalysisFilter): Promise<IAnalysisCreated[]> {
+  async getAll(filter: IAnalysisFilter): Promise<IAnalysisCreated[]> {
     const allAnalyzes = await this.repository.analysis.findMany({
       where: filter
     })
