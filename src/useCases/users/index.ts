@@ -14,9 +14,15 @@ const repository = User.of(prisma)
 
 async function createUser(params: IUser): Promise<void> {
   try {
+    const user = await repository.getOneBy({ email: params.email })
+    if (user) {
+      throw  new Error('Email already in use', )
+    }
+
     await repository.create(params)
-  } catch (error) {
-    throw new CustomError('Error to create user', 400, error)
+  } catch (error: any) {
+    const message = error?.message || 'Error to create user'
+    throw new CustomError(message, 400, error)
   }
 }
 
