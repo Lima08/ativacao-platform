@@ -6,9 +6,15 @@ interface ModalProps {
   children?: React.ReactNode
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
+  size?: string
 }
 
-export default function Modal2({ children, open, setOpen }: ModalProps) {
+export default function Modal2({
+  children,
+  open,
+  setOpen,
+  size = ''
+}: ModalProps) {
   const cancelButtonRef = useRef(null)
 
   return (
@@ -43,7 +49,11 @@ export default function Modal2({ children, open, setOpen }: ModalProps) {
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white  w-10/12 h-[650px] md:h-[575px]  my-0 md:mb-0 shadow-xl transition-all">
+                <Dialog.Panel
+                  className={`relative transform overflow-hidden rounded-lg bg-white ${
+                    size != '' ? size : 'w-10/12 h-[650px] md:h-[575px]'
+                  } my-0 md:mb-0 shadow-xl transition-all`}
+                >
                   {children}
                 </Dialog.Panel>
               </Transition.Child>
