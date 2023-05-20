@@ -1,4 +1,4 @@
-import CustomError from 'constants/errors/CustoError'
+import CustomError from 'errors/CustomError'
 import {
   IAnalysis,
   IAnalysisCreated,
