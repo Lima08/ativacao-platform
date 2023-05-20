@@ -1,10 +1,25 @@
+import type { NextApiRequestCustom, NextApiResponse } from 'next'
+
+import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
+import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
+import { authCheck } from 'middlewares/authCheck'
 import { getAllCampaigns } from 'useCases/campaigns'
 
-export default async function handler(req: any, res: any) {
-  if (req.method === 'GET') {
-    const companyId = '5c9e558a-1eb8-44d4-9abb-693c65ee57c4'
+async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
+  if (req.method === REQUEST_METHODS.GET) {
+    const { companyId } = req.user!
 
-    const allCampaigns = await getAllCampaigns({ companyId })
-    return res.status(200).json({ data: allCampaigns })
+    try {
+      const allCampaigns = await getAllCampaigns({ companyId })
+      return res.status(HTTP_STATUS.OK).json({ data: allCampaigns })
+    } catch (error: any) {
+      return res.status(error.code).json({ error: { message: error.message } })
+    }
   }
+
+  res
+    .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+    .json({ error: { message: 'Method not allowed' } })
 }
+
+export default authCheck(handler)

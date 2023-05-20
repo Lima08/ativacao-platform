@@ -7,7 +7,8 @@ import {
   DeleteObjectCommand,
   PutObjectOutput
 } from '@aws-sdk/client-s3'
-import CustomError from 'constants/errors/CustoError'
+import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
+import CustomError from 'errors/CustomError'
 import { IPutObject, IDeleteObject } from 'interfaces/services/'
 
 import { getS3Client } from '../lib/s3'
@@ -32,30 +33,34 @@ export default class s3Service {
 
     try {
       return this.s3Client.send(command)
-    } catch (error) {
-      console.log(
-        '🚀 ~ file: s3Service.ts:36 ~ s3Service ~ getObject ~ error:',
+    } catch (error: any) {
+      throw new CustomError(error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR, {
+        ...params,
         error
-      )
-      throw error
+      })
     }
   }
 
-  public async putObject(params: IPutObject): Promise<PutObjectOutput> {
+  public async putObject({
+    bucket,
+    key,
+    body,
+    contentType
+  }: IPutObject): Promise<PutObjectOutput> {
     const command = new PutObjectCommand({
-      Bucket: params.bucket,
-      Key: params.key,
-      Body: params.body,
-      ContentType: params.contentType
+      Bucket: bucket,
+      Key: key,
+      Body: body,
+      ContentType: contentType
     })
     try {
       return this.s3Client.send(command)
-    } catch (error) {
-      console.log(
-        '🚀 ~ file: s3Service.ts:54 ~ s3Service ~ putObject ~ error:',
+    } catch (error: any) {
+      throw new CustomError(error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR, {
+        bucket,
+        key,
         error
-      )
-      throw error
+      })
     }
   }
 
@@ -65,11 +70,14 @@ export default class s3Service {
       Key: key
     })
 
-    await this.s3Client.send(command).catch(() => {
-      throw new CustomError('Error to delete bucket object', 500, {
+    try {
+      await this.s3Client.send(command)
+    } catch (error: any) {
+      throw new CustomError(error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR, {
         bucket,
-        key
+        key,
+        error
       })
-    })
+    }
   }
 }

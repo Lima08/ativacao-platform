@@ -1,4 +1,4 @@
-import CustomError from 'constants/errors/CustoError'
+import CustomError from 'errors/CustomError'
 import {
   IAnalysis,
   IAnalysisCreated,
@@ -25,7 +25,7 @@ async function createAnalysis({
       biUrl
     })
     .catch((error: any) => {
-      const meta = error.meta
+      const meta = error.meta || error.message
       throw new CustomError('Error creating Analysis', 500, meta)
     })
 
@@ -38,7 +38,7 @@ async function getAnalysisById(id: string): Promise<IAnalysisCreated> {
 
     return analysis
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError('Error to get Analysis', 500, meta)
   }
 }
@@ -50,7 +50,7 @@ async function getAllAnalyzes(
     const newAnalyzes = await repository.getAll(filter)
     return newAnalyzes
   } catch (error: any) {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError('Error to get Analyzes', 500, meta)
   }
 }
@@ -62,7 +62,7 @@ async function updateAnalysis(
   const updatedAnalysis = await repository
     .update(id, { biUrl, status, title })
     .catch((error: any) => {
-      const meta = error.meta
+      const meta = error.meta || error.message
       throw new CustomError('Error to update Analysis', 400, meta)
     })
 
@@ -71,7 +71,7 @@ async function updateAnalysis(
 
 async function deleteAnalysis(id: string): Promise<void> {
   await repository.delete(id).catch((error: any) => {
-    const meta = error.meta
+    const meta = error.meta || error.message
     throw new CustomError('Error to delete Analysis', 400, meta)
   })
 }
@@ -83,7 +83,7 @@ async function done(
   const updatedAnalysis = await repository
     .update(id, { biUrl, status: 'done' })
     .catch((error: any) => {
-      const meta = error.meta
+      const meta = error.meta || error.message
       throw new CustomError('Error to update Analysis', 400, meta)
     })
 
@@ -94,7 +94,7 @@ async function rejected(id: string): Promise<IAnalysisCreated> {
   const updatedAnalysis = await repository
     .update(id, { status: 'rejected', biUrl: '' })
     .catch((error: any) => {
-      const meta = error.meta
+      const meta = error.meta || error.message
       throw new CustomError('Error to update Analysis', 400, meta)
     })
 
