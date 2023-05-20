@@ -1,10 +1,12 @@
 import { NextApiRequestCustom, NextApiResponse } from 'next'
 
+import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
+import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
 import { authCheck } from 'middlewares/authCheck'
 import { createAnalysis } from 'useCases/analyzes'
 
 async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
-  if (req.method == 'POST') {
+  if (req.method == REQUEST_METHODS.POST) {
     const { companyId, userId } = req.user!
 
     const { title, bucketUrl, message } = req.body
@@ -16,8 +18,10 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
       message,
       bucketUrl
     })
-    return res.status(201).json({ data: createdTraining })
+    return res.status(HTTP_STATUS.CREATED).json({ data: createdTraining })
   }
-  res.status(405).json({ error: { message: 'Method not allowed' } })
+  res
+    .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+    .json({ error: { message: 'Method not allowed' } })
 }
 export default authCheck(handler)
