@@ -12,13 +12,11 @@ import { User } from 'models/User'
 dotenv.config()
 const repository = User.of(prisma)
 
-async function createUser(params: IUser): Promise<IUserCreated> {
+async function createUser(params: IUser): Promise<void> {
   try {
-    const user = await repository.create(params)
-    return user
-  } catch (error: any) {
-    const meta = error.meta
-    throw new CustomError('Error to create user', 400, meta)
+    await repository.create(params)
+  } catch (error) {
+    throw new CustomError('Error to create user', 400, error)
   }
 }
 
