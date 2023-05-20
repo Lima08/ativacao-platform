@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
-import CustomError from 'constants/errors/CustoError'
+import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import dotenv from 'dotenv'
+import CustomError from 'errors/CustomError'
 import type {
   IUser,
   IUserCreated,
@@ -24,7 +25,7 @@ async function createUser(params: IUser): Promise<void> {
     await repository.create(params)
   } catch (error: any) {
     const message = error?.message || 'Error to create user'
-    throw new CustomError(message, 400, error)
+    throw new CustomError(message, HTTP_STATUS.BAD_REQUEST, error)
   }
 }
 
@@ -50,20 +51,22 @@ async function loginUser({
 
     const token = jwt.sign(
       {
-        userID: user.id,
-        role: user.role,
-        companyId: user.companyId
+        user: {
+          userId: user.id,
+          role: user.role,
+          companyId: user.companyId
+        }
       },
       process.env.JWT_SECRET!,
       {
-        expiresIn: '7d'
+        expiresIn: '1h' // TODO: passar para 7 dias
       }
     )
 
     return token
   } catch (error: any) {
     const message = error?.message || 'Error to login user'
-    throw new CustomError(message, 400, error)
+    throw new CustomError(message, HTTP_STATUS.BAD_REQUEST, error)
   }
 }
 
@@ -73,7 +76,7 @@ async function getUsers(filter: IUserFilter): Promise<IUserCreated[]> {
     return users
   } catch (error: any) {
     const meta = error.meta
-    throw new CustomError('Error to get users', 400, meta)
+    throw new CustomError('Error to get users', HTTP_STATUS.BAD_REQUEST, meta)
   }
 }
 
@@ -83,7 +86,7 @@ async function getUserById(id: string): Promise<IUserCreated> {
     return user
   } catch (error: any) {
     const meta = error.meta
-    throw new CustomError(`Error to get user`, 400, meta)
+    throw new CustomError(`Error to get user`, HTTP_STATUS.BAD_REQUEST, meta)
   }
 }
 
@@ -96,7 +99,7 @@ async function updateUser(
     return updatedUser
   } catch (error: any) {
     const meta = error.meta
-    throw new CustomError(`Error to update user`, 400, meta)
+    throw new CustomError(`Error to update user`, HTTP_STATUS.BAD_REQUEST, meta)
   }
 }
 
@@ -105,7 +108,7 @@ async function deleteUser(id: string): Promise<void> {
     await repository.delete(id)
   } catch (error: any) {
     const meta = error.meta
-    throw new CustomError(`Error to delete user`, 400, meta)
+    throw new CustomError(`Error to delete user`, HTTP_STATUS.BAD_REQUEST, meta)
   }
 }
 
