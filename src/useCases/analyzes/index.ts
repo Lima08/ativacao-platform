@@ -8,12 +8,12 @@ import {
 import { prisma } from 'lib/prisma'
 import { Analysis } from 'models/Analysis'
 
-
 const repository = Analysis.of(prisma)
 
 async function createAnalysis({
   title,
   userId,
+  companyId,
   bucketUrl,
   biUrl
 }: IAnalysis): Promise<IAnalysisCreated> {
@@ -21,6 +21,7 @@ async function createAnalysis({
     .create({
       title,
       userId,
+      companyId,
       bucketUrl,
       biUrl
     })
@@ -57,10 +58,10 @@ async function getAllAnalyzes(
 
 async function updateAnalysis(
   id: string,
-  { biUrl, status, title }: IAnalysisModifier
+  modifierData: IAnalysisModifier
 ): Promise<IAnalysisCreated> {
   const updatedAnalysis = await repository
-    .update(id, { biUrl, status, title })
+    .update(id, modifierData)
     .catch((error: any) => {
       const meta = error.meta
       throw new CustomError('Error to update Analysis', 400, meta)
@@ -76,37 +77,10 @@ async function deleteAnalysis(id: string): Promise<void> {
   })
 }
 
-async function done(
-  id: string,
-  { biUrl }: IAnalysisModifier
-): Promise<IAnalysisCreated> {
-  const updatedAnalysis = await repository
-    .update(id, { biUrl, status: 'done' })
-    .catch((error: any) => {
-      const meta = error.meta
-      throw new CustomError('Error to update Analysis', 400, meta)
-    })
-
-  return updatedAnalysis
-}
-
-async function rejected(id: string): Promise<IAnalysisCreated> {
-  const updatedAnalysis = await repository
-    .update(id, { status: 'rejected', biUrl: '' })
-    .catch((error: any) => {
-      const meta = error.meta
-      throw new CustomError('Error to update Analysis', 400, meta)
-    })
-
-  return updatedAnalysis
-}
-
 export {
   createAnalysis,
   getAnalysisById,
   getAllAnalyzes,
   updateAnalysis,
-  deleteAnalysis,
-  done,
-  rejected
+  deleteAnalysis
 }
