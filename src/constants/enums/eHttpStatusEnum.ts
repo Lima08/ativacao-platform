@@ -1,4 +1,4 @@
-export enum HttpStatusEnum {
+export enum HTTP_STATUS {
     OK = 200,
     CREATED = 201,
     NO_CONTENT = 204,
@@ -6,5 +6,6 @@ export enum HttpStatusEnum {
     UNAUTHORIZED = 401,
     FORBIDDEN = 403,
     NOT_FOUND = 404,
+    METHOD_NOT_ALLOWED = 405,
     INTERNAL_SERVER_ERROR = 500
 }

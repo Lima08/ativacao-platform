@@ -13,7 +13,6 @@ export default async function handler(
 
     const createdTraining = await createAnalysis({
       title,
-      companyId,
       userId,
       bucketUrl
     })

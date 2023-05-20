@@ -1,13 +1,14 @@
-import handler from 'handler'
 import { start } from 'useCases/users/userTrainings'
 
-export default handler.post(async (req, res) => {
-  const { trainingId } = req.body
-  const userId = req.userId!
+export default async function handler(req: any, res: any) {
+  if (req.method === 'POST') {
+    const { trainingId } = req.body
+    const userId = '4181b23f-c4a8-47d1-99c8-2db883d84eb3'
 
-  const createdTraining = await start({
-    trainingId,
-    userId
-  })
-  return res.status(201).json({ data: createdTraining })
-})
+    const createdTraining = await start({
+      trainingId,
+      userId
+    })
+    return res.status(201).json({ data: createdTraining })
+  }
+}

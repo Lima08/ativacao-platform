@@ -1,13 +1,15 @@
-import handler from 'handler'
 import { updateStatus } from 'useCases/users/userTrainings'
 
-export default handler.put(async (req, res) => {
-  const { status } = req.body
+export default async function handler(req: any, res: any) {
   const id = req.query.id as string
 
-  const updatedTraining = await updateStatus(id, {
-    status
-  })
+  if (req.method === 'PUT') {
+    const { status } = req.body
 
-  return res.status(200).json({ data: updatedTraining })
-})
+    const updatedTraining = await updateStatus(id, {
+      status
+    })
+
+    return res.status(200).json({ data: updatedTraining })
+  }
+}
