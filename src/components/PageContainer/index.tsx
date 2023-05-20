@@ -9,12 +9,14 @@ type PageContainerProps = {
   children: ReactNode
   pageTitle: string
   pageSection: string
+  onClickAdd?: () => void
 }
 
 export default function PageContainer({
   pageTitle,
   pageSection,
-  children
+  children,
+  onClickAdd
 }: PageContainerProps) {
   const router = useRouter()
 
@@ -26,7 +28,7 @@ export default function PageContainer({
     <div className="w-full flex flex-col py-[25px] items-center">
       <div className="w-9/12 flex flex-row justify-around items-center">
         <h1 className="text-2xl font-medium">{pageTitle}</h1>
-        <CustomButton onClick={navToCreatePage} variant="default">
+        <CustomButton onClick={onClickAdd || navToCreatePage} variant="default">
           <p>Adicionar</p>
         </CustomButton>
       </div>
