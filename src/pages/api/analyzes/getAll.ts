@@ -1,11 +1,17 @@
+import type { NextApiRequestCustom, NextApiResponse } from 'next'
+
+import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
+import { authCheck } from 'middlewares/authCheck'
 import { getAllAnalyzes } from 'useCases/analyzes'
 
-export default async function handler(req: any, res: any) {
-  if (req.method === 'GET') {
-    const userId = '4181b23f-c4a8-47d1-99c8-2db883d84eb3'
+async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
+  if (req.method === REQUEST_METHODS.GET) {
+    const { companyId, userId } = req.user!
     const { status } = req.body
 
-    const user = await getAllAnalyzes({ status, userId })
+    const user = await getAllAnalyzes({ status, userId, companyId })
     return res.status(200).json({ data: user })
   }
 }
+
+export default authCheck(handler)

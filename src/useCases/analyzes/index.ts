@@ -33,9 +33,9 @@ async function createAnalysis({
   return newAnalysis
 }
 
-async function getAnalysisById(id: string): Promise<IAnalysisCreated> {
+async function getAnalysisBy(filterData: IAnalysisFilter): Promise<IAnalysisCreated> {
   try {
-    const analysis = await repository.getOneBy(id)
+    const analysis = await repository.getOneBy(filterData)
 
     return analysis
   } catch (error: any) {

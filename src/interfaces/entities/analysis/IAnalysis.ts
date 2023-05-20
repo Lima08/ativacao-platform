@@ -3,5 +3,6 @@ export interface IAnalysis {
   userId: string
   companyId: string
   bucketUrl: string
+  message?: string
   biUrl?: string
 }
