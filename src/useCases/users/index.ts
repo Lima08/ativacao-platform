@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs'
 import CustomError from 'constants/errors/CustoError'
 import dotenv from 'dotenv'
 import type {
@@ -6,6 +7,7 @@ import type {
   IUserFilter,
   IUserModifier
 } from 'interfaces/entities/user'
+import jwt from 'jsonwebtoken'
 import { prisma } from 'lib/prisma'
 import { User } from 'models/User'
 
@@ -16,12 +18,51 @@ async function createUser(params: IUser): Promise<void> {
   try {
     const user = await repository.getOneBy({ email: params.email })
     if (user) {
-      throw  new Error('Email already in use', )
+      throw new Error('Email already in use')
     }
 
     await repository.create(params)
   } catch (error: any) {
     const message = error?.message || 'Error to create user'
+    throw new CustomError(message, 400, error)
+  }
+}
+
+async function loginUser({
+  email,
+  password
+}: Pick<IUser, 'email' | 'password'>): Promise<string> {
+  try {
+    const user = await repository.getOneBy({ email })
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    if (!user.isActive) {
+      throw new Error('User is not active. Contact the administrator')
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password)
+
+    if (!isMatch) {
+      throw new Error('Email or password invalid')
+    }
+
+    const token = jwt.sign(
+      {
+        userID: user.id,
+        role: user.role,
+        companyId: user.companyId
+      },
+      process.env.JWT_SECRET!,
+      {
+        expiresIn: '7d'
+      }
+    )
+
+    return token
+  } catch (error: any) {
+    const message = error?.message || 'Error to login user'
     throw new CustomError(message, 400, error)
   }
 }
@@ -38,7 +79,7 @@ async function getUsers(filter: IUserFilter): Promise<IUserCreated[]> {
 
 async function getUserById(id: string): Promise<IUserCreated> {
   try {
-    const user = await repository.getOneBy(id)
+    const user = await repository.getOneBy({ id })
     return user
   } catch (error: any) {
     const meta = error.meta
@@ -68,4 +109,4 @@ async function deleteUser(id: string): Promise<void> {
   }
 }
 
-export { createUser, getUsers, updateUser, deleteUser, getUserById }
+export { createUser, loginUser, getUsers, updateUser, deleteUser, getUserById }

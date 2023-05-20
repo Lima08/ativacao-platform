@@ -3,4 +3,5 @@ export interface IUserFilter {
   role?: number
   isActive?: boolean,
   email?: string
+  id?: string
 }
