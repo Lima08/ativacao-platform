@@ -114,6 +114,14 @@ const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
         )
       }))
     }
+  },
+  deleteAnalysis: async (id: string) => {
+    set((state) => ({
+      ...state,
+      analyzesList: state.analyzesList.filter((c) => c.id !== id)
+    }))
+
+    await httpServices.analysis.delete(id)
   }
 })
 

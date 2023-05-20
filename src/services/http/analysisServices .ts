@@ -20,7 +20,8 @@ export interface AnalysisServiceInterface {
   update(
     id: string,
     modifierData: IAnalysisModifier
-  ): Promise<ApiResponse<IAnalysisCreated>>
+  ): Promise<ApiResponse<IAnalysisCreated>>,
+  delete(analysisId: string): Promise<void>
 }
 
 const AnalysisService = (
@@ -85,6 +86,13 @@ const AnalysisService = (
     } catch (error) {
       console.error('Error to update analysis:', error)
       return error
+    }
+  },
+  delete: async (analysisId: string) => {
+    try {
+      await httpClient.delete(`/api/analyzes/${analysisId}`)
+    } catch (error) {
+      console.error('Error to delete analyze:', error)
     }
   }
 })

@@ -12,4 +12,5 @@ export interface IAnalysisStore {
   getAllByOwner: () => void
   done: (id: string) => void
   reject: (id: string) => void
+  deleteAnalysis: (id: string) => void
 }

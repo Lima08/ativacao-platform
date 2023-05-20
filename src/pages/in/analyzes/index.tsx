@@ -8,6 +8,7 @@ import useStore from 'store/useStore'
 
 import DashboardLayout from 'components/DashboardLayout'
 import ListAnalyzesItem from 'components/ListAnalyzesItem'
+import Modal2 from 'components/Modal2'
 import PageContainer from 'components/PageContainer'
 import SearchPrevNext from 'components/SearchPrevNext'
 
@@ -24,12 +25,15 @@ type AnalyzesObject = {
 export default function AnalyzesTable() {
   const router = useRouter()
 
-  const [analyzesList, getAllByOwner, loading] = useStore.Analysis((state) => [
-    state.analyzesList,
-    state.getAllByOwner,
-    state.loading
-  ])
+  const [analyzesList, getAllByOwner, deleteAnalysis, loading] =
+    useStore.Analysis((state) => [
+      state.analyzesList,
+      state.getAllByOwner,
+      state.deleteAnalysis,
+      state.loading
+    ])
   const [analyzesListAdapted, setAnalyzesListAdapted] = useState<any>([])
+  const [open, setOpen] = useState(false)
 
   const analyzesAdapter = (
     analyzes: IAnalysisCreated[]
@@ -46,8 +50,16 @@ export default function AnalyzesTable() {
     return result
   }
 
-  const onClickRow = (id: string) => {
-    router.push(`/in/analyzes/${id}`)
+  const onClickStatus = () => {
+    setOpen(true)
+  }
+
+  function deleteItem(id: string) {
+    const userDecision = confirm('Confirmar deleção?')
+
+    if (userDecision) {
+      deleteAnalysis(id)
+    }
   }
 
   useEffect(() => {
@@ -63,7 +75,11 @@ export default function AnalyzesTable() {
 
   return (
     <DashboardLayout>
-      <PageContainer pageTitle="Análises" pageSection="analyzes">
+      <PageContainer
+        pageTitle="Análises"
+        pageSection="analyzes"
+        onClickAdd={onClickStatus}
+      >
         <SearchPrevNext />
         {loading && <p>Carregando...</p>}
         <ul className="list-none mt-8 w-12/12">
@@ -76,12 +92,17 @@ export default function AnalyzesTable() {
             analyzesListAdapted.map((analysis: AnalyzesObject) => (
               <li
                 key={analysis.id}
-                className="flex md:gap-10 hover:bg-slate-100 bg-white hover:cursor-pointer w-full border rounded max-h-18"
-                onClick={() => onClickRow(analysis.id)}
+                className="flex md:gap-10 hover:bg-slate-100 bg-white w-full border rounded max-h-18"
               >
-                <ListAnalyzesItem data={analysis} />
+                <ListAnalyzesItem data={analysis} onDelete={deleteItem} />
               </li>
             ))}
+
+          {open && (
+            <Modal2 open={open} setOpen={setOpen}>
+              Analyses Uploader
+            </Modal2>
+          )}
         </ul>
       </PageContainer>
     </DashboardLayout>
