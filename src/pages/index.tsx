@@ -1,25 +1,11 @@
-import Link from 'next/link'
 import React from 'react'
 
 import LoginForm from 'components/LoginForm'
 
 export default function Homepage() {
   return (
-    <main className="container h-screen w-screen mx-auto flex flex-col items-center justify-center">
-      <div className="flex gap-2">
-        <Link href="/in">Entrar</Link>
-      </div>
-      <div>
-        {/* <Suspense
-          fallback={
-            <div>
-              <h1>Carregando...</h1>
-            </div>
-          }
-        ></Suspense> */}
-        <h1>Pagina inicial | Login </h1>
-        <LoginForm />
-      </div>
+    <main className="container h-screen w-screen mx-auto flex  items-center justify-center">
+      <LoginForm />
     </main>
   )
 }
