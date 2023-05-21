@@ -162,6 +162,7 @@ async function toggleActive(id: string): Promise<createdTrainingDto> {
 
 async function deleteTraining(id: string): Promise<void> {
   const allMedias = await getMediasBy({ trainingId: id })
+
   if (allMedias.length) {
     const promises = allMedias.map((media) => deleteMedia(media.id))
     await Promise.all(promises).catch((error: any) => {
