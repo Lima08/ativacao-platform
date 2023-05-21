@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
@@ -8,7 +7,7 @@ import useStore from 'store/useStore'
 
 import DashboardLayout from 'components/DashboardLayout'
 import ListAnalyzesItem from 'components/ListAnalyzesItem'
-import Modal2 from 'components/Modal2'
+import Modal2 from 'components/Modal'
 import PageContainer from 'components/PageContainer'
 import SearchPrevNext from 'components/SearchPrevNext'
 
@@ -17,21 +16,22 @@ type IAnalyzesAdapted = Partial<IAnalysisCreated>
 type AnalyzesObject = {
   id: string
   status: string
+  message?: string | undefined
   title: string
   bucketUrl: string
   biUrl: string
 }
 
 export default function AnalyzesTable() {
-  const router = useRouter()
-
-  const [analyzesList, getAllByOwner, deleteAnalysis, loading] =
-    useStore.Analysis((state) => [
+  const [analyzesList, getAll, loading, deleteAnalysis] = useStore.Analysis(
+    (state) => [
       state.analyzesList,
-      state.getAllByOwner,
-      state.deleteAnalysis,
-      state.loading
-    ])
+      state.getAll,
+      state.loading,
+      state.deleteAnalysis
+    ]
+  )
+
   const [analyzesListAdapted, setAnalyzesListAdapted] = useState<any>([])
   const [open, setOpen] = useState(false)
 
@@ -42,6 +42,7 @@ export default function AnalyzesTable() {
       analyzes.map((analysis) => ({
         id: analysis.id,
         status: analysis.status,
+        message: analysis.message,
         title: analysis.title,
         bucketUrl: analysis.bucketUrl,
         biUrl: analysis.biUrl
@@ -63,8 +64,8 @@ export default function AnalyzesTable() {
   }
 
   useEffect(() => {
-    getAllByOwner()
-  }, [getAllByOwner])
+    getAll()
+  }, [getAll])
 
   useEffect(() => {
     if (!analyzesList.length) return
@@ -99,7 +100,7 @@ export default function AnalyzesTable() {
             ))}
 
           {open && (
-            <Modal2 open={open} setOpen={setOpen}>
+            <Modal2 size="w-[400px] h-[400px]" open={open} setOpen={setOpen}>
               Analyses Uploader
             </Modal2>
           )}

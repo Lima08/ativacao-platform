@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react'
 
-import Modal2 from 'components/Modal2'
+import Modal from 'components/Modal'
 
 export type AnalyzesDataList = {
   id: string
@@ -8,6 +8,7 @@ export type AnalyzesDataList = {
   bucketUrl: string
   biUrl?: string
   status: string
+  message?: string | undefined
 }
 
 type ListItemProps = {
@@ -17,7 +18,7 @@ type ListItemProps = {
 
 const STATUS: { [key: string]: ReactNode } = {
   pending: (
-    <span className="flex w-6 h-6 bg-gray-200 rounded-full text-center text-sm text-white">
+    <span className="flex w-6 h-6 bg-yellow-500 rounded-full text-center text-sm text-white">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -75,13 +76,16 @@ const STATUS: { [key: string]: ReactNode } = {
 export default function ListAnalyzesItem({ data, onDelete }: ListItemProps) {
   const [open, setOpen] = useState(false)
 
+  console.log('data', data)
+
   return (
     <div className="flex flex-col items-center w-full dark:border-gray-700 rounded-md">
       <div className="flex px-4 py-4 justify-center gap-4 items-center w-full">
         <button
-          className={`w-1/4 flex justify-around items-center border border-gray-200 rounded-md p-1 bg-white ${
-            data.status === 'pending' ? 'op-50 pointer-events-none' : ''
-          }`}
+          className={`w-1/4 flex justify-around items-center border border-gray-200 rounded-md p-1 bg-white`}
+          // className={`w-1/4 flex justify-around items-center border border-gray-200 rounded-md p-1 bg-white ${
+          //   data.status === 'pending' ? 'op-50 pointer-events-none' : ''
+          // }`}
           onClick={() => setOpen(!open)}
         >
           {STATUS[data.status]}
@@ -105,14 +109,26 @@ export default function ListAnalyzesItem({ data, onDelete }: ListItemProps) {
           {data.title}
         </h2>
         <div className="px-4 py-4 flex gap-6 justify-evenly">
+          {/* <a
+            href={data?.biUrl}
+            className={`${
+              data.status === 'pending' ? 'pointer-events-none' : ''
+            }`}
+          > */}
           <button
             onClick={(event) => {
               event.stopPropagation()
+              window.location.href = data.biUrl || ''
             }}
-            className="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border border-blue-500 hover:bg-blue-600 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
+            className={`flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border border-blue-500 hover:bg-blue-600 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 ${
+              data.status === 'pending'
+                ? 'pointer-events-none border-gray-200 op-50'
+                : ''
+            }`}
           >
             Visualizar
           </button>
+          {/* </a> */}
           <button
             className="flex items-center justify-center w-1/2 px-5 py-2 text-sm hover:text-gray-100 border-red-600 text-gray-700 capitalize transition-colors duration-200 hover:bg-red-600 border rounded-md sm:w-auto gap-x-2  dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
             onClick={(event) => {
@@ -125,7 +141,7 @@ export default function ListAnalyzesItem({ data, onDelete }: ListItemProps) {
         </div>
       </div>
       {open && (
-        <Modal2 size="w-[400px] h-[400px]" open={open} setOpen={setOpen}>
+        <Modal size="w-[400px] h-[400px]" open={open} setOpen={setOpen}>
           <div className="m-auto py-5 px-6">
             <h1 className="font-bold text-lg bg-blue-500 text-white rounded-t-md">
               {data.title}
@@ -133,15 +149,9 @@ export default function ListAnalyzesItem({ data, onDelete }: ListItemProps) {
             <p className="py-2 uppercase bg-gray-100 text-sm rounded-b-md">
               comentários
             </p>
-            <p className="py-2 mt-2">
-              Living in the moment, embracing the present. I'm currently
-              offline, diving into my daily endeavors. Reach out and I'll get
-              back to you as soon as possible. Let's make today great and
-              tomorrow even better. Stay positive, stay curious.
-              #OfflineButEngaged #BackSoon
-            </p>
+            <p className="py-2 mt-2">{data.message || 'Sem comentários.'}</p>
           </div>
-        </Modal2>
+        </Modal>
       )}
     </div>
   )
