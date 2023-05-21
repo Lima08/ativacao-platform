@@ -17,47 +17,46 @@ async function createCampaign({
   userId,
   mediaIds
 }: newCampaignDto): Promise<ICampaignCreated> {
-  const newCampaign = await repository
-    .create({
+  try {
+    const newCampaign = await repository.create({
       name,
       description,
       companyId,
       userId
     })
-    .catch((error: any) => {
-      const meta = error.meta || error.message
-      throw new CustomError(
-        'Error creating campaign',
-        HTTP_STATUS.BAD_REQUEST,
-        meta
+    if (!newCampaign)
+      throw new CustomError('Error creating campaign', HTTP_STATUS.BAD_REQUEST)
+
+    let medias: IMediaCreated[] = []
+    if (mediaIds && mediaIds.length) {
+      const promises = mediaIds.map((mediaId) =>
+        updateMedia(mediaId, { campaignId: newCampaign.id })
       )
-    })
 
-  if (!newCampaign)
-    throw new CustomError('Error creating campaign', HTTP_STATUS.BAD_REQUEST)
+      await Promise.all(promises)
+        .then((files) => (medias = files))
+        .catch((error: any) => {
+          const meta = error.meta || error.message
+          throw new CustomError(
+            'Error in creating campaign media',
+            HTTP_STATUS.BAD_REQUEST,
+            {
+              ...meta,
+              createdCampaign: newCampaign
+            }
+          )
+        })
+    }
 
-  let medias: IMediaCreated[] = []
-  if (mediaIds && mediaIds.length) {
-    const promises = mediaIds.map((mediaId) =>
-      updateMedia(mediaId, { campaignId: newCampaign.id })
+    return { ...newCampaign, medias }
+  } catch (error: any) {
+    const meta = error.meta || error.message
+    throw new CustomError(
+      'Error creating campaign',
+      HTTP_STATUS.BAD_REQUEST,
+      meta
     )
-
-    await Promise.all(promises)
-      .then((files) => (medias = files))
-      .catch((error: any) => {
-        const meta = error.meta || error.message
-        throw new CustomError(
-          'Error in creating campaign media',
-          HTTP_STATUS.BAD_REQUEST,
-          {
-            ...meta,
-            createdCampaign: newCampaign
-          }
-        )
-      })
   }
-
-  return { ...newCampaign, medias }
 }
 
 async function getCampaignById(id: string): Promise<createdCampaignDto> {

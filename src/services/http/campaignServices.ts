@@ -1,6 +1,7 @@
 import { AxiosInstance } from 'axios'
-import { ApiResponse } from '../../../types'
 import { ICampaignCreated } from 'interfaces/entities/campaign'
+
+import { ApiResponse } from '../../../types'
 
 type CreatePayload = {
   name: string
@@ -37,9 +38,8 @@ const CampaignService = (
         mediaIds
       })
       return response.data
-    } catch (error) {
-      console.error('Error to create campaign:', error)
-      return error
+    } catch (error: any) {
+      throw new Error(error.message)
     }
   },
 
@@ -47,18 +47,16 @@ const CampaignService = (
     try {
       const response = await httpClient.get('/api/campaigns/getAll')
       return response.data || []
-    } catch (error) {
-      console.error('Error fetching campaigns:', error)
-      return error
+    } catch (error: any) {
+      throw new Error(error.message)
     }
   },
   getById: async (campaignId) => {
     try {
       const response = await httpClient.get(`/api/campaigns/${campaignId}`)
       return response.data
-    } catch (error) {
-      console.error('Error to get campaign:', error)
-      return error
+    } catch (error: any) {
+      throw new Error(error.message)
     }
   },
 
@@ -72,18 +70,16 @@ const CampaignService = (
       })
 
       return response.data
-    } catch (error) {
-      console.error('Error to update campaign:', error)
-      return error
+    } catch (error: any) {
+      throw new Error(error.message)
     }
   },
 
   delete: async (campaignId: string) => {
     try {
       await httpClient.delete(`/api/campaigns/${campaignId}`)
-    } catch (error) {
-      console.error('Error to delete campaign:', error)
-      // TODO: Tratar erro criando handler global
+    } catch (error: any) {
+      throw new Error(error.message)
     }
   }
 })
