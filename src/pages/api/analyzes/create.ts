@@ -11,14 +11,14 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
 
     const { title, bucketUrl, message } = req.body
 
-    const createdTraining = await createAnalysis({
+    const createdAnalysis = await createAnalysis({
       title,
       companyId,
       userId,
       message,
       bucketUrl
     })
-    return res.status(HTTP_STATUS.CREATED).json({ data: createdTraining })
+    return res.status(HTTP_STATUS.CREATED).json({ data: createdAnalysis })
   }
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)

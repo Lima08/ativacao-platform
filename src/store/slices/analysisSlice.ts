@@ -1,9 +1,5 @@
-import {
-  IAnalysisCreated,
-  IAnalysisModifier
-} from 'interfaces/entities/analysis'
+import { IAnalysisCreated } from 'interfaces/entities/analysis'
 import httpServices from 'services/http'
-import { CreateAnalysisPayload } from 'services/http/analysisServices '
 import { IAnalysisStore } from 'store/types/IAnalysisStore'
 import { StateCreator } from 'zustand'
 
@@ -114,6 +110,14 @@ const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
         )
       }))
     }
+  },
+  deleteAnalysis: async (id: string) => {
+    set((state) => ({
+      ...state,
+      analyzesList: state.analyzesList.filter((c) => c.id !== id)
+    }))
+
+    await httpServices.analysis.delete(id)
   }
 })
 
