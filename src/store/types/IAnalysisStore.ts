@@ -13,4 +13,5 @@ export interface IAnalysisStore {
   done: (id: string, message: string) => void
   reject: (id: string, message: string) => void
   update: (id: string, modifierData: IAnalysisModifier) => void
+  deleteAnalysis: (id: string) => void
 }
