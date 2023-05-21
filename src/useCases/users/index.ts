@@ -11,6 +11,28 @@ import type {
 import jwt from 'jsonwebtoken'
 import { prisma } from 'lib/prisma'
 import { User } from 'models/User'
+import { getCompanyById } from 'useCases/company'
+
+interface IUserLoginResponse {
+  id: string
+  name: string
+  email: string
+  role: number
+  isActive: boolean
+}
+
+interface ICompanyLoginResponse {
+  id: string
+  name: string
+  slug: string
+  imageUrl?: string
+}
+
+export interface ILoginResponse {
+  token: string
+  user: IUserLoginResponse
+  company: ICompanyLoginResponse
+}
 
 dotenv.config()
 const repository = User.of(prisma)
@@ -25,14 +47,21 @@ async function createUser(params: IUser): Promise<void> {
     await repository.create(params)
   } catch (error: any) {
     const message = error?.message || 'Error to create user'
-    throw new CustomError(message, HTTP_STATUS.BAD_REQUEST, error)
+    throw new CustomError(
+      'Error to create user',
+      HTTP_STATUS.BAD_REQUEST,
+      message
+    )
   }
 }
 
 async function loginUser({
   email,
   password
-}: Pick<IUser, 'email' | 'password'>): Promise<string> {
+}: {
+  email: string
+  password: string
+}): Promise<ILoginResponse> {
   try {
     const user = await repository.getOneBy({ email })
     if (!user) {
@@ -65,7 +94,19 @@ async function loginUser({
       }
     )
 
-    return token
+    const company = await getCompanyById(user.companyId)
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive
+      },
+      company
+    }
   } catch (error: any) {
     const message = error?.message || 'Error to login user'
     throw new CustomError(message, HTTP_STATUS.BAD_REQUEST, error)

@@ -12,7 +12,9 @@ export default async function handler(
 ) {
   if (req.method === REQUEST_METHODS.POST) {
     const { email, password, name, companyId } = req.body
+
     const { error } = loginSchema.validate({ email, password, name, companyId })
+    console.log('🚀 ~ file: create.ts:20 ~ error:', error)
 
     if (error) {
       // TODO: Verificar se esse erro está funcionando
