@@ -1,52 +1,54 @@
-import axios from 'axios'
+import Router from 'next/router'
 
-// import Router from 'next/dist/client/router'
+import axios from 'axios'
+import useStore from 'store/useStore'
+
 import AnalysisService from './analysisServices '
 import CampaignService from './campaignServices'
 import TrainingService from './trainingServices'
 import UploadService from './uploadServices'
+import UserService from './UserServices'
 
 const httpClient = axios.create()
 
-// httpClient.interceptors.request.use((config) => {
-//   // setGlobalLoading(true)
-//   const token = window.localStorage.getItem('token')
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`
-//   }
-//   return config
-// })
+httpClient.interceptors.request.use((config) => {
+  useStore.Global().setLoading(true)
 
-// httpClient.interceptors.response.use(
-//   (response) => {
-//     // setGlobalLoading(false)
-//     return response
-//   },
-//   (error) => {
-//     // setGlobalLoading(false)
-//     const canThrowAnError =
-//       error.request?.status === 0 || error.request?.status === 500
+  const token = window.localStorage.getItem('token')
+  console.log(
+    '🚀 ~ file: index.ts:14 ~ httpClient.interceptors.request.use ~ token:',
+    token
+  )
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
 
-//     if (canThrowAnError) {
-//       // setGlobalLoading(false)
-//       throw new Error(error.message)
-//     }
+httpClient.interceptors.response.use(
+  (response) => {
+      useStore.Global().setLoading(true)
 
-//     if (error.response?.status === 401) {
-//       // TODO: Ver se funfa
-//       Router.push('/')
-//     }
+    return response
+  },
+  (error) => {
+    if (error.response && error.response.status === 403) {
+      Router.push('/login')
+    }
 
-//     // setGlobalLoading(false)
-//     return error
-//   }
-// )
+      useStore.Global().setLoading(true)
+      useStore.Global().setError(error)
+
+    return error
+  }
+)
 
 const httpServices = {
   campaigns: CampaignService(httpClient),
   trainings: TrainingService(httpClient),
   analysis: AnalysisService(httpClient),
-  upload: UploadService(httpClient)
+  upload: UploadService(httpClient),
+  user: UserService(httpClient)
 }
 
 export default httpServices
