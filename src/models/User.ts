@@ -36,10 +36,10 @@ export class User {
     return allUsers
   }
 
-  async getOneBy(id: string): Promise<IUserCreated> {
+  async getOneBy(filter: IUserFilter): Promise<IUserCreated> {
     try {
       const foundedUser = await this.repository.user.findUnique({
-        where: { id }
+        where: { ...filter }
       })
 
       return foundedUser

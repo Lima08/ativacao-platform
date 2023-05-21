@@ -10,10 +10,12 @@ datasource db {
 
 model User {
   id        String  @id @default(uuid())
-  name      String
+  name      String  @db.VarChar(95)
   email     String  @unique
   password  String
   companyId String
+  role      Int  @default(100)
+  isActive  Boolean @default(false) 
   imageUrl  String? @db.VarChar(255)
 
   createdAt DateTime @default(now())
@@ -31,7 +33,7 @@ model User {
 
 model Company {
   id       String  @id @default(uuid())
-  name     String
+  name     String  @db.VarChar(95)
   slug     String  @unique
   imageUrl String? @db.VarChar(255)
 
@@ -69,7 +71,7 @@ enum MediaType {
 
 model Training {
   id          String  @id @default(uuid())
-  name        String
+  name        String  @db.VarChar(95)
   active      Boolean @default(true)
   description String? @db.VarChar(255)
   userId      String
@@ -88,7 +90,7 @@ model Training {
 
 model Campaign {
   id          String  @id @default(uuid())
-  name        String
+  name        String  @db.VarChar(95)
   active      Boolean @default(true)
   description String? @db.VarChar(255)
   userId      String
@@ -126,8 +128,10 @@ enum TrainingStatusType {
 
 model Analysis {
   id        String             @id @default(uuid())
-  title     String
+  title     String             @db.VarChar(255)
+  message   String?            @db.VarChar(255)
   userId    String
+  companyId    String
   bucketUrl String?            @db.VarChar(255)
   biUrl     String?            @db.VarChar(255)
   status    AnalysisStatusType @default(pending)
@@ -145,17 +149,3 @@ enum AnalysisStatusType {
   rejected
   done
 }
-
-// model Permissions { (vide esquma de permissionamento por feat)
-//   id        String      @default(uuid()) @id
-//   url     String   @unique
-//   owner      idDoDono
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-
-//   @@map("users")
-// }
-
-// Pensar em usecasa, controlers etc - vide projetos anteriores
-
-//  TODO: EScrever documentação das requests

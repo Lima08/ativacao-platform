@@ -3,6 +3,7 @@ import {
   IAnalysisCreated,
   IAnalysisModifier
 } from 'interfaces/entities/analysis'
+import { EAnalysisStatusType } from 'interfaces/entities/analysis/EAnalysisStatus'
 
 import { ApiResponse } from '../../../types'
 
@@ -13,15 +14,15 @@ export type CreateAnalysisPayload = {
 
 export interface AnalysisServiceInterface {
   create(payload: CreateAnalysisPayload): Promise<ApiResponse<IAnalysisCreated>>
-  getAllByOwner(): Promise<ApiResponse<IAnalysisCreated[]>>
+  getAll(): Promise<ApiResponse<IAnalysisCreated[]>>
   getExampleWorksheet(): Promise<ApiResponse<IAnalysisCreated>>
-  done(id: string): Promise<ApiResponse<IAnalysisCreated>>
-  reject(id: string): Promise<ApiResponse<IAnalysisCreated>>
+  done(id: string, message: string): Promise<ApiResponse<IAnalysisCreated>>
+  reject(id: string, message: string): Promise<ApiResponse<IAnalysisCreated>>
   update(
     id: string,
     modifierData: IAnalysisModifier
-  ): Promise<ApiResponse<IAnalysisCreated>>,
-  delete(analysisId: string): Promise<void>
+  ): Promise<ApiResponse<IAnalysisCreated>>
+  delete(id: string): Promise<void>
 }
 
 const AnalysisService = (
@@ -34,65 +35,69 @@ const AnalysisService = (
         bucketUrl
       })
       return response.data
-    } catch (error) {
-      console.error('Error to create Analysis:', error)
-      return error
+    } catch (error: any) {
+      const message = error.message || 'Error to create analysis'
+      throw new Error(message)
     }
   },
-  getAllByOwner: async () => {
+  getAll: async () => {
     try {
-      const response = await httpClient.get('/api/analyzes/getAllByOwner')
+      const response = await httpClient.get('/api/analyzes/getAll')
       return response.data
-    } catch (error) {
-      console.error('Error to get Analysis by id:', error)
-      return error
+    } catch (error: any) {
+      const message = error.message || 'Error to get analyzes'
+      throw new Error(message)
     }
   },
   getExampleWorksheet: async () => {
     try {
       const response = await httpClient.get('/api/analyzes/getExampleWorksheet')
       return response.data
-    } catch (error) {
-      console.error('Error to get example:', error)
-      return error
+    } catch (error: any) {
+      const message = error.message || 'Error to get example worksheet'
+      throw new Error(message)
     }
   },
-  done: async (id) => {
+  done: async (id, message) => {
     try {
-      const response = await httpClient.get(`/api/analyzes/${id}/done`)
+      const response = await httpClient.put(`/api/analyzes/${id}`, {
+        status: EAnalysisStatusType.done,
+        message
+      })
       return response.data
-    } catch (error) {
-      console.error('Error to get example:', error)
-      return error
+    } catch (error: any) {
+      const message = error.message || 'Error to complete analysis'
+      throw new Error(message)
     }
   },
-  reject: async (id) => {
+  reject: async (id, message) => {
     try {
-      const response = await httpClient.get(`/api/analyzes/${id}/reject`)
+      const response = await httpClient.put(`/api/analyzes/${id}`, {
+        status: EAnalysisStatusType.rejected,
+        message
+      })
       return response.data
-    } catch (error) {
-      console.error('Error to get example:', error)
-      return error
+    } catch (error: any) {
+      const message = error.message || 'Error to reject analysis'
+      throw new Error(message)
     }
   },
   update: async (id, modifierData) => {
     try {
-      const response = await httpClient.put(
-        `/api/analyzes/${id}/update`,
-        modifierData
-      )
+      const response = await httpClient.put(`/api/analyzes/${id}`, modifierData)
 
       return response.data
-    } catch (error) {
-      console.error('Error to update analysis:', error)
-      return error
+    } catch (error: any) {
+      const message = error.message || 'Error to update analysis'
+      throw new Error(message)
     }
   },
-  delete: async (analysisId: string) => {
+  delete: async (id) => {
     try {
-      await httpClient.delete(`/api/analyzes/${analysisId}`)
-    } catch (error) {
-      console.error('Error to delete analyze:', error)
+      await httpClient.delete(`/api/analyzes/${id}`)
+    } catch (error: any) {
+      const message = error.message || 'Error to delete analysis'
+      throw new Error(message)
     }
   }
 })

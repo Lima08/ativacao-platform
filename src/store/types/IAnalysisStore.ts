@@ -1,4 +1,4 @@
-import { IAnalysisCreated } from 'interfaces/entities/analysis'
+import { IAnalysisCreated, IAnalysisModifier } from 'interfaces/entities/analysis'
 import { CreateAnalysisPayload } from 'services/http/analysisServices '
 
 export interface IAnalysisStore {
@@ -9,8 +9,8 @@ export interface IAnalysisStore {
   setLoading: (isLoading: boolean) => void
   resetCurrentAnalysis: () => void
   createAnalysis: (newAnalysis: CreateAnalysisPayload) => void
-  getAllByOwner: () => void
-  done: (id: string) => void
-  reject: (id: string) => void
-  deleteAnalysis: (id: string) => void
+  getAll: () => void
+  done: (id: string, message: string) => void
+  reject: (id: string, message: string) => void
+  update: (id: string, modifierData: IAnalysisModifier) => void
 }

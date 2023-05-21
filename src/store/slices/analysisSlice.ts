@@ -14,7 +14,7 @@ const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
   error: null,
   setLoading: (isLoading) => set(() => ({ loading: isLoading })),
   resetCurrentAnalysis: () => set(() => ({ currentAnalysis: null })),
-  createAnalysis: async (newAnalysis: CreateAnalysisPayload) => {
+  createAnalysis: async (newAnalysis) => {
     set({ loading: true })
 
     const response = await httpServices.analysis.create(newAnalysis)
@@ -35,10 +35,10 @@ const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
       }))
     }
   },
-  getAllByOwner: async () => {
+  getAll: async () => {
     set({ loading: true })
 
-    const response = await httpServices.analysis.getAllByOwner()
+    const response = await httpServices.analysis.getAll()
     set((state) => ({
       ...state,
       loading: false,
@@ -46,10 +46,10 @@ const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
       error: response?.error
     }))
   },
-  done: async (id: string) => {
+  done: async (id, message) => {
     set({ loading: true })
 
-    const response = await httpServices.analysis.done(id)
+    const response = await httpServices.analysis.done(id, message)
     if (response && response.error) {
       set((state) => ({
         ...state,
@@ -69,10 +69,10 @@ const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
       }))
     }
   },
-  reject: async (id: string) => {
+  reject: async (id, message) => {
     set({ loading: true })
 
-    const response = await httpServices.analysis.reject(id)
+    const response = await httpServices.analysis.reject(id, message)
     if (response && response.error) {
       set((state) => ({
         ...state,
@@ -92,7 +92,7 @@ const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
       }))
     }
   },
-  update: async (id: string, modifierData: IAnalysisModifier) => {
+  update: async (id, modifierData) => {
     set({ loading: true })
 
     const response = await httpServices.analysis.update(id, modifierData)
