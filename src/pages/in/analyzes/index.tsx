@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react'
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
 import useStore from 'store/useStore'
 
+import CustomModal from 'components/CustomModal'
 import DashboardLayout from 'components/DashboardLayout'
 import ListAnalyzesItem from 'components/ListAnalyzesItem'
-import Modal2 from 'components/Modal'
 import PageContainer from 'components/PageContainer'
 import SearchPrevNext from 'components/SearchPrevNext'
 
@@ -100,9 +100,13 @@ export default function AnalyzesTable() {
             ))}
 
           {open && (
-            <Modal2 size="w-[400px] h-[400px]" open={open} setOpen={setOpen}>
+            <CustomModal
+              size="w-[400px] h-[400px]"
+              open={open}
+              setOpen={setOpen}
+            >
               Analyses Uploader
-            </Modal2>
+            </CustomModal>
           )}
         </ul>
       </PageContainer>

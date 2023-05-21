@@ -9,7 +9,7 @@ interface ModalProps {
   size?: string
 }
 
-export default function Modal2({
+export default function CustomModal({
   children,
   open,
   setOpen,

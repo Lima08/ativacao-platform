@@ -8,14 +8,14 @@ import UploadService from './uploadServices'
 
 const httpClient = axios.create()
 
-httpClient.interceptors.request.use((config) => {
-  // setGlobalLoading(true)
-  const token = window.localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
+// httpClient.interceptors.request.use((config) => {
+//   // setGlobalLoading(true)
+//   const token = window.localStorage.getItem('token')
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`
+//   }
+//   return config
+// })
 
 // httpClient.interceptors.response.use(
 //   (response) => {
