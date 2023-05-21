@@ -1,10 +1,19 @@
-import { getAllTrainings } from 'useCases/trainings'
+import { NextApiRequestCustom, NextApiResponse } from 'next'
 
-export default async function handler(req: any, res: any) {
-  if (req.method === 'GET') {
-    const companyId = '5c9e558a-1eb8-44d4-9abb-693c65ee57c4'
+import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
+import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
+import { authCheck } from 'middlewares/authCheck'
+import { getAllTrainings } from 'useCases/trainings'
+async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
+  if (req.method === REQUEST_METHODS.GET) {
+    const { companyId } = req.user!
 
     const trainings = await getAllTrainings({ companyId })
     return res.status(200).json({ data: trainings })
   }
+
+  res
+    .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+    .json({ error: { message: 'Method not allowed' } })
 }
+export default authCheck(handler)

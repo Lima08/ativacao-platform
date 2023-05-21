@@ -1,19 +1,51 @@
+import type { NextApiRequestCustom, NextApiResponse } from 'next'
+
+import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
+import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
+import { authCheck } from 'middlewares/authCheck'
+import campaign from 'schemaValidation/campaign'
 import { createCampaign } from 'useCases/campaigns'
 
-// TODO: Colocar middleware de validação
-export default async function handler(req: any, res: any) {
-  const { name, description, mediaIds } = req.body
-  // TODO: Passar por token e no middleware decodificar
+async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
+  if (req.method === REQUEST_METHODS.POST) {
+    const { companyId, userId, role } = req.user!
 
-  if (req.method === 'POST') {
-    const createdCampaign = await createCampaign({
+    const { name, description, mediaIds } = req.body
+    const { error } = campaign.createSchema.validate({
+      companyId,
+      userId,
       name,
       description,
-      userId: '4181b23f-c4a8-47d1-99c8-2db883d84eb3',
-      companyId: '5c9e558a-1eb8-44d4-9abb-693c65ee57c4',
-      mediaIds
+      mediaIds,
+      role
     })
 
-    return res.status(201).json({ data: createdCampaign })
+    if (error) {
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ error: error.details[0].message })
+    }
+
+    try {
+      const createdCampaign = await createCampaign({
+        name,
+        description,
+        userId,
+        companyId,
+        mediaIds
+      })
+
+      return res.status(HTTP_STATUS.CREATED).json({ data: createdCampaign })
+    } catch (error: any) {
+      return res
+        .status(error.code || HTTP_STATUS.INTERNAL_SERVER_ERROR)
+        .json({ error: { message: error.message } })
+    }
   }
+
+  res
+    .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+    .json({ error: { message: 'Method not allowed' } })
 }
+
+export default authCheck(handler)

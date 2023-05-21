@@ -1,15 +1,27 @@
+import { NextApiRequestCustom, NextApiResponse } from 'next'
+
+import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
+import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
+import { authCheck } from 'middlewares/authCheck'
 import { createAnalysis } from 'useCases/analyzes'
 
-export default async function handler(req: any, res: any) {
-  if (req.method === 'POST') {
-    const userId = '4181b23f-c4a8-47d1-99c8-2db883d84eb3'
-    const { title, bucketUrl } = req.body
+async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
+  if (req.method == REQUEST_METHODS.POST) {
+    const { companyId, userId } = req.user!
 
-    const createdTraining = await createAnalysis({
+    const { title, bucketUrl, message } = req.body
+
+    const createdAnalysis = await createAnalysis({
       title,
+      companyId,
       userId,
+      message,
       bucketUrl
     })
-    return res.status(201).json({ data: createdTraining })
+    return res.status(HTTP_STATUS.CREATED).json({ data: createdAnalysis })
   }
+  res
+    .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+    .json({ error: { message: 'Method not allowed' } })
 }
+export default authCheck(handler)

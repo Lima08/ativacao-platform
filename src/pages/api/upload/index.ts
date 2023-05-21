@@ -18,10 +18,18 @@ export default handler.use(uploadS3Multer).post(async (req, res) => {
   for (const file of req.files) {
     const key = file.key
     const url = file.location
-    let type = file.contentType.split('/')[0]
+    const type = file.contentType.split('/')[0]
 
     if (type === 'application') {
-      type = 'document'
+      return res.status(201).json({
+        data: {
+          type: 'document',
+          key,
+          url,
+          bucket: file.bucket,
+          name: file.originalname
+        }
+      })
     }
 
     const createdFile = await createMedia({ type, url, key })
