@@ -1,3 +1,4 @@
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -22,6 +23,7 @@ export default function LoginForm() {
     resolver: yupResolver(validationSchema)
   })
 
+  const router = useRouter()
   const [error, loading, setGlobal, setError] = useStore.Global((state) => [
     state.error,
     state.loading,
@@ -34,6 +36,7 @@ export default function LoginForm() {
       const { data } = await httpServices.user.login(values)
       if (!data) return
       setGlobal({ company: data.company, user: data.user })
+      router.push('/in/campaigns')
     } catch (error) {
       setError(error)
     } finally {

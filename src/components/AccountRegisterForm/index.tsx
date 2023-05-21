@@ -1,9 +1,9 @@
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Alert, CircularProgress } from '@mui/material'
+import { Alert, Button, CircularProgress } from '@mui/material'
 import httpServices from 'services/http'
 
 import { validationSchema } from './schema'
@@ -25,6 +25,7 @@ export default function AccountRegisterForm() {
     resolver: yupResolver(validationSchema)
   })
 
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [errorToCreate, setIsErrorToCreate] = useState(false)
   const [creteSuccess, setCreteSuccess] = useState(false)
@@ -43,6 +44,10 @@ export default function AccountRegisterForm() {
       setIsLoading(false)
       reset()
     }
+  }
+
+  function goToLogin() {
+    router.push('/login')
   }
 
   return (
@@ -147,14 +152,23 @@ export default function AccountRegisterForm() {
             >
               Criar
             </button>
-            {isLoading && <CircularProgress />}
+          </div>
+        )}
+        {isLoading && (
+          <div className="flex items-center justify-center">
+            <CircularProgress />
           </div>
         )}
         {!isLoading && creteSuccess && (
           <>
-            <button className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium border-solid rounded-md text-indigo-600 hover:bg-indigo-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              <Link href="/login">Entrar</Link>
-            </button>
+            <Button
+              variant="contained"
+              color="success"
+              fullWidth
+              onClick={goToLogin}
+            >
+              Entrar
+            </Button>
             <Alert severity="success">
               Solicitação enviada com sucesso! Aguarde e-mail de confirmação.
             </Alert>

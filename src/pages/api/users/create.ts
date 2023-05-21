@@ -14,7 +14,6 @@ export default async function handler(
     const { email, password, name, companyId } = req.body
 
     const { error } = loginSchema.validate({ email, password, name, companyId })
-    console.log('🚀 ~ file: create.ts:20 ~ error:', error)
 
     if (error) {
       // TODO: Verificar se esse erro está funcionando

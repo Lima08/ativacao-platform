@@ -7,10 +7,10 @@ export default function Homepage() {
   return (
     <main className="container h-screen w-screen mx-auto flex flex-col items-center justify-center gap-4">
       <div className="flex gap-2">
-        <Button variant="outlined" href="#outlined-buttons">
+        <Button variant="outlined">
           <Link href="/login">Entrar</Link>
         </Button>
-        <Button variant="contained" href="#outlined-buttons">
+        <Button variant="contained" color="primary">
           <Link href="/create-account">Criar uma conta</Link>
         </Button>
       </div>
