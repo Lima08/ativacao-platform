@@ -1,10 +1,12 @@
 -- CreateTable
 CREATE TABLE `users` (
     `id` VARCHAR(191) NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(95) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
     `companyId` VARCHAR(191) NOT NULL,
+    `role` INTEGER NOT NULL DEFAULT 100,
+    `isActive` BOOLEAN NOT NULL DEFAULT false,
     `imageUrl` VARCHAR(255) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
@@ -16,7 +18,7 @@ CREATE TABLE `users` (
 -- CreateTable
 CREATE TABLE `companies` (
     `id` VARCHAR(191) NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(95) NOT NULL,
     `slug` VARCHAR(191) NOT NULL,
     `imageUrl` VARCHAR(255) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -44,7 +46,7 @@ CREATE TABLE `media` (
 -- CreateTable
 CREATE TABLE `trainings` (
     `id` VARCHAR(191) NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(95) NOT NULL,
     `active` BOOLEAN NOT NULL DEFAULT true,
     `description` VARCHAR(255) NULL,
     `userId` VARCHAR(191) NOT NULL,
@@ -58,7 +60,7 @@ CREATE TABLE `trainings` (
 -- CreateTable
 CREATE TABLE `campaigns` (
     `id` VARCHAR(191) NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(95) NOT NULL,
     `active` BOOLEAN NOT NULL DEFAULT true,
     `description` VARCHAR(255) NULL,
     `userId` VARCHAR(191) NOT NULL,
@@ -84,8 +86,10 @@ CREATE TABLE `user_training` (
 -- CreateTable
 CREATE TABLE `analyzes` (
     `id` VARCHAR(191) NOT NULL,
-    `title` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `message` VARCHAR(255) NULL,
     `userId` VARCHAR(191) NOT NULL,
+    `companyId` VARCHAR(191) NOT NULL,
     `bucketUrl` VARCHAR(255) NULL,
     `biUrl` VARCHAR(255) NULL,
     `status` ENUM('pending', 'rejected', 'done') NOT NULL DEFAULT 'pending',
