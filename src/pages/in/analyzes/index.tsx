@@ -5,11 +5,13 @@ import { useEffect, useState } from 'react'
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
 import useStore from 'store/useStore'
 
+import AdminAnalysisRegister from 'components/AdminAnalysisRegister'
 import DashboardLayout from 'components/DashboardLayout'
 import ListAnalyzesItem from 'components/ListAnalyzesItem'
 import Modal2 from 'components/Modal'
 import PageContainer from 'components/PageContainer'
 import SearchPrevNext from 'components/SearchPrevNext'
+import UserAnalysisRegister from 'components/UserAnalysisRegister'
 
 type IAnalyzesAdapted = Partial<IAnalysisCreated>
 
@@ -33,7 +35,8 @@ export default function AnalyzesTable() {
   )
 
   const [analyzesListAdapted, setAnalyzesListAdapted] = useState<any>([])
-  const [open, setOpen] = useState(false)
+  const [openUser, setOpenUser] = useState(false)
+  const [openAdmin, setOpenAdmin] = useState(false)
 
   const analyzesAdapter = (
     analyzes: IAnalysisCreated[]
@@ -52,7 +55,7 @@ export default function AnalyzesTable() {
   }
 
   const onClickStatus = () => {
-    setOpen(true)
+    setOpenUser(true)
   }
 
   function deleteItem(id: string) {
@@ -95,13 +98,31 @@ export default function AnalyzesTable() {
                 key={analysis.id}
                 className="flex md:gap-10 hover:bg-slate-100 bg-white w-full border rounded max-h-18"
               >
-                <ListAnalyzesItem data={analysis} onDelete={deleteItem} />
+                <ListAnalyzesItem
+                  data={analysis}
+                  onDelete={deleteItem}
+                  editAnalysis={openAdmin}
+                  setEditAnalysis={setOpenAdmin}
+                />
               </li>
             ))}
 
-          {open && (
-            <Modal2 size="w-[400px] h-[400px]" open={open} setOpen={setOpen}>
-              Analyses Uploader
+          {openUser && (
+            <Modal2
+              size="w-[400px] h-[400px]"
+              open={openUser}
+              setOpen={setOpenUser}
+            >
+              {openUser && <UserAnalysisRegister />}
+            </Modal2>
+          )}
+          {openAdmin && (
+            <Modal2
+              size="w-[400px] h-[400px]"
+              open={openAdmin}
+              setOpen={setOpenAdmin}
+            >
+              {openAdmin && <AdminAnalysisRegister />}
             </Modal2>
           )}
         </ul>

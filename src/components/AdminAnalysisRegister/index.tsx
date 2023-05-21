@@ -1,4 +1,4 @@
-export default function AdminAnalysis() {
+export default function AdminAnalysisRegister() {
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="py-2 bg-blue-600 rounded-b-md w-2/4 text-white text-center">
