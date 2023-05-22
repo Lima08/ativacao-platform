@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react'
 
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
 import useStore from 'store/useStore'
+import DashboardLayout from 'wrappers/DashboardLayout'
 
 import AdminAnalysisRegister from 'components/AdminAnalysisRegister'
-import DashboardLayout from 'components/DashboardLayout'
+import CustomModal from 'components/CustomModal'
 import ListAnalyzesItem from 'components/ListAnalyzesItem'
-import Modal2 from 'components/Modal'
 import PageContainer from 'components/PageContainer'
 import SearchPrevNext from 'components/SearchPrevNext'
 import UserAnalysisRegister from 'components/UserAnalysisRegister'
@@ -108,22 +108,22 @@ export default function AnalyzesTable() {
             ))}
 
           {openUser && (
-            <Modal2
+            <CustomModal
               size="w-[400px] h-[400px]"
               open={openUser}
               setOpen={setOpenUser}
             >
               {openUser && <UserAnalysisRegister />}
-            </Modal2>
+            </CustomModal>
           )}
           {openAdmin && (
-            <Modal2
+            <CustomModal
               size="w-[400px] h-[400px]"
               open={openAdmin}
               setOpen={setOpenAdmin}
             >
               {openAdmin && <AdminAnalysisRegister />}
-            </Modal2>
+            </CustomModal>
           )}
         </ul>
       </PageContainer>

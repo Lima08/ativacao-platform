@@ -18,8 +18,12 @@ export default async function handler(
     }
 
     try {
-      const token = await loginUser({ email, password })
-      return res.status(200).json({ token })
+      const loginData = await loginUser({ email, password })
+      return res.status(HTTP_STATUS.OK).json({
+        token: loginData.token,
+        user: loginData.user,
+        company: loginData.company
+      })
     } catch (error: any) {
       return res.status(error.code).json({ error: { message: error.message } })
     }

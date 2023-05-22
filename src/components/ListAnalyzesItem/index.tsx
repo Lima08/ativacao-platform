@@ -1,6 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction, useState } from 'react'
 
-import Modal from 'components/Modal'
+import Modal from 'components/CustomModal'
 
 export type AnalyzesDataList = {
   id: string

@@ -25,6 +25,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
         .status(HTTP_STATUS.BAD_REQUEST)
         .json({ error: error.details[0].message })
     }
+
     try {
       const createdCampaign = await createCampaign({
         name,

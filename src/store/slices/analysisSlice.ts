@@ -1,9 +1,5 @@
-import {
-  IAnalysisCreated,
-  IAnalysisModifier
-} from 'interfaces/entities/analysis'
+import { IAnalysisCreated } from 'interfaces/entities/analysis'
 import httpServices from 'services/http'
-import { CreateAnalysisPayload } from 'services/http/analysisServices '
 import { IAnalysisStore } from 'store/types/IAnalysisStore'
 import { StateCreator } from 'zustand'
 
