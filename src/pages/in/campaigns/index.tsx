@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import type { ICampaignCreated } from 'interfaces/entities/campaign'
-import useStore from 'store/useStore'
+import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
 import ListItem from 'components/ListItem'
@@ -28,7 +28,7 @@ export default function CampaignsList() {
     deleteCampaign,
     error,
     loading
-  ] = useStore.Campaign((state) => [
+  ] = useMainStore((state) => [
     state.campaignsList,
     state.getAllCampaigns,
     state.handleCampaignActive,

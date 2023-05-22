@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
-import useStore from 'store/useStore'
+import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
 import CustomModal from 'components/CustomModal'
@@ -23,7 +23,7 @@ type AnalyzesObject = {
 }
 
 export default function AnalyzesTable() {
-  const [analyzesList, getAll, loading, deleteAnalysis] = useStore.Analysis(
+  const [analyzesList, getAll, loading, deleteAnalysis] = useMainStore(
     (state) => [
       state.analyzesList,
       state.getAll,

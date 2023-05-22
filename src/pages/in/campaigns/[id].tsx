@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from 'react'
 
 import { PhotoIcon } from '@heroicons/react/24/solid'
 import httpServices from 'services/http'
-import useStore from 'store/useStore'
+import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
 import FormCustom from 'components/FormCustom'
@@ -32,7 +32,7 @@ export default function RegisterCampaign() {
     resetCurrentCampaign,
     error,
     loading
-  ] = useStore.Campaign((state) => [
+  ] = useMainStore((state) => [
     state.currentCampaign,
     state.getCampaignById,
     state.createCampaign,

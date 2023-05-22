@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import type { ITrainingCreated } from 'interfaces/entities/training'
-import useStore from 'store/useStore'
+import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
 import ListItem from 'components/ListItem'
@@ -28,7 +28,7 @@ export default function TrainingsPage() {
     deleteTraining,
     error,
     loading
-  ] = useStore.Training((state) => [
+  ] = useMainStore((state) => [
     state.trainingsList,
     state.getAllTrainings,
     state.handleTrainingActive,

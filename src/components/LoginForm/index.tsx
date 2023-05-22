@@ -1,10 +1,11 @@
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Alert, CircularProgress } from '@mui/material'
 import httpServices from 'services/http'
-import useStore from 'store/useStore'
+import { useAuthStore } from 'store/useAuthStore'
 
 import { validationSchema } from './schema'
 
@@ -23,23 +24,23 @@ export default function LoginForm() {
     resolver: yupResolver(validationSchema)
   })
 
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
+
   const router = useRouter()
-  const [error, loading, setGlobal, setError] = useStore.Global((state) => [
-    state.error,
-    state.loading,
-    state.setGlobal,
-    state.setError
-  ])
+  const setUserLogged = useAuthStore((state) => state.setUserLogged)
 
   async function loginAccount(values: IFormValues) {
     try {
+      setIsLoading(true)
       const { data } = await httpServices.user.login(values)
       if (!data) return
-      setGlobal({ company: data.company, user: data.user })
+      setUserLogged({ company: data.company, user: data.user })
       router.push('/in/campaigns')
-    } catch (error) {
+    } catch (error: any) {
       setError(error)
     } finally {
+      setIsLoading(false)
       reset()
     }
   }
@@ -101,7 +102,7 @@ export default function LoginForm() {
           </div>
         </div>
 
-        {!loading && (
+        {!isLoading && (
           <div className="flex items-center justify-center">
             <button
               type="submit"
@@ -109,11 +110,11 @@ export default function LoginForm() {
             >
               Entrar
             </button>
-            {loading && <CircularProgress />}
+            {isLoading && <CircularProgress />}
           </div>
         )}
 
-        {!loading && error && (
+        {!isLoading && error && (
           <Alert severity="error">
             Erro ao realizar login! Tente novamente.
           </Alert>
