@@ -11,48 +11,40 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
   campaignsList: [],
   resetCurrentCampaign: () => set(() => ({ currentCampaign: null })),
   getCampaignById: async (id) => {
-    useGlobalStore.getState().setLoading(true)
-
-    const response = await httpServices.campaigns.getById(id)
-    if (response && response.error) {
-      useGlobalStore.getState().setError(response.error)
+    try {
+      const response = await httpServices.campaigns.getById(id)
+      set((state) => ({
+        ...state,
+        currentCampaign: response?.data,
+        error: response?.error
+      }))
+    } catch (error) {
+      useGlobalStore.getState().setError(error)
       return
+    } finally {
+      useGlobalStore.getState().setLoading(false)
     }
-
-    set((state) => ({
-      ...state,
-      currentCampaign: response?.data,
-      error: response?.error
-    }))
-    useGlobalStore.getState().setLoading(false)
   },
   getAllCampaigns: async () => {
     useGlobalStore.getState().setLoading(true)
-
-    const response = await httpServices.campaigns.getAll()
-    if (response && response.error) {
-      useGlobalStore.getState().setError(response.error)
-      return
-    }
-
-    if (response.data) {
+    try {
+      const response = await httpServices.campaigns.getAll()
       set((state) => ({
         ...state,
         campaignsList: response.data
       }))
+    } catch (error) {
+      useGlobalStore.getState().setError(error)
+      return
+    } finally {
+      useGlobalStore.getState().setLoading(false)
     }
-    useGlobalStore.getState().setLoading(false)
   },
   createCampaign: async (newCampaign: CreatePayloadStore) => {
     useGlobalStore.getState().setLoading(true)
 
-    const response = await httpServices.campaigns.create(newCampaign)
-    if (response && response.error) {
-      useGlobalStore.getState().setError(response.error)
-      return
-    }
-
-    if (response && response.data) {
+    try {
+      const response = await httpServices.campaigns.create(newCampaign)
       set((state) => ({
         ...state,
         campaignsList: [
@@ -60,57 +52,67 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
           response.data as ICampaignCreated
         ]
       }))
+    } catch (error) {
+      useGlobalStore.getState().setError(error)
+      return
+    } finally {
+      useGlobalStore.getState().setLoading(false)
     }
-    useGlobalStore.getState().setLoading(false)
   },
   updateCampaign: async (id: string, updatedCampaign: modifierCampaignDto) => {
     useGlobalStore.getState().setLoading(true)
 
-    const response = await httpServices.campaigns.update(id, updatedCampaign)
-    if (response && response.error) {
-      useGlobalStore.getState().setError(response.error)
-      return
-    }
-
-    if (response && response.data) {
+    try {
+      const response = await httpServices.campaigns.update(id, updatedCampaign)
       set((state) => ({
         ...state,
         campaignsList: state.campaignsList.map((c) =>
           c.id === id ? (response.data as ICampaignCreated) : c
         )
       }))
+    } catch (error) {
+      useGlobalStore.getState().setError(error)
+      return
+    } finally {
+      useGlobalStore.getState().setLoading(false)
     }
-    useGlobalStore.getState().setLoading(false)
   },
   handleCampaignActive: async (id: string, status: boolean) => {
     useGlobalStore.getState().setLoading(true)
 
-    const response = await httpServices.campaigns.update(id, { active: status })
-    if (response && response.error) {
-      useGlobalStore.getState().setError(response.error)
-      return
-    }
-
-    if (response && response.data) {
+    try {
+      const response = await httpServices.campaigns.update(id, {
+        active: status
+      })
       set((state) => ({
         ...state,
         trainingsList: state.campaignsList.map((c) =>
           c.id === id ? (response.data as ICampaignCreated) : c
         )
       }))
+    } catch (error) {
+      useGlobalStore.getState().setError(error)
+      return
+    } finally {
+      useGlobalStore.getState().setLoading(false)
     }
-    useGlobalStore.getState().setLoading(false)
   },
   deleteCampaign: async (id: string) => {
     useGlobalStore.getState().setLoading(true)
 
-    set((state) => ({
-      ...state,
-      campaignsList: state.campaignsList.filter((c) => c.id !== id)
-    }))
+    try {
+      set((state) => ({
+        ...state,
+        campaignsList: state.campaignsList.filter((c) => c.id !== id)
+      }))
 
-    await httpServices.campaigns.delete(id)
-    useGlobalStore.getState().setLoading(false)
+      await httpServices.campaigns.delete(id)
+    } catch (error) {
+      useGlobalStore.getState().setError(error)
+      return
+    } finally {
+      useGlobalStore.getState().setLoading(false)
+    }
   }
 })
 

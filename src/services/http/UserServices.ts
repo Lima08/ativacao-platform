@@ -39,8 +39,9 @@ const UserService = (httpClient: AxiosInstance): UserServiceInterface => ({
         email,
         password
       })
+  
 
-      return response
+      return response.data
     } catch (error: any) {
       throw new Error(error.message)
     }
@@ -51,8 +52,9 @@ const UserService = (httpClient: AxiosInstance): UserServiceInterface => ({
         email,
         password
       })
+    
 
-      return response
+      return response.data
     } catch (error: any) {
       throw new Error(error.message)
     }

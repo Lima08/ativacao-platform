@@ -31,52 +31,36 @@ const TrainingService = (
   httpClient: AxiosInstance
 ): TrainingServiceInterface => ({
   create: async ({ name, description, mediaIds }) => {
-    try {
-      const response = await httpClient.post('/api/trainings/create', {
-        name,
-        description,
-        mediaIds
-      })
+    const response = await httpClient.post('/api/trainings/create', {
+      name,
+      description,
+      mediaIds
+    })
 
-      return response
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    return response.data
   },
 
   getAll: async () => {
-    try {
-      const response = await httpClient.get('/api/trainings/getAll')
+    const response = await httpClient.get('/api/trainings/getAll')
 
-      return response
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    return response.data
   },
 
   getById: async (trainingId) => {
-    try {
-      const response = await httpClient.get(`/api/trainings/${trainingId}`)
+    const response = await httpClient.get(`/api/trainings/${trainingId}`)
 
-      return response
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    return response.data
   },
 
   update: async (trainingId, { name, description, active, mediaIds }) => {
-    try {
-      const response = await httpClient.put(`/api/trainings/${trainingId}`, {
-        name,
-        description,
-        active,
-        mediaIds
-      })
+    const response = await httpClient.put(`/api/trainings/${trainingId}`, {
+      name,
+      description,
+      active,
+      mediaIds
+    })
 
-      return response
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    return response.data
   },
 
   delete: async (trainingId: string) => {

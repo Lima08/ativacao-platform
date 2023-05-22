@@ -34,7 +34,7 @@ const AnalysisService = (
         title,
         bucketUrl
       })
-      return response
+      return response.data
     } catch (error: any) {
       throw new Error(error.message)
     }
@@ -42,7 +42,7 @@ const AnalysisService = (
   getAll: async () => {
     try {
       const response = await httpClient.get('/api/analyzes/getAll')
-      return response
+      return response.data
     } catch (error: any) {
       throw new Error(error.message)
     }
@@ -50,7 +50,7 @@ const AnalysisService = (
   getExampleWorksheet: async () => {
     try {
       const response = await httpClient.get('/api/analyzes/getExampleWorksheet')
-      return response
+      return response.data
     } catch (error: any) {
       throw new Error(error.message)
     }
@@ -61,7 +61,7 @@ const AnalysisService = (
         status: EAnalysisStatusType.done,
         message
       })
-      return response
+      return response.data
     } catch (error: any) {
       throw new Error(error.message)
     }
@@ -72,7 +72,7 @@ const AnalysisService = (
         status: EAnalysisStatusType.rejected,
         message
       })
-      return response
+      return response.data
     } catch (error: any) {
       throw new Error(error.message)
     }
@@ -80,7 +80,7 @@ const AnalysisService = (
   update: async (id, modifierData) => {
     try {
       const response = await httpClient.put(`/api/analyzes/${id}`, modifierData)
-      return response
+      return response.data
     } catch (error: any) {
       throw new Error(error.message)
     }
