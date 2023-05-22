@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react'
 
 import { PhotoIcon } from '@heroicons/react/24/solid'
 import httpServices from 'services/http'
+import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
@@ -21,25 +22,25 @@ export default function RegisterTraining() {
   const router = useRouter()
   const trainingId = router.query.id
 
+  const [loading, setLoading, setToaster] = useGlobalStore((state) => [
+    state.loading,
+    state.setLoading,
+    state.setToaster
+  ])
   const [
     currentTraining,
     getTrainingById,
     createTraining,
     updateTraining,
-    resetCurrentTraining,
-    error,
-    loading
+    resetCurrentTraining
   ] = useMainStore((state) => [
     state.currentTraining,
     state.getTrainingById,
     state.createTraining,
     state.updateTraining,
-    state.resetCurrentTraining,
-    state.error,
-    state.loading
+    state.resetCurrentTraining
   ])
 
-  const [isFetching, setIsFetching] = useState(false)
   const [trainingName, setTrainingName] = useState('')
   const [trainingDescription, setTrainingDescription] = useState('')
   const filesRef = useRef<MediaResponse[]>([])
@@ -51,7 +52,11 @@ export default function RegisterTraining() {
     const files = e.target.files
 
     if (files.length > 10) {
-      alert('Limite de 10 arquivos por vez excedido!')
+      setToaster({
+        isOpen: true,
+        message: 'Limite de 10 arquivos por vez excedido!',
+        type: 'warning'
+      })
       return
     }
 
@@ -61,23 +66,28 @@ export default function RegisterTraining() {
     }
 
     try {
-      setIsFetching(true)
+      setLoading(true)
       // TODO: passar pra zustand
 
       const { data, error } = await httpServices.upload.save(formData)
 
       if (!!error || !data) {
         // TODO: Colocar toaster avisando que deu erro
-        throw new Error(error?.message || 'Erro ao salvar imagem50')
+        throw new Error(error?.message || 'Erro ao salvar imagem')
       }
 
       for (const image of data) {
         filesRef.current.push(image)
       }
     } catch (error) {
-      console.error(error)
+      // TODO: Ver qual erro é esse e colocar msg personalizada
+      setToaster({
+        isOpen: true,
+        message: 'Error ao salvar dados',
+        type: 'error'
+      })
     } finally {
-      setIsFetching(false)
+      setLoading(false)
     }
   }
 
@@ -123,12 +133,6 @@ export default function RegisterTraining() {
     setTrainingDescription(currentTraining?.description || '')
     // TODO: colocar os files e o active tbm
   }, [currentTraining])
-
-  useEffect(() => {
-    if (!error) return
-    alert('Erro ao salvar treinamento')
-    router.push('/in/trainings')
-  }, [error])
 
   useEffect(() => {
     resetCurrentTraining()
@@ -213,7 +217,7 @@ export default function RegisterTraining() {
                             type="file"
                             className="sr-only"
                             multiple={true}
-                            disabled={isFetching}
+                            disabled={loading}
                             onChange={(e) => uploadImage(e)}
                           />
                         </label>
@@ -240,12 +244,12 @@ export default function RegisterTraining() {
             <button
               type="submit"
               className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              disabled={loading || isFetching}
+              disabled={loading || loading}
             >
               Salvar
             </button>
           </div>
-          {isFetching && (
+          {loading && (
             <div className="px-3 py-2 w-[100px] mt-3 flex items-end justify-center ml-auto rounded-lg font-semibold bg-blue-600 text-white">
               Salvando item...
             </div>

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import type { ICampaignCreated } from 'interfaces/entities/campaign'
+import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
@@ -21,21 +22,18 @@ interface mediaObject {
 export default function CampaignsList() {
   const router = useRouter()
 
-  const [
-    campaignsList,
-    getAllCampaigns,
-    handleCampaignActive,
-    deleteCampaign,
-    error,
-    loading
-  ] = useMainStore((state) => [
-    state.campaignsList,
-    state.getAllCampaigns,
-    state.handleCampaignActive,
-    state.deleteCampaign,
+  const [loading, error, setToaster] = useGlobalStore((state) => [
+    state.loading,
     state.error,
-    state.loading
+    state.setToaster
   ])
+  const [campaignsList, getAllCampaigns, handleCampaignActive, deleteCampaign] =
+    useMainStore((state) => [
+      state.campaignsList,
+      state.getAllCampaigns,
+      state.handleCampaignActive,
+      state.deleteCampaign
+    ])
 
   const [campaignsListAdapted, setCampaignsListAdapted] = useState<DataList[]>(
     []
@@ -55,7 +53,14 @@ export default function CampaignsList() {
     const campaign = campaignsList.find((campaign) => campaign.id === id)
     const media = campaign?.medias
 
-    if (!media?.length) return alert('Nenhuma media encontrada')
+    if (!media?.length) {
+      setToaster({
+        isOpen: true,
+        message: 'Nenhuma media encontrada',
+        type: 'warning'
+      })
+      return
+    }
     setCampaign({
       title: campaign?.name || '',
       description: campaign?.description || '',
@@ -110,11 +115,17 @@ export default function CampaignsList() {
 
   useEffect(() => {
     if (!error) return
-    alert('Erro ao carregar campanhas')
-  }, [error])
+    setToaster({
+      isOpen: true,
+      message: 'Um erro inesperado ocorreu.',
+      type: 'error',
+      duration: 5000
+    })
+  }, [error, setToaster])
 
   useEffect(() => {
     if (!campaignsList) return
+
     const campaignsAdapted = campaignsAdapter(campaignsList)
     setCampaignsListAdapted(campaignsAdapted)
   }, [campaignsList])

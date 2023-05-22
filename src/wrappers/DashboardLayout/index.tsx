@@ -7,13 +7,14 @@ import AsidePanel from 'components/AsidePanel'
 import BaseNavbar from 'components/BaseNavbar'
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const [error, setError] = useGlobalStore((state) => [
-    state.error,
-    state.setError
+  const [toaster, setToaster] = useGlobalStore((state) => [
+    state.toaster,
+    state.setToaster
   ])
+  const { isOpen, message, type, duration } = toaster
 
   function handleClose() {
-    setError(null)
+    setToaster({ ...toaster, isOpen: false })
   }
 
   return (
@@ -25,13 +26,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       </main>
 
       <Snackbar
-        open={!!error}
-        autoHideDuration={5000}
         onClose={handleClose}
-        message="Note archived"
+        open={isOpen}
+        autoHideDuration={duration || 5000}
       >
-        <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-          Erro ao realizar operação!
+        <Alert onClose={handleClose} severity={type} sx={{ width: '100%' }}>
+          {message}
         </Alert>
       </Snackbar>
     </div>

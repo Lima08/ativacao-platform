@@ -32,10 +32,11 @@ export default function LoginForm() {
 
   async function loginAccount(values: IFormValues) {
     try {
+      setError(null)
       setIsLoading(true)
-      const { data } = await httpServices.user.login(values)
-      if (!data) return
-      setUserLogged({ company: data.company, user: data.user })
+      const loginData = await httpServices.user.login(values)
+      if (!loginData) return
+      setUserLogged({ company: loginData.company, user: loginData.user })
       router.push('/in/campaigns')
     } catch (error: any) {
       setError(error)

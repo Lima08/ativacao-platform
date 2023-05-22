@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from 'react'
 
 import { PhotoIcon } from '@heroicons/react/24/solid'
 import httpServices from 'services/http'
+import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
@@ -24,25 +25,25 @@ export default function RegisterCampaign() {
   const router = useRouter()
   const campaignId = router.query.id
 
+  const [loading, setLoading, setToaster] = useGlobalStore((state) => [
+    state.loading,
+    state.setLoading,
+    state.setToaster
+  ])
   const [
     currentCampaign,
     getCampaignById,
     createCampaign,
     updateCampaign,
-    resetCurrentCampaign,
-    error,
-    loading
+    resetCurrentCampaign
   ] = useMainStore((state) => [
     state.currentCampaign,
     state.getCampaignById,
     state.createCampaign,
     state.updateCampaign,
-    state.resetCurrentCampaign,
-    state.error,
-    state.loading
+    state.resetCurrentCampaign
   ])
 
-  const [isFetching, setIsFetching] = useState(false)
   const [campaignName, setCampaignName] = useState('')
   const [campaignDescription, setCampaignDescription] = useState('')
   const filesRef = useRef<MediaResponse[]>([])
@@ -54,7 +55,11 @@ export default function RegisterCampaign() {
     const files = e.target.files
 
     if (files.length > 10) {
-      alert('Limite de 10 arquivos por vez excedido!')
+      setToaster({
+        isOpen: true,
+        message: 'Limite de 10 arquivos por vez excedido!',
+        type: 'warning'
+      })
       return
     }
 
@@ -64,7 +69,7 @@ export default function RegisterCampaign() {
     }
 
     try {
-      setIsFetching(true)
+      setLoading(true)
       // TODO: passar pra zustand
 
       const { data, error } = await httpServices.upload.save(formData)
@@ -78,10 +83,14 @@ export default function RegisterCampaign() {
         filesRef.current.push(image)
       }
     } catch (error) {
-      alert('Erro ao salvar imagem')
+      setToaster({
+        isOpen: true,
+        message: 'Erro ao salvar imagem',
+        type: 'error'
+      })
       console.error(error)
     } finally {
-      setIsFetching(false)
+      setLoading(false)
     }
   }
 
@@ -117,8 +126,6 @@ export default function RegisterCampaign() {
         mediaIds: mediasIdsFiltered
       })
     }
-    // TODO: Colocar toast avisando que falhou ao salvar, apaga os dados e deixa o usuário tentar novamente
-    // TODO: Colocar toast com mensagem avisando que salvou com sucesso antes de redirecionar
     router.push('/in/campaigns')
     resetState()
   }
@@ -133,14 +140,7 @@ export default function RegisterCampaign() {
     if (!currentCampaign) return
     setCampaignName(currentCampaign.name)
     setCampaignDescription(currentCampaign?.description || '')
-    // TODO: colocar os files e o active tbm
   }, [currentCampaign])
-
-  useEffect(() => {
-    if (!error) return
-    alert('Erro ao salvar campanha')
-    router.push('/in/campaigns')
-  }, [error])
 
   useEffect(() => {
     resetState()
@@ -220,7 +220,7 @@ export default function RegisterCampaign() {
                             type="file"
                             className="sr-only"
                             multiple={true}
-                            disabled={loading || isFetching}
+                            disabled={loading || loading}
                             onChange={(e) => uploadFile(e)}
                           />
                         </label>
@@ -247,12 +247,12 @@ export default function RegisterCampaign() {
             <button
               type="submit"
               className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              disabled={loading || isFetching}
+              disabled={loading || loading}
             >
               Salvar
             </button>
           </div>
-          {isFetching && (
+          {loading && (
             <div className="px-3 py-2 w-[100px] mt-3 flex items-end justify-center ml-auto rounded-lg font-semibold bg-blue-600 text-white">
               Salvando item...
             </div>

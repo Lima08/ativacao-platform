@@ -34,10 +34,10 @@ httpClient.interceptors.response.use(
     ) {
       window.localStorage.removeItem('token')
       Router.push('/login')
-      return error
+      return Promise.reject(error)
     }
 
-    return { error }
+    return Promise.reject(error)
   }
 )
 
