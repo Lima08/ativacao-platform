@@ -2,21 +2,28 @@ import type { NextApiRequestCustom, NextApiResponse } from 'next'
 
 import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
+import { ROLES } from 'constants/enums/eRoles'
 import { authCheck } from 'middlewares/authCheck'
-import training from 'schemaValidation/training'
+import training from 'schemaValidation/trainingSchema'
 import { createTraining } from 'useCases/trainings'
 
 async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
   if (req.method === REQUEST_METHODS.POST) {
     const { companyId, userId, role } = req.user!
+
+    if (role < ROLES.COMPANY_ADMIN) {
+      return res
+        .status(HTTP_STATUS.UNAUTHORIZED)
+        .json({ error: { message: 'Unauthorized' } })
+    }
+
     const { name, description, mediaIds } = req.body
     const { error } = training.createSchema.validate({
       companyId,
       userId,
       name,
       description,
-      mediaIds,
-      role
+      mediaIds
     })
 
     if (error) {
