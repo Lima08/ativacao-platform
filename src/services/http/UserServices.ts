@@ -40,10 +40,9 @@ const UserService = (httpClient: AxiosInstance): UserServiceInterface => ({
         password
       })
 
-      return response.data
+      return response
     } catch (error: any) {
-      console.error('Error to create User:', error)
-      throw new Error(error.message) // TODO: ver como tratar os erros (criar tarefa para tratamento geral)
+      throw new Error(error.message)
     }
   },
   login: async ({ email, password }) => {
@@ -53,12 +52,9 @@ const UserService = (httpClient: AxiosInstance): UserServiceInterface => ({
         password
       })
 
-      return {
-        data: response.data
-      }
+      return response
     } catch (error: any) {
-      console.error('Error to create User:', error)
-      throw new Error(error.message) // TODO: ver como tratar os erros (criar tarefa para tratamento geral)
+      throw new Error(error.message)
     }
   }
   // getAll: async () => {

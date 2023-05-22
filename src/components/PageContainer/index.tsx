@@ -3,20 +3,20 @@
 import { useRouter } from 'next/navigation'
 import { ReactNode } from 'react'
 
-import CustomButton from 'components/ButtonCustom'
+import { Button } from '@mui/material'
 
 type PageContainerProps = {
   children: ReactNode
   pageTitle: string
   pageSection: string
-  onClickAdd?: () => void
+  showAddButton?: boolean
 }
 
 export default function PageContainer({
   pageTitle,
   pageSection,
   children,
-  onClickAdd
+  showAddButton
 }: PageContainerProps) {
   const router = useRouter()
 
@@ -28,9 +28,15 @@ export default function PageContainer({
     <div className="w-full flex flex-col py-[25px] items-center">
       <div className="w-9/12 flex flex-row justify-around items-center">
         <h1 className="text-2xl font-medium">{pageTitle}</h1>
-        <CustomButton onClick={onClickAdd || navToCreatePage} variant="default">
-          <p>Adicionar</p>
-        </CustomButton>
+        {showAddButton && (
+          <Button
+            onClick={navToCreatePage}
+            variant="contained"
+            className="bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600 font-bold"
+          >
+            <p>Adicionar</p>
+          </Button>
+        )}
       </div>
       <div className="flex flex-col mx-auto">{children}</div>
     </div>

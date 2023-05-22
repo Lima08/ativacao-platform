@@ -37,7 +37,8 @@ const CampaignService = (
         description,
         mediaIds
       })
-      return response.data
+
+      return response
     } catch (error: any) {
       throw new Error(error.message)
     }
@@ -46,7 +47,7 @@ const CampaignService = (
   getAll: async () => {
     try {
       const response = await httpClient.get('/api/campaigns/getAll')
-      return response.data || []
+      return response
     } catch (error: any) {
       throw new Error(error.message)
     }
@@ -54,7 +55,7 @@ const CampaignService = (
   getById: async (campaignId) => {
     try {
       const response = await httpClient.get(`/api/campaigns/${campaignId}`)
-      return response.data
+      return response
     } catch (error: any) {
       throw new Error(error.message)
     }
@@ -68,8 +69,8 @@ const CampaignService = (
         active,
         mediaIds
       })
-
-      return response.data
+      
+      return response
     } catch (error: any) {
       throw new Error(error.message)
     }

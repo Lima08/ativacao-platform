@@ -122,7 +122,11 @@ export default function TrainingsPage() {
 
   return (
     <DashboardLayout>
-      <PageContainer pageTitle="Treinamentos" pageSection="trainings">
+      <PageContainer
+        pageTitle="Treinamentos"
+        pageSection="trainings"
+        showAddButton
+      >
         <SearchPrevNext />
         {loading && <p>Carregando...</p>}
         {!loading && !trainingListAdapted.length && (

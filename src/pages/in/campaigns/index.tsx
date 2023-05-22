@@ -121,7 +121,11 @@ export default function CampaignsList() {
 
   return (
     <DashboardLayout>
-      <PageContainer pageTitle="Campanhas" pageSection="campaigns">
+      <PageContainer
+        pageTitle="Campanhas"
+        pageSection="campaigns"
+        showAddButton
+      >
         <SearchPrevNext />
         {loading && <p>Carregando...</p>}
         <ul className="list-none mt-8">

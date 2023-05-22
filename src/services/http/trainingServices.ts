@@ -38,10 +38,9 @@ const TrainingService = (
         mediaIds
       })
 
-      return response.data
-    } catch (error) {
-      console.error('Error to create training:', error)
-      return error
+      return response
+    } catch (error: any) {
+      throw new Error(error.message)
     }
   },
 
@@ -49,10 +48,9 @@ const TrainingService = (
     try {
       const response = await httpClient.get('/api/trainings/getAll')
 
-      return response.data
-    } catch (error) {
-      console.error('Error fetching trainings:', error)
-      return error
+      return response
+    } catch (error: any) {
+      throw new Error(error.message)
     }
   },
 
@@ -60,10 +58,9 @@ const TrainingService = (
     try {
       const response = await httpClient.get(`/api/trainings/${trainingId}`)
 
-      return response.data
-    } catch (error) {
-      console.error('Error to get training:', error)
-      return error
+      return response
+    } catch (error: any) {
+      throw new Error(error.message)
     }
   },
 
@@ -76,20 +73,14 @@ const TrainingService = (
         mediaIds
       })
 
-      return response.data
-    } catch (error) {
-      console.error('Error to update training:', error)
-      return error
+      return response
+    } catch (error: any) {
+      throw new Error(error.message)
     }
   },
 
   delete: async (trainingId: string) => {
-    try {
-      const response = await httpClient.delete(`/api/trainings/${trainingId}`)
-      return response.data
-    } catch (error) {
-      console.error('Error to delete training:', error)
-    }
+    await httpClient.delete(`/api/trainings/${trainingId}`)
   }
 })
 

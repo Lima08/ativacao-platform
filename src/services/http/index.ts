@@ -1,6 +1,7 @@
 import Router from 'next/router'
 
 import axios from 'axios'
+import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 
 import AnalysisService from './analysisServices '
 import CampaignService from './campaignServices'
@@ -28,14 +29,15 @@ httpClient.interceptors.response.use(
   },
   (error) => {
     const errorStatus = error.response && error.response.status
-    if ([401, 403].includes(errorStatus)) {
-      // TODO: colocar com enums
+    if (
+      [HTTP_STATUS.FORBIDDEN, HTTP_STATUS.UNAUTHORIZED].includes(errorStatus)
+    ) {
       window.localStorage.removeItem('token')
       Router.push('/login')
       return error
     }
 
-    throw error
+    return { error }
   }
 )
 
