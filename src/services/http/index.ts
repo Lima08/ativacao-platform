@@ -28,14 +28,14 @@ httpClient.interceptors.response.use(
     return response
   },
   (error) => {
-    const errorStatus = error.response && error.response.status
-    if (
-      [HTTP_STATUS.FORBIDDEN, HTTP_STATUS.UNAUTHORIZED].includes(errorStatus)
-    ) {
-      window.localStorage.removeItem('token')
-      Router.push('/login')
-      return Promise.reject(error)
-    }
+    // const errorStatus = error.response && error.response.status
+    // if (
+    //   [HTTP_STATUS.FORBIDDEN, HTTP_STATUS.UNAUTHORIZED].includes(errorStatus)
+    // ) {
+    //   VER se não faz mais sentido enviar uma mensagem e não deslogar
+    //   window.localStorage.removeItem('token')
+    //   Router.push('/login')
+    // }
 
     return Promise.reject(error)
   }
