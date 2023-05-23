@@ -45,6 +45,7 @@ export default function AnalyzesTable() {
       analyzes.map((analysis) => ({
         id: analysis.id,
         status: analysis.status,
+        date: analysis.createdAt,
         message: analysis.message,
         title: analysis.title,
         bucketUrl: analysis.bucketUrl,

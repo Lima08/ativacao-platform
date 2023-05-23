@@ -1,6 +1,8 @@
 import { Dispatch, ReactNode, SetStateAction, useState } from 'react'
 
-import Modal from 'components/CustomModal'
+import CustomModal from 'components/CustomModal'
+
+import { formatDate } from '../../../utils'
 
 export type AnalyzesDataList = {
   id: string
@@ -8,6 +10,7 @@ export type AnalyzesDataList = {
   bucketUrl: string
   biUrl?: string
   status: string
+  date: string
   message?: string | undefined
 }
 
@@ -114,7 +117,9 @@ export default function ListAnalyzesItem({
             />
           </svg>
         </button>
-        <div className="font-medium text-slate-500 w-1/4">01/01/2022</div>
+        <div className="font-medium text-slate-500 w-1/4">
+          {formatDate(data.date)}
+        </div>
         <h2
           className={`font-medium text-gray-800 dark:text-white w-1/2 ${
             roleAdmin ? 'cursor-pointer' : ''
@@ -162,7 +167,7 @@ export default function ListAnalyzesItem({
         </div>
       </div>
       {openStatus && (
-        <Modal
+        <CustomModal
           size="w-[400px] h-[400px]"
           open={openStatus}
           setOpen={setOpenStatus}
@@ -176,7 +181,7 @@ export default function ListAnalyzesItem({
             </p>
             <p className="py-2 mt-2">{data.message || 'Sem comentários.'}</p>
           </div>
-        </Modal>
+        </CustomModal>
       )}
     </div>
   )
