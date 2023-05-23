@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 
 import { PhotoIcon } from '@heroicons/react/24/solid'
 import httpServices from 'services/http'
@@ -11,15 +11,9 @@ import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
 import FormCustom from 'components/FormCustom'
+import MediaList from 'components/MediaList'
 
-type MediaResponse = {
-  id: string
-  url: string
-  type: string
-  key: string
-  campaignId?: string
-  trainingId?: string
-}
+import { MediaResponseType } from '../../../../types'
 
 export default function RegisterCampaign() {
   const router = useRouter()
@@ -46,7 +40,7 @@ export default function RegisterCampaign() {
 
   const [campaignName, setCampaignName] = useState('')
   const [campaignDescription, setCampaignDescription] = useState('')
-  const filesRef = useRef<MediaResponse[]>([])
+  const [campaignMedias, setCampaignMedias] = useState<MediaResponseType[]>([])
 
   const uploadFile = async (e: any) => {
     // TODO: passar para zustand
@@ -75,20 +69,25 @@ export default function RegisterCampaign() {
       const { data, error } = await httpServices.upload.save(formData)
 
       if (!!error || !data) {
-        // TODO: Colocar toaster avisando que deu erro
-        throw new Error(error?.message || 'Erro ao salvar imagem50')
+        setToaster({
+          isOpen: true,
+          message: 'Error ao salvar medias',
+          type: 'error'
+        })
+        return
       }
 
-      for (const image of data) {
-        filesRef.current.push(image)
+      for (const media of data) {
+        setCampaignMedias((prevMediaList) => {
+          return [...prevMediaList, media]
+        })
       }
     } catch (error) {
       setToaster({
         isOpen: true,
-        message: 'Erro ao salvar imagem',
+        message: 'Error ao salvar dados',
         type: 'error'
       })
-      console.error(error)
     } finally {
       setLoading(false)
     }
@@ -98,7 +97,7 @@ export default function RegisterCampaign() {
     return () => {
       setCampaignName('')
       setCampaignDescription('')
-      filesRef.current = []
+      setCampaignMedias([])
       resetCurrentCampaign()
     }
   }
@@ -107,13 +106,12 @@ export default function RegisterCampaign() {
     e.preventDefault()
 
     const mediaIds =
-      filesRef.current && filesRef.current?.length
-        ? filesRef.current.map((media) => media.id)
+      campaignMedias && campaignMedias?.length
+        ? campaignMedias.map((media) => media.id)
         : []
     const mediasIdsFiltered = mediaIds.filter((id) => id) as string[]
 
     if (!campaignId || campaignId === 'new') {
-      // TODO: Passar pare service
       createCampaign({
         name: campaignName,
         description: campaignDescription,
@@ -134,6 +132,11 @@ export default function RegisterCampaign() {
     if (!campaignId || campaignId === 'new') return
 
     getCampaignById(String(campaignId))
+  }
+
+  const removeMedia = (id: string) => {
+    const medias = campaignMedias.filter((media) => media.id !== id)
+    setCampaignMedias(medias)
   }
 
   useEffect(() => {
@@ -257,6 +260,8 @@ export default function RegisterCampaign() {
               Salvando item...
             </div>
           )}
+
+          <MediaList mediasList={campaignMedias} onDelete={removeMedia} />
         </FormCustom>
       </div>
     </DashboardLayout>

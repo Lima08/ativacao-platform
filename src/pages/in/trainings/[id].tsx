@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 
 import { PhotoIcon } from '@heroicons/react/24/solid'
 import httpServices from 'services/http'
@@ -8,15 +8,9 @@ import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
 import FormCustom from 'components/FormCustom'
+import MediaList from 'components/MediaList'
 
-type MediaResponse = {
-  id: string
-  url: string
-  type: string
-  key: string
-  trainingId?: string
-  campaignId?: string
-}
+import { MediaResponseType } from '../../../../types'
 
 export default function RegisterTraining() {
   const router = useRouter()
@@ -43,7 +37,7 @@ export default function RegisterTraining() {
 
   const [trainingName, setTrainingName] = useState('')
   const [trainingDescription, setTrainingDescription] = useState('')
-  const filesRef = useRef<MediaResponse[]>([])
+  const [trainingsMedias, setTrainingMedias] = useState<MediaResponseType[]>([])
 
   const uploadImage = async (e: any) => {
     // TODO: passar para zustand
@@ -72,15 +66,20 @@ export default function RegisterTraining() {
       const { data, error } = await httpServices.upload.save(formData)
 
       if (!!error || !data) {
-        // TODO: Colocar toaster avisando que deu erro
-        throw new Error(error?.message || 'Erro ao salvar imagem')
+        setToaster({
+          isOpen: true,
+          message: 'Error ao salvar medias',
+          type: 'error'
+        })
+        return
       }
 
-      for (const image of data) {
-        filesRef.current.push(image)
+      for (const media of data) {
+        setTrainingMedias((prevMediaList) => {
+          return [...prevMediaList, media]
+        })
       }
     } catch (error) {
-      // TODO: Ver qual erro é esse e colocar msg personalizada
       setToaster({
         isOpen: true,
         message: 'Error ao salvar dados',
@@ -91,18 +90,26 @@ export default function RegisterTraining() {
     }
   }
 
+  const resetState = () => {
+    return () => {
+      setTrainingName('')
+      setTrainingDescription('')
+      setTrainingMedias([])
+      resetCurrentTraining()
+    }
+  }
+
   const submitTraining = async (e: any) => {
     e.preventDefault()
 
     const mediaIds =
-      filesRef.current && filesRef.current.length
-        ? filesRef.current.map((media) => media.id)
+      trainingsMedias && trainingsMedias.length
+        ? trainingsMedias.map((media) => media.id)
         : []
 
     const mediasIdsFiltered = mediaIds.filter((id) => id) as string[]
 
     if (!trainingId || trainingId === 'new') {
-      // TODO: Passar pare service
       createTraining({
         name: trainingName,
         description: trainingDescription,
@@ -115,9 +122,7 @@ export default function RegisterTraining() {
         mediaIds: mediasIdsFiltered
       })
     }
-
-    // TODO: Colocar toast avisando que falhou ao salvar, apaga os dados e deixa o usuário tentar novamente
-    // TODO: Colocar toast com mensagem avisando que salvou com sucesso antes de redirecionar
+    resetState()
     router.push('/in/trainings')
   }
 
@@ -127,11 +132,15 @@ export default function RegisterTraining() {
     getTrainingById(String(trainingId))
   }
 
+  const removeMedia = (id: string) => {
+    const medias = trainingsMedias.filter((media) => media.id !== id)
+    setTrainingMedias(medias)
+  }
+
   useEffect(() => {
     if (!currentTraining) return
     setTrainingName(currentTraining.name)
     setTrainingDescription(currentTraining?.description || '')
-    // TODO: colocar os files e o active tbm
   }, [currentTraining])
 
   useEffect(() => {
@@ -141,7 +150,6 @@ export default function RegisterTraining() {
     fetchTraining()
   }, [trainingId])
 
-  // TODO: Adicionar compo de atitive e inative + função
   return (
     <DashboardLayout>
       <div className="container flex items-center justify-start">
@@ -254,6 +262,8 @@ export default function RegisterTraining() {
               Salvando item...
             </div>
           )}
+          <div></div>
+          <MediaList mediasList={trainingsMedias} onDelete={removeMedia} />
         </FormCustom>
       </div>
     </DashboardLayout>
