@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
+import { useAuthStore } from 'store/useAuthStore'
+import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
@@ -26,17 +28,15 @@ type AnalyzesObject = {
 }
 
 export default function AnalyzesTable() {
-  const [analyzesList, getAll, loading, deleteAnalysis] = useMainStore(
-    (state) => [
-      state.analyzesList,
-      state.getAll,
-      state.loading,
-      state.deleteAnalysis
-    ]
-  )
+  const [loading] = useGlobalStore((state) => [state.loading])
 
-  const [user] = useStore.Global((state) => [state.global.user])
-  console.log('🚀 ~ file: index.tsx:39 ~ AnalyzesTable ~ user:', user)
+  const [analyzesList, getAll, deleteAnalysis] = useMainStore((state) => [
+    state.analyzesList,
+    state.getAll,
+    state.deleteAnalysis
+  ])
+
+  const user = useStore(useAuthStore, (state) => state)
 
   const [analyzesListAdapted, setAnalyzesListAdapted] = useState<any>([])
   const [openUser, setOpenUser] = useState(false)
@@ -57,10 +57,6 @@ export default function AnalyzesTable() {
       })) || []
 
     return result
-  }
-
-  const onClickStatus = () => {
-    setOpenUser(true)
   }
 
   function deleteItem(id: string) {
@@ -84,9 +80,13 @@ export default function AnalyzesTable() {
 
   return (
     <DashboardLayout>
-      <PageContainer pageTitle="Análises" pageSection="analyzes">
+      <PageContainer
+        pageTitle="Análises"
+        pageSection="analyzes"
+        customCallback={() => setOpenUser(true)}
+      >
         <SearchPrevNext />
-        {loading && <p>Carregando...</p>}
+        {/* {loading && <p>Carregando...</p>} */}
         <ul className="list-none mt-8 w-12/12">
           {!loading && !analyzesList.length && (
             <li className="flex items-center justify-center mt-5 bg-white h-12 w-full border rounded">
@@ -114,7 +114,7 @@ export default function AnalyzesTable() {
               open={openUser}
               setOpen={setOpenUser}
             >
-              {openUser && <UserAnalysisRegister />}
+              {openUser && <UserAnalysisRegister setClose={setOpenUser} />}
             </CustomModal>
           )}
           {openAdmin && (
@@ -130,4 +130,18 @@ export default function AnalyzesTable() {
       </PageContainer>
     </DashboardLayout>
   )
+}
+
+const useStore = <T, F>(
+  store: (callback: (state: T) => unknown) => unknown,
+  callback: (state: T) => F
+) => {
+  const result = store(callback) as F
+  const [data, setData] = useState<F>()
+
+  useEffect(() => {
+    setData(result)
+  }, [result])
+
+  return data
 }

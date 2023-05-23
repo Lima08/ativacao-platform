@@ -1,4 +1,7 @@
-import { Dispatch, ReactNode, SetStateAction, useState } from 'react'
+import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react'
+
+import { ROLES } from 'constants/enums/eRoles'
+import { useAuthStore } from 'store/useAuthStore'
 
 import CustomModal from 'components/CustomModal'
 
@@ -20,9 +23,6 @@ type ListItemProps = {
   setEditAnalysis: Dispatch<SetStateAction<boolean>>
   editAnalysis: boolean
 }
-
-// const roleAdmin = false
-const roleAdmin = true
 
 const STATUS: { [key: string]: ReactNode } = {
   pending: (
@@ -88,8 +88,15 @@ export default function ListAnalyzesItem({
   setEditAnalysis
 }: ListItemProps) {
   const [openStatus, setOpenStatus] = useState(false)
+  const [systemAdmin, setIsSystemAdmin] = useState(false)
 
-  console.log('data', data)
+  const role = useAuthStore((state) => state.user?.role)
+
+  useEffect(() => {
+    setIsSystemAdmin(role >= ROLES.SYSTEM_ADMIN)
+  }, [role])
+
+  // console.log('data', data)
 
   return (
     <div className="flex flex-col items-center w-full dark:border-gray-700 rounded-md">
@@ -122,10 +129,10 @@ export default function ListAnalyzesItem({
         </div>
         <h2
           className={`font-medium text-gray-800 dark:text-white w-1/2 ${
-            roleAdmin ? 'cursor-pointer' : ''
+            systemAdmin ? 'cursor-pointer' : ''
           }`}
           onClick={() => {
-            if (roleAdmin) setEditAnalysis(!editAnalysis)
+            if (systemAdmin) setEditAnalysis(!editAnalysis)
           }}
         >
           {data.title}
@@ -140,15 +147,14 @@ export default function ListAnalyzesItem({
           <button
             onClick={(event) => {
               event.stopPropagation()
-              window.location.href = data.bucketUrl || ''
             }}
             className={`flex items-center justify-center w-1/2 h-1/3 px-5 py-2 text-gray-700 capitalize transition-colors duration-200 bg-white border border-blue-500 hover:bg-blue-600 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`}
           >
-            Baixar
+            <a href={data.bucketUrl || ''}>Baixar</a>
           </button>
           <button
             className={`flex items-center justify-center w-1/2 h-1/3 px-5 py-2 text-gray-700 capitalize transition-colors duration-200 bg-white border hover:bg-green-500 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 ${
-              data.status === 'pending'
+              data.status === 'pending' || data.status === 'rejected'
                 ? 'border-gray-200 pointer-events-none op-50'
                 : 'border-green-500'
             }`}

@@ -11,12 +11,14 @@ type PageContainerProps = {
   children: ReactNode
   pageTitle: string
   pageSection: string
+  customCallback?: () => void
 }
 
 export default function PageContainer({
   pageTitle,
   pageSection,
-  children
+  children,
+  customCallback
 }: PageContainerProps) {
   const role = useAuthStore((state) => state.user?.role)
   const [isAdmin, setIsAdmin] = useState(false)
@@ -36,7 +38,7 @@ export default function PageContainer({
         <h1 className="text-2xl font-medium">{pageTitle}</h1>
         {isAdmin && (
           <Button
-            onClick={navToCreatePage}
+            onClick={customCallback || navToCreatePage}
             variant="contained"
             className="bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600 font-bold"
           >
