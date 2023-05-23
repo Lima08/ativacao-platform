@@ -18,6 +18,7 @@ type IAnalyzesAdapted = Partial<IAnalysisCreated>
 type AnalyzesObject = {
   id: string
   status: string
+  date: string
   message?: string | undefined
   title: string
   bucketUrl: string
