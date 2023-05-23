@@ -35,6 +35,9 @@ export default function AnalyzesTable() {
     ]
   )
 
+  const [user] = useStore.Global((state) => [state.global.user])
+  console.log('🚀 ~ file: index.tsx:39 ~ AnalyzesTable ~ user:', user)
+
   const [analyzesListAdapted, setAnalyzesListAdapted] = useState<any>([])
   const [openUser, setOpenUser] = useState(false)
   const [openAdmin, setOpenAdmin] = useState(false)
