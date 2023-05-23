@@ -31,56 +31,38 @@ const CampaignService = (
   httpClient: AxiosInstance
 ): CampaignServiceInterface => ({
   create: async ({ name, description, mediaIds }) => {
-    try {
-      const response = await httpClient.post('/api/campaigns/create', {
-        name,
-        description,
-        mediaIds
-      })
-      return response.data
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const response = await httpClient.post('/api/campaigns/create', {
+      name,
+      description,
+      mediaIds
+    })
+
+    return response.data
   },
 
   getAll: async () => {
-    try {
-      const response = await httpClient.get('/api/campaigns/getAll')
-      return response.data || []
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const response = await httpClient.get('/api/campaigns/getAll')
+
+    return response.data
   },
   getById: async (campaignId) => {
-    try {
-      const response = await httpClient.get(`/api/campaigns/${campaignId}`)
-      return response.data
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const response = await httpClient.get(`/api/campaigns/${campaignId}`)
+    return response.data
   },
 
   update: async (campaignId, { name, description, active, mediaIds }) => {
-    try {
-      const response = await httpClient.put(`/api/campaigns/${campaignId}`, {
-        name,
-        description,
-        active,
-        mediaIds
-      })
+    const response = await httpClient.put(`/api/campaigns/${campaignId}`, {
+      name,
+      description,
+      active,
+      mediaIds
+    })
 
-      return response.data
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    return response.data
   },
 
   delete: async (campaignId: string) => {
-    try {
-      await httpClient.delete(`/api/campaigns/${campaignId}`)
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    await httpClient.delete(`/api/campaigns/${campaignId}`)
   }
 })
 

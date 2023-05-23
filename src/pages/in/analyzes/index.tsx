@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
-import useStore from 'store/useStore'
+import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
 import AdminAnalysisRegister from 'components/AdminAnalysisRegister'
@@ -26,7 +26,7 @@ type AnalyzesObject = {
 }
 
 export default function AnalyzesTable() {
-  const [analyzesList, getAll, loading, deleteAnalysis] = useStore.Analysis(
+  const [analyzesList, getAll, loading, deleteAnalysis] = useMainStore(
     (state) => [
       state.analyzesList,
       state.getAll,
@@ -84,11 +84,7 @@ export default function AnalyzesTable() {
 
   return (
     <DashboardLayout>
-      <PageContainer
-        pageTitle="Análises"
-        pageSection="analyzes"
-        onClickAdd={onClickStatus}
-      >
+      <PageContainer pageTitle="Análises" pageSection="analyzes">
         <SearchPrevNext />
         {loading && <p>Carregando...</p>}
         <ul className="list-none mt-8 w-12/12">
