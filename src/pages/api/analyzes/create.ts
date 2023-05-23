@@ -2,15 +2,22 @@ import { NextApiRequestCustom, NextApiResponse } from 'next'
 
 import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
+import { ROLES } from 'constants/enums/eRoles'
 import { authCheck } from 'middlewares/authCheck'
 import { createAnalysis } from 'useCases/analyzes'
 
 async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
   if (req.method == REQUEST_METHODS.POST) {
-    const { companyId, userId } = req.user!
+    const { companyId, userId, role } = req.user!
 
+    if (role < ROLES.COMPANY_ADMIN) {
+      return res
+        .status(HTTP_STATUS.UNAUTHORIZED)
+        .json({ error: { message: 'Unauthorized' } })
+    }
+
+    
     const { title, bucketUrl, message } = req.body
-
     const createdAnalysis = await createAnalysis({
       title,
       companyId,

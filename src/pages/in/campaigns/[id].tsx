@@ -2,50 +2,45 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 
 import { PhotoIcon } from '@heroicons/react/24/solid'
 import httpServices from 'services/http'
-import useStore from 'store/useStore'
+import useGlobalStore from 'store/useGlobalStore'
+import useMainStore from 'store/useMainStore'
+import DashboardLayout from 'wrappers/DashboardLayout'
 
-import DashboardLayout from 'components/DashboardLayout'
 import FormCustom from 'components/FormCustom'
+import MediaList from 'components/MediaList'
 
-type MediaResponse = {
-  id: string
-  url: string
-  type: string
-  key: string
-  campaignId?: string
-  trainingId?: string
-}
+import { MediaResponseType } from '../../../../types'
 
 export default function RegisterCampaign() {
   const router = useRouter()
   const campaignId = router.query.id
 
+  const [loading, setLoading, setToaster] = useGlobalStore((state) => [
+    state.loading,
+    state.setLoading,
+    state.setToaster
+  ])
   const [
     currentCampaign,
     getCampaignById,
     createCampaign,
     updateCampaign,
-    resetCurrentCampaign,
-    error,
-    loading
-  ] = useStore.Campaign((state) => [
+    resetCurrentCampaign
+  ] = useMainStore((state) => [
     state.currentCampaign,
     state.getCampaignById,
     state.createCampaign,
     state.updateCampaign,
-    state.resetCurrentCampaign,
-    state.error,
-    state.loading
+    state.resetCurrentCampaign
   ])
 
-  const [isFetching, setIsFetching] = useState(false)
   const [campaignName, setCampaignName] = useState('')
   const [campaignDescription, setCampaignDescription] = useState('')
-  const filesRef = useRef<MediaResponse[]>([])
+  const [campaignMedias, setCampaignMedias] = useState<MediaResponseType[]>([])
 
   const uploadFile = async (e: any) => {
     // TODO: passar para zustand
@@ -54,7 +49,11 @@ export default function RegisterCampaign() {
     const files = e.target.files
 
     if (files.length > 10) {
-      alert('Limite de 10 arquivos por vez excedido!')
+      setToaster({
+        isOpen: true,
+        message: 'Limite de 10 arquivos por vez excedido!',
+        type: 'warning'
+      })
       return
     }
 
@@ -64,24 +63,33 @@ export default function RegisterCampaign() {
     }
 
     try {
-      setIsFetching(true)
+      setLoading(true)
       // TODO: passar pra zustand
 
       const { data, error } = await httpServices.upload.save(formData)
 
       if (!!error || !data) {
-        // TODO: Colocar toaster avisando que deu erro
-        throw new Error(error?.message || 'Erro ao salvar imagem50')
+        setToaster({
+          isOpen: true,
+          message: 'Error ao salvar medias',
+          type: 'error'
+        })
+        return
       }
 
-      for (const image of data) {
-        filesRef.current.push(image)
+      for (const media of data) {
+        setCampaignMedias((prevMediaList) => {
+          return [...prevMediaList, media]
+        })
       }
     } catch (error) {
-      alert('Erro ao salvar imagem')
-      console.error(error)
+      setToaster({
+        isOpen: true,
+        message: 'Error ao salvar dados',
+        type: 'error'
+      })
     } finally {
-      setIsFetching(false)
+      setLoading(false)
     }
   }
 
@@ -89,7 +97,7 @@ export default function RegisterCampaign() {
     return () => {
       setCampaignName('')
       setCampaignDescription('')
-      filesRef.current = []
+      setCampaignMedias([])
       resetCurrentCampaign()
     }
   }
@@ -98,13 +106,12 @@ export default function RegisterCampaign() {
     e.preventDefault()
 
     const mediaIds =
-      filesRef.current && filesRef.current?.length
-        ? filesRef.current.map((media) => media.id)
+      campaignMedias && campaignMedias?.length
+        ? campaignMedias.map((media) => media.id)
         : []
     const mediasIdsFiltered = mediaIds.filter((id) => id) as string[]
 
     if (!campaignId || campaignId === 'new') {
-      // TODO: Passar pare service
       createCampaign({
         name: campaignName,
         description: campaignDescription,
@@ -117,8 +124,6 @@ export default function RegisterCampaign() {
         mediaIds: mediasIdsFiltered
       })
     }
-    // TODO: Colocar toast avisando que falhou ao salvar, apaga os dados e deixa o usuário tentar novamente
-    // TODO: Colocar toast com mensagem avisando que salvou com sucesso antes de redirecionar
     router.push('/in/campaigns')
     resetState()
   }
@@ -129,18 +134,16 @@ export default function RegisterCampaign() {
     getCampaignById(String(campaignId))
   }
 
+  const removeMedia = (id: string) => {
+    const medias = campaignMedias.filter((media) => media.id !== id)
+    setCampaignMedias(medias)
+  }
+
   useEffect(() => {
     if (!currentCampaign) return
     setCampaignName(currentCampaign.name)
     setCampaignDescription(currentCampaign?.description || '')
-    // TODO: colocar os files e o active tbm
   }, [currentCampaign])
-
-  useEffect(() => {
-    if (!error) return
-    alert('Erro ao salvar campanha')
-    router.push('/in/campaigns')
-  }, [error])
 
   useEffect(() => {
     resetState()
@@ -220,7 +223,7 @@ export default function RegisterCampaign() {
                             type="file"
                             className="sr-only"
                             multiple={true}
-                            disabled={loading || isFetching}
+                            disabled={loading || loading}
                             onChange={(e) => uploadFile(e)}
                           />
                         </label>
@@ -247,16 +250,18 @@ export default function RegisterCampaign() {
             <button
               type="submit"
               className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              disabled={loading || isFetching}
+              disabled={loading || loading}
             >
               Salvar
             </button>
           </div>
-          {isFetching && (
+          {loading && (
             <div className="px-3 py-2 w-[100px] mt-3 flex items-end justify-center ml-auto rounded-lg font-semibold bg-blue-600 text-white">
               Salvando item...
             </div>
           )}
+
+          <MediaList mediasList={campaignMedias} onDelete={removeMedia} />
         </FormCustom>
       </div>
     </DashboardLayout>

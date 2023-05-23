@@ -1,12 +1,23 @@
+import { useEffect, useState } from 'react'
+
+import { ROLES } from 'constants/enums/eRoles'
+import { useAuthStore } from 'store/useAuthStore'
+
 import AsidePanelItem from 'components/AsidePanelItem'
 
 import fourSquares from '../../../images/icons/fourSquares'
-import homeIcon from '../../../images/icons/homeIcon'
-import inboxIcon from '../../../images/icons/inboxIcon'
+// import homeIcon from '../../../images/icons/homeIcon'
+// import inboxIcon from '../../../images/icons/inboxIcon'
 import megaphoneIcon from '../../../images/icons/megaphoneIcon'
 import pizzaGraph from '../../../images/icons/pizzaGraph'
 
 function AsidePanel() {
+  const role = useAuthStore((state) => state.user?.role)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    setIsAdmin(role >= ROLES.COMPANY_ADMIN)
+  }, [role])
   return (
     <aside
       id="sidebar"
@@ -18,7 +29,7 @@ function AsidePanel() {
         <div className="flex-1 flex flex-col pt-5 pb-4">
           <div className="flex-1 px-3 bg-white divide-y space-y-1">
             <ul className="space-y-2 pb-2">
-              <AsidePanelItem title="Home" linkSrc="/in" icon={homeIcon} />
+              {/* <AsidePanelItem title="Home" linkSrc="/in" icon={homeIcon} /> */}
               <AsidePanelItem
                 title="Campanhas"
                 linkSrc="/in/campaigns"
@@ -29,17 +40,19 @@ function AsidePanel() {
                 linkSrc="/in/trainings"
                 icon={fourSquares}
               />
-              <AsidePanelItem
-                title="Análises"
-                linkSrc="/in/analyzes"
-                icon={pizzaGraph}
-              />
+              {isAdmin && (
+                <AsidePanelItem
+                  title="Análises"
+                  linkSrc="/in/analyzes"
+                  icon={pizzaGraph}
+                />
+              )}
 
-              <AsidePanelItem
+              {/* <AsidePanelItem
                 title="Mural de Avisos"
                 linkSrc="/in/communications"
                 icon={inboxIcon}
-              />
+              /> */}
             </ul>
           </div>
         </div>

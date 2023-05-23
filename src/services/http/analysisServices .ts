@@ -36,8 +36,7 @@ const AnalysisService = (
       })
       return response.data
     } catch (error: any) {
-      const message = error.message || 'Error to create analysis'
-      throw new Error(message)
+      throw new Error(error.message)
     }
   },
   getAll: async () => {
@@ -45,8 +44,7 @@ const AnalysisService = (
       const response = await httpClient.get('/api/analyzes/getAll')
       return response.data
     } catch (error: any) {
-      const message = error.message || 'Error to get analyzes'
-      throw new Error(message)
+      throw new Error(error.message)
     }
   },
   getExampleWorksheet: async () => {
@@ -54,8 +52,7 @@ const AnalysisService = (
       const response = await httpClient.get('/api/analyzes/getExampleWorksheet')
       return response.data
     } catch (error: any) {
-      const message = error.message || 'Error to get example worksheet'
-      throw new Error(message)
+      throw new Error(error.message)
     }
   },
   done: async (id, message) => {
@@ -66,8 +63,7 @@ const AnalysisService = (
       })
       return response.data
     } catch (error: any) {
-      const message = error.message || 'Error to complete analysis'
-      throw new Error(message)
+      throw new Error(error.message)
     }
   },
   reject: async (id, message) => {
@@ -78,27 +74,19 @@ const AnalysisService = (
       })
       return response.data
     } catch (error: any) {
-      const message = error.message || 'Error to reject analysis'
-      throw new Error(message)
+      throw new Error(error.message)
     }
   },
   update: async (id, modifierData) => {
     try {
       const response = await httpClient.put(`/api/analyzes/${id}`, modifierData)
-
       return response.data
     } catch (error: any) {
-      const message = error.message || 'Error to update analysis'
-      throw new Error(message)
+      throw new Error(error.message)
     }
   },
   delete: async (id) => {
-    try {
-      await httpClient.delete(`/api/analyzes/${id}`)
-    } catch (error: any) {
-      const message = error.message || 'Error to delete analysis'
-      throw new Error(message)
-    }
+    await httpClient.delete(`/api/analyzes/${id}`)
   }
 })
 
