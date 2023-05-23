@@ -7,6 +7,7 @@ export default class EmailService implements IEmailService {
   // constructor() {
 
   // }
+  // TODO: Ver se isso esta certo - iniciar uma instancia da classe sem ter constructor. N poeria ser static?
   public static getInstance(): EmailService {
     if (!this.instance) {
       this.instance = new EmailService()
@@ -14,49 +15,24 @@ export default class EmailService implements IEmailService {
     return this.instance
   }
 
+  // static?
   async sendEmail(to: string, subject: string, content: string): Promise<void> {
     const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      // secure: true, // use SSL
+      // @ts-ignore
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: false, // TODO: use SSL - passar para true
       auth: {
-        user: '',
-        pass: ''
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD
       }
-      // tls: {
-      //   rejectUnauthorized: false
-      // },
-      // debug: true,
-      // logger: true,
-      // pool: true,
-      // maxConnections: 5,
-      // maxMessages: 100,
-      // rateDelta: 1000,
-      // rateLimit: 5,
-      // rateLimitInterval: 1000,
-      // connectionTimeout: 1000,
-      // greetingTimeout: 1000,
-      // socketTimeout: 1000,
-      // closeTimeout: 1000,
-      // authTimeout: 1000,
-      // messageTimeout: 1000,
-      // proxy: 'http://localhost:3000',
     })
 
     const mailOptions = {
-      from: 'seu_email@example.com',
+      from: process.env.SMTP_FROM,
       to,
       subject,
-      text: 'Hello world?',
-      html: '<b>Hello world?</b>' // content??
-      // attachments: [],
-      // messageId: '',
-      // inReplyTo: '',
-      // references: '',
-      // envelope: '',
-      // headers: '',
-      // priority: '',
-      // dsn: '',
+      html: content
     }
 
     await transporter.sendMail(mailOptions)
