@@ -76,7 +76,7 @@ export default function AnalyzesTable() {
 
   return (
     <DashboardLayout>
-      <PageContainer pageTitle="Análises" pageSection="analyzes" showAddButton>
+      <PageContainer pageTitle="Análises" pageSection="analyzes">
         <SearchPrevNext />
         {loading && <p>Carregando...</p>}
         <ul className="list-none mt-8 w-12/12">
