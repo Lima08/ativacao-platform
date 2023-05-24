@@ -87,7 +87,6 @@ export default function UserAnalysisRegister({
         type: 'success'
       })
       setLocalLoading(false)
-
     } catch (error) {
       setToaster({
         isOpen: true,
@@ -102,7 +101,6 @@ export default function UserAnalysisRegister({
   const submitAnalysisRequest = async (e: any) => {
     e.preventDefault()
     setLocalLoading(true)
-
 
     if (!analysisFile) {
       setToaster({

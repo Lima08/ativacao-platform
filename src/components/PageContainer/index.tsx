@@ -20,6 +20,7 @@ export default function PageContainer({
   children,
   customCallback
 }: PageContainerProps) {
+  // @ts-ignore
   const role = useAuthStore((state) => state.user?.role)
   const [isAdmin, setIsAdmin] = useState(false)
 

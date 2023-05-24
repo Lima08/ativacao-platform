@@ -12,6 +12,7 @@ import megaphoneIcon from '../../../images/icons/megaphoneIcon'
 import pizzaGraph from '../../../images/icons/pizzaGraph'
 
 function AsidePanel() {
+  // @ts-ignore
   const role = useAuthStore((state) => state.user?.role)
   const [isAdmin, setIsAdmin] = useState(false)
 

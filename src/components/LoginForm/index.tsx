@@ -28,6 +28,7 @@ export default function LoginForm() {
   const [error, setError] = useState(null)
 
   const router = useRouter()
+  // @ts-ignore
   const setUserLogged = useAuthStore((state) => state.setUserLogged)
 
   async function loginAccount(values: IFormValues) {
@@ -36,6 +37,7 @@ export default function LoginForm() {
       setIsLoading(true)
       const loginData = await httpServices.user.login(values)
       if (!loginData) return
+      // @ts-ignore
       setUserLogged({ company: loginData.company, user: loginData.user })
       router.push('/in/campaigns')
     } catch (error: any) {

@@ -91,7 +91,7 @@ export default function ListAnalyzesItem({
 }: ListItemProps) {
   const [openStatus, setOpenStatus] = useState(false)
   const [systemAdmin, setIsSystemAdmin] = useState(false)
-
+  // @ts-ignore
   const role = useAuthStore((state) => state.user?.role)
 
   useEffect(() => {

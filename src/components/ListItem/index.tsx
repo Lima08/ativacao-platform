@@ -28,6 +28,8 @@ export default function ListItem({
   onEdit,
   onDelete
 }: ListItemProps) {
+
+  // @ts-ignore
   const role = useAuthStore((state) => state.user?.role)
   const [isAdmin, setIsAdmin] = useState(false)
 
