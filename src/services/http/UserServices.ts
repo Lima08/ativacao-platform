@@ -22,7 +22,7 @@ export interface UserServiceInterface {
   create(payload: CreatePayload): Promise<ApiResponse<void>>
   login(
     payload: Pick<CreatePayload, 'email' | 'password'>
-  ): Promise<ApiResponse<Pick<ILoginResponse, 'company' | 'user'>>>
+  ): Promise<ApiResponse<ILoginResponse>>
   // getAll(): Promise<ApiResponse<IUserCreated[]>>
   // update(
   //   UserId: string,
@@ -39,11 +39,11 @@ const UserService = (httpClient: AxiosInstance): UserServiceInterface => ({
         email,
         password
       })
+  
 
       return response.data
     } catch (error: any) {
-      console.error('Error to create User:', error)
-      throw new Error(error.message) // TODO: ver como tratar os erros (criar tarefa para tratamento geral)
+      throw new Error(error.message)
     }
   },
   login: async ({ email, password }) => {
@@ -52,18 +52,11 @@ const UserService = (httpClient: AxiosInstance): UserServiceInterface => ({
         email,
         password
       })
-      console.log(
-        '🚀 ~ file: UserServices.ts:62 ~ login: ~ response:',
-        response
-      )
-      localStorage.setItem('token', response.data.token)
+    
 
-      return {
-        data: { user: response.data.user, company: response.data.company }
-      }
+      return response.data
     } catch (error: any) {
-      console.error('Error to create User:', error)
-      throw new Error(error.message) // TODO: ver como tratar os erros (criar tarefa para tratamento geral)
+      throw new Error(error.message)
     }
   }
   // getAll: async () => {

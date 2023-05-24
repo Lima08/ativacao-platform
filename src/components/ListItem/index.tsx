@@ -1,3 +1,8 @@
+import { useEffect, useState } from 'react'
+
+import { ROLES } from 'constants/enums/eRoles'
+import { useAuthStore } from 'store/useAuthStore'
+
 import ToggleInput from 'components/ToggleInput'
 
 export type DataList = {
@@ -23,6 +28,12 @@ export default function ListItem({
   onEdit,
   onDelete
 }: ListItemProps) {
+  const role = useAuthStore((state) => state.user?.role)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    setIsAdmin(role >= ROLES.COMPANY_ADMIN)
+  }, [role])
   return (
     <li
       key={data.id}
@@ -53,31 +64,33 @@ export default function ListItem({
         </div> */}
       </div>
 
-      <div className="px-4 py-4 flex gap-6 justify-evenly">
-        <ToggleInput
-          toggleId={data.id}
-          defaultActive={data.active}
-          onClickToggle={onClickToggle}
-        />
-        <button
-          onClick={(event) => {
-            event.stopPropagation()
-            onEdit(data.id)
-          }}
-          className="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md sm:w-auto gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 disabled"
-        >
-          Editar
-        </button>
-        <button
-          className="flex items-center justify-center w-1/2 px-5 py-2 text-sm hover:text-gray-100 border-red-600 text-gray-700 capitalize transition-colors duration-200 hover:bg-red-600 border rounded-md sm:w-auto gap-x-2  dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
-          onClick={(event) => {
-            event.stopPropagation()
-            onDelete(data.id)
-          }}
-        >
-          Deletar
-        </button>
-      </div>
+      {isAdmin && (
+        <div className="px-4 py-4 flex gap-6 justify-evenly">
+          <ToggleInput
+            toggleId={data.id}
+            defaultActive={data.active}
+            onClickToggle={onClickToggle}
+          />
+          <button
+            onClick={(event) => {
+              event.stopPropagation()
+              onEdit(data.id)
+            }}
+            className="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md sm:w-auto gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 disabled"
+          >
+            Editar
+          </button>
+          <button
+            className="flex items-center justify-center w-1/2 px-5 py-2 text-sm hover:text-gray-100 border-red-600 text-gray-700 capitalize transition-colors duration-200 hover:bg-red-600 border rounded-md sm:w-auto gap-x-2  dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
+            onClick={(event) => {
+              event.stopPropagation()
+              onDelete(data.id)
+            }}
+          >
+            Deletar
+          </button>
+        </div>
+      )}
     </li>
   )
 }

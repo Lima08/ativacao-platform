@@ -1,12 +1,23 @@
+import { useEffect, useState } from 'react'
+
+import { ROLES } from 'constants/enums/eRoles'
+import { useAuthStore } from 'store/useAuthStore'
+
 import AsidePanelItem from 'components/AsidePanelItem'
 
 import fourSquares from '../../../images/icons/fourSquares'
-import homeIcon from '../../../images/icons/homeIcon'
-import inboxIcon from '../../../images/icons/inboxIcon'
+// import homeIcon from '../../../images/icons/homeIcon'
+// import inboxIcon from '../../../images/icons/inboxIcon'
 import megaphoneIcon from '../../../images/icons/megaphoneIcon'
 import pizzaGraph from '../../../images/icons/pizzaGraph'
 
 function AsidePanel() {
+  const role = useAuthStore((state) => state.user?.role)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    setIsAdmin(role >= ROLES.COMPANY_ADMIN)
+  }, [role])
   return (
     <aside
       id="sidebar"
@@ -29,11 +40,13 @@ function AsidePanel() {
                 linkSrc="/in/trainings"
                 icon={fourSquares}
               />
-              <AsidePanelItem
-                title="Análises"
-                linkSrc="/in/analyzes"
-                icon={pizzaGraph}
-              />
+              {isAdmin && (
+                <AsidePanelItem
+                  title="Análises"
+                  linkSrc="/in/analyzes"
+                  icon={pizzaGraph}
+                />
+              )}
 
               {/* <AsidePanelItem
                 title="Mural de Avisos"

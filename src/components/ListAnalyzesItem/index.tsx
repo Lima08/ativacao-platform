@@ -1,6 +1,11 @@
-import { ReactNode, useState } from 'react'
+import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react'
 
-import Modal from 'components/CustomModal'
+import { ROLES } from 'constants/enums/eRoles'
+import { useAuthStore } from 'store/useAuthStore'
+
+import CustomModal from 'components/CustomModal'
+
+import { formatDate } from '../../../utils'
 
 export type AnalyzesDataList = {
   id: string
@@ -8,12 +13,16 @@ export type AnalyzesDataList = {
   bucketUrl: string
   biUrl?: string
   status: string
+  date: string
   message?: string | undefined
 }
 
 type ListItemProps = {
   data: AnalyzesDataList
   onDelete: (id: string) => void
+  setEditAnalysis: Dispatch<SetStateAction<boolean>>
+  editAnalysis: boolean
+  setAnalysisId: Dispatch<SetStateAction<string>>
 }
 
 const STATUS: { [key: string]: ReactNode } = {
@@ -73,10 +82,21 @@ const STATUS: { [key: string]: ReactNode } = {
   )
 }
 
-export default function ListAnalyzesItem({ data, onDelete }: ListItemProps) {
-  const [open, setOpen] = useState(false)
+export default function ListAnalyzesItem({
+  data,
+  onDelete,
+  editAnalysis,
+  setEditAnalysis,
+  setAnalysisId
+}: ListItemProps) {
+  const [openStatus, setOpenStatus] = useState(false)
+  const [systemAdmin, setIsSystemAdmin] = useState(false)
 
-  console.log('data', data)
+  const role = useAuthStore((state) => state.user?.role)
+
+  useEffect(() => {
+    setIsSystemAdmin(role >= ROLES.SYSTEM_ADMIN)
+  }, [role])
 
   return (
     <div className="flex flex-col items-center w-full dark:border-gray-700 rounded-md">
@@ -86,7 +106,7 @@ export default function ListAnalyzesItem({ data, onDelete }: ListItemProps) {
           // className={`w-1/4 flex justify-around items-center border border-gray-200 rounded-md p-1 bg-white ${
           //   data.status === 'pending' ? 'op-50 pointer-events-none' : ''
           // }`}
-          onClick={() => setOpen(!open)}
+          onClick={() => setOpenStatus(!openStatus)}
         >
           {STATUS[data.status]}
           <svg
@@ -104,33 +124,48 @@ export default function ListAnalyzesItem({ data, onDelete }: ListItemProps) {
             />
           </svg>
         </button>
-        <div className="font-medium text-slate-500 w-1/4">01/01/2022</div>
-        <h2 className="font-medium text-gray-800 dark:text-white w-1/2">
+        <div className="font-medium text-slate-500 w-1/4">
+          {formatDate(data.date)}
+        </div>
+        <h2
+          className={`font-medium text-gray-800 dark:text-white w-1/2 ${
+            systemAdmin ? 'cursor-pointer' : ''
+          }`}
+          onClick={() => {
+            if (systemAdmin) {
+              setAnalysisId(data.id)
+              setEditAnalysis(!editAnalysis)
+            }
+          }}
+        >
           {data.title}
         </h2>
         <div className="px-4 py-4 flex gap-6 justify-evenly">
-          {/* <a
-            href={data?.biUrl}
-            className={`${
-              data.status === 'pending' ? 'pointer-events-none' : ''
-            }`}
-          > */}
           <button
             onClick={(event) => {
               event.stopPropagation()
-              window.location.href = data.biUrl || ''
             }}
-            className={`flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border border-blue-500 hover:bg-blue-600 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 ${
-              data.status === 'pending'
-                ? 'pointer-events-none border-gray-200 op-50'
-                : ''
+            disabled={!data.bucketUrl}
+            className={`flex items-center justify-center w-1/2 h-1/3 px-5 py-2 text-gray-700 capitalize transition-colors duration-200 bg-white border border-blue-500 hover:bg-blue-600 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`}
+          >
+            <a href={data.bucketUrl || ''}>Baixar</a>
+          </button>
+          <button
+            disabled={!data.biUrl}
+            className={`flex items-center justify-center w-1/2 h-1/3 px-5 py-2 text-gray-700 capitalize transition-colors duration-200 bg-white border hover:bg-green-500 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 ${
+              data.status === 'pending' ||
+              data.status === 'rejected' ||
+              !data.biUrl
+                ? 'border-gray-200 pointer-events-none op-50'
+                : 'border-green-500'
             }`}
           >
-            Visualizar
+            <a href={data.biUrl || ''} target="_blank" rel="noreferrer">
+              BI
+            </a>
           </button>
-          {/* </a> */}
           <button
-            className="flex items-center justify-center w-1/2 px-5 py-2 text-sm hover:text-gray-100 border-red-600 text-gray-700 capitalize transition-colors duration-200 hover:bg-red-600 border rounded-md sm:w-auto gap-x-2  dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
+            className="flex items-center justify-center w-1/2 h-1/3 px-5 py-2 hover:text-gray-100 border-red-600 text-gray-700 capitalize transition-colors duration-200 hover:bg-red-600 border rounded-md sm:w-auto gap-x-2  dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
             onClick={(event) => {
               event.stopPropagation()
               onDelete(data.id)
@@ -140,8 +175,12 @@ export default function ListAnalyzesItem({ data, onDelete }: ListItemProps) {
           </button>
         </div>
       </div>
-      {open && (
-        <Modal size="w-[400px] h-[400px]" open={open} setOpen={setOpen}>
+      {openStatus && (
+        <CustomModal
+          size="w-[400px] h-[400px]"
+          open={openStatus}
+          setOpen={setOpenStatus}
+        >
           <div className="m-auto py-5 px-6">
             <h1 className="font-bold text-lg bg-blue-500 text-white rounded-t-md">
               {data.title}
@@ -151,7 +190,7 @@ export default function ListAnalyzesItem({ data, onDelete }: ListItemProps) {
             </p>
             <p className="py-2 mt-2">{data.message || 'Sem comentários.'}</p>
           </div>
-        </Modal>
+        </CustomModal>
       )}
     </div>
   )

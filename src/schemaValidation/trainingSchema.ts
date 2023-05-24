@@ -1,4 +1,3 @@
-import { ROLES } from 'constants/enums/eRoles'
 import Joi from 'joi'
 
 import { eUserValidation } from './eSchemaValidation'
@@ -8,8 +7,7 @@ const createSchema = Joi.object({
   userId: Joi.string().required(),
   name: Joi.string().min(eUserValidation.minNameLength).required(),
   description: Joi.string().allow('', null).optional(),
-  mediaIds: Joi.array().items(Joi.string()).allow(null).optional(),
-  role: Joi.number().min(ROLES.COMPANY_ADMIN).required()
+  mediaIds: Joi.array().items(Joi.string()).allow(null).optional()
 })
 
 export default { createSchema }

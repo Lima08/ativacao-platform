@@ -23,6 +23,7 @@ export default function TableWrapper({
   const [inMemoryData, setInMemoryData] = useState(data)
 
   function remove(id: string) {
+    // TODO: Mudar para modal
     const userDecision = confirm('Confirmar deleção?')
     if (!userDecision) return
 

@@ -2,18 +2,30 @@ import { NextApiRequestCustom, NextApiResponse } from 'next'
 
 import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
+import { ROLES } from 'constants/enums/eRoles'
 import { authCheck } from 'middlewares/authCheck'
 import { getAllTrainings } from 'useCases/trainings'
 async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
   if (req.method === REQUEST_METHODS.GET) {
-    const { companyId } = req.user!
+    const { companyId, role } = req.user!
 
-    const trainings = await getAllTrainings({ companyId })
-    return res.status(200).json({ data: trainings })
+    try {
+      let allTrainings
+      if (role < ROLES.COMPANY_ADMIN) {
+        allTrainings = await getAllTrainings({ companyId, active: true })
+      } else {
+        allTrainings = await getAllTrainings({ companyId })
+      }
+
+      return res.status(HTTP_STATUS.OK).json({ data: allTrainings })
+    } catch (error: any) {
+      return res.status(error.code).json({ error: { message: error.message } })
+    }
   }
 
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
     .json({ error: { message: 'Method not allowed' } })
 }
+
 export default authCheck(handler)
