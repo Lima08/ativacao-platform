@@ -28,7 +28,7 @@ export default function AdminAnalysisRegister({ analysis, setClose }: any) {
 
   // const router = useRouter()
 
-  const handlSubmit = () => {
+  const handlSubmit = async () => {
     if (comments && status) {
       if (status === 'done') {
         done(analysis.id, comments)

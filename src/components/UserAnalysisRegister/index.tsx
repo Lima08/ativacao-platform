@@ -68,7 +68,6 @@ export default function UserAnalysisRegister({
       // TODO: passar pra zustand
 
       const { data, error } = await httpServices.upload.save(formData)
-      console.log('🚀 ~ file: index.tsx:71 ~ uploadFile ~ data:', data)
 
       if (!!error || !data || !data.url) {
         setToaster({
@@ -89,7 +88,6 @@ export default function UserAnalysisRegister({
       })
       setLocalLoading(false)
 
-      console.log('🚀 ~ file: index.tsx:93 ~ uploadFile ~ url:', url)
     } catch (error) {
       setToaster({
         isOpen: true,
@@ -105,7 +103,6 @@ export default function UserAnalysisRegister({
     e.preventDefault()
     setLocalLoading(true)
 
-    console.log('analysisFile:', analysisFile)
 
     if (!analysisFile) {
       setToaster({
