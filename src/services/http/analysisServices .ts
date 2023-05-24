@@ -16,7 +16,10 @@ export interface AnalysisServiceInterface {
   create(payload: CreateAnalysisPayload): Promise<ApiResponse<IAnalysisCreated>>
   getAll(): Promise<ApiResponse<IAnalysisCreated[]>>
   getExampleWorksheet(): Promise<ApiResponse<IAnalysisCreated>>
-  done(id: string, message: string): Promise<ApiResponse<IAnalysisCreated>>
+  done(
+    id: string,
+    { biUrl, message }: { biUrl: string; message: string }
+  ): Promise<ApiResponse<IAnalysisCreated>>
   reject(id: string, message: string): Promise<ApiResponse<IAnalysisCreated>>
   update(
     id: string,
@@ -43,10 +46,11 @@ const AnalysisService = (
     const response = await httpClient.get('/api/analyzes/getExampleWorksheet')
     return response.data
   },
-  done: async (id, message) => {
+  done: async (id, { biUrl, message }) => {
     const response = await httpClient.put(`/api/analyzes/${id}`, {
       status: EAnalysisStatusType.done,
-      message
+      message,
+      biUrl
     })
     return response.data
   },

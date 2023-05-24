@@ -43,10 +43,10 @@ const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  done: async (id, message) => {
+  done: async (id, { biUrl, message }) => {
     try {
       useGlobalStore.getState().setLoading(true)
-      const response = await httpServices.analysis.done(id, message)
+      const response = await httpServices.analysis.done(id, { biUrl, message })
       set((state) => ({
         ...state,
         loading: false,

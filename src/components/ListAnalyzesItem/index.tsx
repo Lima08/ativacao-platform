@@ -141,28 +141,28 @@ export default function ListAnalyzesItem({
           {data.title}
         </h2>
         <div className="px-4 py-4 flex gap-6 justify-evenly">
-          {/* <a
-            href={data?.biUrl}
-            className={`${
-              data.status === 'pending' ? 'pointer-events-none' : ''
-            }`}
-          > */}
           <button
             onClick={(event) => {
               event.stopPropagation()
             }}
+            disabled={!data.bucketUrl}
             className={`flex items-center justify-center w-1/2 h-1/3 px-5 py-2 text-gray-700 capitalize transition-colors duration-200 bg-white border border-blue-500 hover:bg-blue-600 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`}
           >
             <a href={data.bucketUrl || ''}>Baixar</a>
           </button>
           <button
+            disabled={!data.biUrl}
             className={`flex items-center justify-center w-1/2 h-1/3 px-5 py-2 text-gray-700 capitalize transition-colors duration-200 bg-white border hover:bg-green-500 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 ${
-              data.status === 'pending' || data.status === 'rejected'
+              data.status === 'pending' ||
+              data.status === 'rejected' ||
+              !data.biUrl
                 ? 'border-gray-200 pointer-events-none op-50'
                 : 'border-green-500'
             }`}
           >
-            BI
+            <a href={data.biUrl || ''} target="_blank" rel="noreferrer">
+              BI
+            </a>
           </button>
           <button
             className="flex items-center justify-center w-1/2 h-1/3 px-5 py-2 hover:text-gray-100 border-red-600 text-gray-700 capitalize transition-colors duration-200 hover:bg-red-600 border rounded-md sm:w-auto gap-x-2  dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"

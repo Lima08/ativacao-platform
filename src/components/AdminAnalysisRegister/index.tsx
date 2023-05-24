@@ -1,18 +1,7 @@
-import { Dispatch, SetStateAction, useState } from 'react'
+import { useState } from 'react'
 
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
-
-// type dataProps = {
-//   id: string
-//   status: string
-//   date: string
-//   message?: string | undefined
-//   title: string
-//   bucketUrl: string
-//   biUrl: string
-//   setClose: () => Dispatch<SetStateAction<boolean>>
-// }
 
 export default function AdminAnalysisRegister({ analysis, setClose }: any) {
   const [setToaster] = useGlobalStore((state) => [state.setToaster])
@@ -22,16 +11,10 @@ export default function AdminAnalysisRegister({ analysis, setClose }: any) {
   const [comments, setComments] = useState(analysis.message || '')
   const [status, setStatus] = useState('done')
 
-  const handleInputs = (e: string, cb?: Dispatch<SetStateAction<string>>) => {
-    if (cb) cb(e)
-  }
-
-  // const router = useRouter()
-
-  const handlSubmit = async () => {
+  const handleSubmit = async () => {
     if (comments && status) {
       if (status === 'done') {
-        done(analysis.id, comments)
+        done(analysis.id, { biUrl: linkBI, message: comments })
       } else {
         reject(analysis.id, comments)
       }
@@ -51,10 +34,9 @@ export default function AdminAnalysisRegister({ analysis, setClose }: any) {
         <h1>{analysis.title}</h1>
       </div>
       <div className="flex flex-col items-center justify-center py-2 mt-4">
-        {/* URL do BI*/}
         <div className="flex flex-col items-start mb-2">
           <label htmlFor="BIURL" className="text-left">
-            Link do BI:{' '}
+            Link do BI:
           </label>
           <input
             type="text"
@@ -62,48 +44,31 @@ export default function AdminAnalysisRegister({ analysis, setClose }: any) {
             id="BIURL"
             value={linkBI}
             className="py-2 my-2 rounded-md w-full drop-shadow-md"
-            onChange={(e) =>
-              handleInputs((e.target as HTMLInputElement).value, setLinkBI)
-            }
+            onChange={(e) => setLinkBI(e.target.value)}
           />
         </div>
-        {/* mensagem*/}
         <div className="flex flex-col items-start w-full">
           <label htmlFor="message" className="text-left">
-            Mensagem:{' '}
+            Mensagem:
           </label>
           <textarea
-            name=""
             id="message"
             value={comments}
             className="my-2 rounded-md h-2/4 w-full drop-shadow-md"
-            onChange={(e) =>
-              handleInputs((e.target as HTMLTextAreaElement).value, setComments)
-            }
+            onChange={(e) => setComments(e.target.value)}
           />
         </div>
         <div className="py-2 mt-4 mb-2 w-full flex gap-4 items-baseline justify-center">
           <select
-            name=""
-            id=""
             className="mb-2 py-3 rounded-md"
-            onClick={(e) =>
-              handleInputs((e.target as HTMLSelectElement).value, setStatus)
-            }
+            onChange={(e) => setStatus(e.target.value)}
           >
             <option value="done">Aprovar</option>
             <option value="rejected">Rejeitar</option>
           </select>
           <button
-            onClick={() => handlSubmit()}
-            className={
-              `flex items-center justify-center w-1/2 px-5 py-3 text-gray-700 capitalize transition-colors duration-200 bg-white border border-blue-500 hover:bg-blue-600 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`
-              // ${
-              //   analysis.status === 'pending'
-              //     ? 'pointer-events-none border-gray-200 op-50'
-              //     : ''
-              // }`
-            }
+            onClick={handleSubmit}
+            className={`flex items-center justify-center w-1/2 px-5 py-3 text-gray-700 capitalize transition-colors duration-200 bg-white border border-blue-500 hover:bg-blue-600 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`}
           >
             Finalizar
           </button>

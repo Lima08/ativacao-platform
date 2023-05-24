@@ -12,7 +12,6 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
 
     const updatedAnalysis = await updateAnalysis(id, { biUrl, message, status })
     return res.status(HTTP_STATUS.OK).json({ data: updatedAnalysis })
-
   }
 
   if (req.method == REQUEST_METHODS.DELETE) {
