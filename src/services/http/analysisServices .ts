@@ -29,61 +29,38 @@ const AnalysisService = (
   httpClient: AxiosInstance
 ): AnalysisServiceInterface => ({
   create: async ({ title, bucketUrl }) => {
-    try {
-      const response = await httpClient.post('/api/analyzes/create', {
-        title,
-        bucketUrl
-      })
-      return response.data
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const response = await httpClient.post('/api/analyzes/create', {
+      title,
+      bucketUrl
+    })
+    return response.data
   },
   getAll: async () => {
-    try {
-      const response = await httpClient.get('/api/analyzes/getAll')
-      return response.data
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const response = await httpClient.get('/api/analyzes/getAll')
+    return response.data
   },
   getExampleWorksheet: async () => {
-    try {
-      const response = await httpClient.get('/api/analyzes/getExampleWorksheet')
-      return response.data
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const response = await httpClient.get('/api/analyzes/getExampleWorksheet')
+    return response.data
   },
   done: async (id, message) => {
-    try {
-      const response = await httpClient.put(`/api/analyzes/${id}`, {
-        status: EAnalysisStatusType.done,
-        message
-      })
-      return response.data
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const response = await httpClient.put(`/api/analyzes/${id}`, {
+      status: EAnalysisStatusType.done,
+      message
+    })
+    return response.data
   },
   reject: async (id, message) => {
-    try {
-      const response = await httpClient.put(`/api/analyzes/${id}`, {
-        status: EAnalysisStatusType.rejected,
-        message
-      })
-      return response.data
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const response = await httpClient.put(`/api/analyzes/${id}`, {
+      status: EAnalysisStatusType.rejected,
+      message
+    })
+    return response.data
   },
   update: async (id, modifierData) => {
-    try {
-      const response = await httpClient.put(`/api/analyzes/${id}`, modifierData)
-      return response.data
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const response = await httpClient.put(`/api/analyzes/${id}`, modifierData)
+
+    return response.data
   },
   delete: async (id) => {
     await httpClient.delete(`/api/analyzes/${id}`)
