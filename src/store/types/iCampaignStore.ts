@@ -19,9 +19,6 @@ export type CreatePayloadStore = {
 export interface ICampaignStore {
   currentCampaign: ICampaignCreated | null
   campaignsList: ICampaignCreated[]
-  loading: boolean
-  error: any
-  setLoading: (isLoading: boolean) => void
   resetCurrentCampaign: () => void
   createCampaign: (newCampaign: CreatePayloadStore) => void
   getCampaignById: (id: string) => void

@@ -1,61 +1,52 @@
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
 import httpServices from 'services/http'
 import { IAnalysisStore } from 'store/types/IAnalysisStore'
+import useGlobalStore from 'store/useGlobalStore'
 import { StateCreator } from 'zustand'
 
 const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
   currentAnalysis: null,
   analyzesList: [],
-  loading: false,
-  error: null,
-  setLoading: (isLoading) => set(() => ({ loading: isLoading })),
   resetCurrentAnalysis: () => set(() => ({ currentAnalysis: null })),
   createAnalysis: async (newAnalysis) => {
-    set({ loading: true })
+    try {
+      useGlobalStore.getState().setLoading(true)
+      const response = await httpServices.analysis.create(newAnalysis)
 
-    const response = await httpServices.analysis.create(newAnalysis)
-    if (response && response.error) {
-      set((state) => ({
-        ...state,
-        loading: false,
-        error: response.error
-      }))
-      return
-    }
-
-    if (response && response.data) {
       set((state) => ({
         ...state,
         loading: false,
         analyzesList: [...state.analyzesList, response.data as IAnalysisCreated]
       }))
+    
+    } catch (error) {
+      useGlobalStore.getState().setError(error)
+      return
+    } finally {
+      useGlobalStore.getState().setLoading(false)
     }
   },
   getAll: async () => {
-    set({ loading: true })
+    useGlobalStore.getState().setLoading(true)
 
-    const response = await httpServices.analysis.getAll()
-    set((state) => ({
-      ...state,
-      loading: false,
-      analyzesList: response?.data,
-      error: response?.error
-    }))
-  },
-  done: async (id, message) => {
-    set({ loading: true })
-
-    const response = await httpServices.analysis.done(id, message)
-    if (response && response.error) {
+    try {
+      const response = await httpServices.analysis.getAll()
       set((state) => ({
         ...state,
         loading: false,
-        error: response.error
+        analyzesList: response?.data,
+        error: response?.error
       }))
-      return
+    } catch (error) {
+      useGlobalStore.getState().setError(error)
+    } finally {
+      useGlobalStore.getState().setLoading(false)
     }
-
-    if (response && response.data) {
+  },
+  done: async (id, { biUrl, message }) => {
+    try {
+      useGlobalStore.getState().setLoading(true)
+      const response = await httpServices.analysis.done(id, { biUrl, message })
       set((state) => ({
         ...state,
         loading: false,
@@ -63,45 +54,36 @@ const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
           c.id === id ? (response.data as IAnalysisCreated) : c
         )
       }))
+    } catch (error) {
+      useGlobalStore.getState().setError(error)
+    } finally {
+      useGlobalStore.getState().setLoading(false)
     }
   },
   reject: async (id, message) => {
-    set({ loading: true })
+    try {
+      useGlobalStore.getState().setLoading(true)
+      const response = await httpServices.analysis.reject(id, message)
+   
 
-    const response = await httpServices.analysis.reject(id, message)
-    if (response && response.error) {
       set((state) => ({
         ...state,
         loading: false,
-        error: response.error
-      }))
-      return
-    }
-
-    if (response && response.data) {
-      set((state) => ({
-        ...state,
-        loading: false,
-        analyzesList: state.analyzesList.map((c) =>
-          c.id === id ? (response.data as IAnalysisCreated) : c
+        analyzesList: state.analyzesList.map((analysis) =>
+          analysis.id === id ? (response.data as IAnalysisCreated) : analysis
         )
       }))
+    } catch (error) {
+      useGlobalStore.getState().setError(error)
+    } finally {
+      useGlobalStore.getState().setLoading(false)
     }
   },
   update: async (id, modifierData) => {
-    set({ loading: true })
+    try {
+      useGlobalStore.getState().setLoading(true)
+      const response = await httpServices.analysis.update(id, modifierData)
 
-    const response = await httpServices.analysis.update(id, modifierData)
-    if (response && response.error) {
-      set((state) => ({
-        ...state,
-        loading: false,
-        error: response.error
-      }))
-      return
-    }
-
-    if (response && response.data) {
       set((state) => ({
         ...state,
         loading: false,
@@ -109,15 +91,27 @@ const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
           c.id === id ? (response.data as IAnalysisCreated) : c
         )
       }))
+    } catch (error) {
+      useGlobalStore.getState().setError(error)
+    } finally {
+      useGlobalStore.getState().setLoading(false)
     }
   },
   deleteAnalysis: async (id: string) => {
-    set((state) => ({
-      ...state,
-      analyzesList: state.analyzesList.filter((c) => c.id !== id)
-    }))
+    useGlobalStore.getState().setLoading(true)
 
-    await httpServices.analysis.delete(id)
+    try {
+      set((state) => ({
+        ...state,
+        analyzesList: state.analyzesList.filter((c) => c.id !== id)
+      }))
+
+      await httpServices.analysis.delete(id)
+    } catch (error) {
+      useGlobalStore.getState().setError(error)
+    } finally {
+      useGlobalStore.getState().setLoading(false)
+    }
   }
 })
 

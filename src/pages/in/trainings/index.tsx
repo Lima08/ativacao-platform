@@ -4,7 +4,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import type { ITrainingCreated } from 'interfaces/entities/training'
-import useStore from 'store/useStore'
+import useGlobalStore from 'store/useGlobalStore'
+import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
 import ListItem from 'components/ListItem'
@@ -21,23 +22,21 @@ interface mediaObject {
 export default function TrainingsPage() {
   const router = useRouter()
 
-  const [
-    trainingsList,
-    getAllTrainings,
-    handleTrainingActive,
-    deleteTraining,
-    error,
-    loading
-  ] = useStore.Training((state) => [
-    state.trainingsList,
-    state.getAllTrainings,
-    state.handleTrainingActive,
-    state.deleteTraining,
-    state.error,
-    state.loading
-  ])
+  const [trainingsList, getAllTrainings, handleTrainingActive, deleteTraining] =
+    useMainStore((state) => [
+      state.trainingsList,
+      state.getAllTrainings,
+      state.handleTrainingActive,
+      state.deleteTraining
+    ])
 
   const [trainingListAdapted, setTrainingListAdapted] = useState<DataList[]>([])
+  const [loading, error, setToaster] = useGlobalStore((state) => [
+    state.loading,
+    state.error,
+    state.setToaster
+  ])
+
   const [open, setOpen] = useState(false)
   const [training, setTraining] = useState<{
     title: string
@@ -54,7 +53,14 @@ export default function TrainingsPage() {
     const training = trainingsList.find((training) => training.id === id)
     const media = training?.medias
 
-    if (!media?.length) return alert('Nenhuma media encontrada')
+    if (!media?.length) {
+      setToaster({
+        isOpen: true,
+        message: 'Nenhuma media encontrada',
+        type: 'warning'
+      })
+      return
+    }
     setTraining({
       title: training?.name || '',
       active: training?.active || false,
@@ -111,8 +117,13 @@ export default function TrainingsPage() {
 
   useEffect(() => {
     if (!error) return
-    alert('Erro ao carregar treinamentos')
-  }, [error])
+    setToaster({
+      isOpen: true,
+      message: 'Um erro inesperado ocorreu.',
+      type: 'error',
+      duration: 5000
+    })
+  }, [error, setToaster])
 
   useEffect(() => {
     if (!trainingsList || trainingsList.length === 0) return

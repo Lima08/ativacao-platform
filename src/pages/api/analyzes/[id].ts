@@ -10,15 +10,15 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
     const { biUrl, message, status } = req.body
     const id = req.query.id as string
 
-    await updateAnalysis(id, { biUrl, message, status })
-    return res.status(201).end()
+    const updatedAnalysis = await updateAnalysis(id, { biUrl, message, status })
+    return res.status(HTTP_STATUS.OK).json({ data: updatedAnalysis })
   }
 
   if (req.method == REQUEST_METHODS.DELETE) {
     const id = req.query.id as string
 
     await deleteAnalysis(id)
-    return res.status(201).end()
+    return res.status(HTTP_STATUS.NO_CONTENT).end()
   }
 
   res

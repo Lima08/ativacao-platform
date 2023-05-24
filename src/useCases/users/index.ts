@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs'
 import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import dotenv from 'dotenv'
 import CustomError from 'errors/CustomError'
+import { readFileSync } from 'fs'
 import type {
   IUser,
   IUserCreated,
@@ -11,6 +12,8 @@ import type {
 import jwt from 'jsonwebtoken'
 import { prisma } from 'lib/prisma'
 import { User } from 'models/User'
+import path from 'path'
+import EmailService from 'services/emailService/IEmailService'
 import { getCompanyById } from 'useCases/company'
 
 interface IUserLoginResponse {
@@ -44,7 +47,21 @@ async function createUser(params: IUser): Promise<void> {
       throw new Error('Email already in use')
     }
 
-    await repository.create(params)
+    const newUser = await repository.create(params)
+
+    if (!newUser) {
+      throw new Error('Error to create user')
+    }
+
+    const emailTemplatePath = path.resolve(
+      'src/utils/emailTemplates/welcome.html'
+    )
+    const emailTemplate = readFileSync(emailTemplatePath, 'utf-8')
+    await EmailService.getInstance().sendEmail(
+      'joaopaulo.gomeslima8@gmail.com',
+      'Seja bem vindo!',
+      emailTemplate
+    )
   } catch (error: any) {
     const message = error?.message || 'Error to create user'
     throw new CustomError(
@@ -139,6 +156,19 @@ async function updateUser(
 ): Promise<IUserCreated> {
   try {
     const updatedUser = await repository.update(id, params)
+
+    if (!!updatedUser && params.isActive) {
+      const emailTemplatePath = path.resolve(
+        'src/utils/emailTemplates/unblockAccount.html'
+      )
+      const emailTemplate = readFileSync(emailTemplatePath, 'utf-8')
+      await EmailService.getInstance().sendEmail(
+        updatedUser.email,
+        'Conta liberada!',
+        emailTemplate
+      )
+    }
+
     return updatedUser
   } catch (error: any) {
     const meta = error.meta || error.message

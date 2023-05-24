@@ -1,5 +1,6 @@
 import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import CustomError from 'errors/CustomError'
+import { readFileSync } from 'fs'
 import {
   IAnalysis,
   IAnalysisCreated,
@@ -8,6 +9,9 @@ import {
 } from 'interfaces/entities/analysis'
 import { prisma } from 'lib/prisma'
 import { Analysis } from 'models/Analysis'
+import path from 'path'
+import EmailService from 'services/emailService/IEmailService'
+import { getUserById } from 'useCases/users'
 
 const repository = Analysis.of(prisma)
 
@@ -75,6 +79,16 @@ async function updateAnalysis(
 ): Promise<IAnalysisCreated> {
   try {
     const updatedAnalysis = await repository.update(id, modifierData)
+    const user = await getUserById(updatedAnalysis.userId)
+    const emailTemplatePath = path.resolve(
+      'src/utils/emailTemplates/analysisUpdate.html'
+    )
+    const emailTemplate = readFileSync(emailTemplatePath, 'utf-8')
+    await EmailService.getInstance().sendEmail(
+      user.email,
+      'Análise atualizada!',
+      emailTemplate
+    )
     return updatedAnalysis
   } catch (error: any) {
     throw new Error(error)
