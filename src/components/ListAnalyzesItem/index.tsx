@@ -22,6 +22,7 @@ type ListItemProps = {
   onDelete: (id: string) => void
   setEditAnalysis: Dispatch<SetStateAction<boolean>>
   editAnalysis: boolean
+  setAnalysisId: Dispatch<SetStateAction<string>>
 }
 
 const STATUS: { [key: string]: ReactNode } = {
@@ -85,7 +86,8 @@ export default function ListAnalyzesItem({
   data,
   onDelete,
   editAnalysis,
-  setEditAnalysis
+  setEditAnalysis,
+  setAnalysisId
 }: ListItemProps) {
   const [openStatus, setOpenStatus] = useState(false)
   const [systemAdmin, setIsSystemAdmin] = useState(false)
@@ -95,8 +97,6 @@ export default function ListAnalyzesItem({
   useEffect(() => {
     setIsSystemAdmin(role >= ROLES.SYSTEM_ADMIN)
   }, [role])
-
-  // console.log('data', data)
 
   return (
     <div className="flex flex-col items-center w-full dark:border-gray-700 rounded-md">
@@ -132,7 +132,10 @@ export default function ListAnalyzesItem({
             systemAdmin ? 'cursor-pointer' : ''
           }`}
           onClick={() => {
-            if (systemAdmin) setEditAnalysis(!editAnalysis)
+            if (systemAdmin) {
+              setAnalysisId(data.id)
+              setEditAnalysis(!editAnalysis)
+            }
           }}
         >
           {data.title}

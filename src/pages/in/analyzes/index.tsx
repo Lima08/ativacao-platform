@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
-import { useAuthStore } from 'store/useAuthStore'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
@@ -36,9 +35,8 @@ export default function AnalyzesTable() {
     state.deleteAnalysis
   ])
 
-  const user = useStore(useAuthStore, (state) => state)
-
   const [analyzesListAdapted, setAnalyzesListAdapted] = useState<any>([])
+  const [analysisId, setAnalysisId] = useState('')
   const [openUser, setOpenUser] = useState(false)
   const [openAdmin, setOpenAdmin] = useState(false)
 
@@ -104,6 +102,7 @@ export default function AnalyzesTable() {
                   onDelete={deleteItem}
                   editAnalysis={openAdmin}
                   setEditAnalysis={setOpenAdmin}
+                  setAnalysisId={setAnalysisId}
                 />
               </li>
             ))}
@@ -123,25 +122,18 @@ export default function AnalyzesTable() {
               open={openAdmin}
               setOpen={setOpenAdmin}
             >
-              {openAdmin && <AdminAnalysisRegister />}
+              {openAdmin && (
+                <AdminAnalysisRegister
+                  analysis={analyzesListAdapted.find(
+                    (el: AnalyzesObject) => el.id === analysisId
+                  )}
+                  setClose={setOpenAdmin}
+                />
+              )}
             </CustomModal>
           )}
         </ul>
       </PageContainer>
     </DashboardLayout>
   )
-}
-
-const useStore = <T, F>(
-  store: (callback: (state: T) => unknown) => unknown,
-  callback: (state: T) => F
-) => {
-  const result = store(callback) as F
-  const [data, setData] = useState<F>()
-
-  useEffect(() => {
-    setData(result)
-  }, [result])
-
-  return data
 }
