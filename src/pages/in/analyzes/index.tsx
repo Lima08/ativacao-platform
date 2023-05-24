@@ -3,19 +3,23 @@
 import { useEffect, useState } from 'react'
 
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
+import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
+import AdminAnalysisRegister from 'components/AdminAnalysisRegister'
 import CustomModal from 'components/CustomModal'
 import ListAnalyzesItem from 'components/ListAnalyzesItem'
 import PageContainer from 'components/PageContainer'
 import SearchPrevNext from 'components/SearchPrevNext'
+import UserAnalysisRegister from 'components/UserAnalysisRegister'
 
 type IAnalyzesAdapted = Partial<IAnalysisCreated>
 
 type AnalyzesObject = {
   id: string
   status: string
+  date: string
   message?: string | undefined
   title: string
   bucketUrl: string
@@ -23,17 +27,18 @@ type AnalyzesObject = {
 }
 
 export default function AnalyzesTable() {
-  const [analyzesList, getAll, loading, deleteAnalysis] = useMainStore(
-    (state) => [
-      state.analyzesList,
-      state.getAll,
-      state.loading,
-      state.deleteAnalysis
-    ]
-  )
+  const [loading] = useGlobalStore((state) => [state.loading])
+
+  const [analyzesList, getAll, deleteAnalysis] = useMainStore((state) => [
+    state.analyzesList,
+    state.getAll,
+    state.deleteAnalysis
+  ])
 
   const [analyzesListAdapted, setAnalyzesListAdapted] = useState<any>([])
-  const [open, setOpen] = useState(false)
+  const [analysisId, setAnalysisId] = useState('')
+  const [openUser, setOpenUser] = useState(false)
+  const [openAdmin, setOpenAdmin] = useState(false)
 
   const analyzesAdapter = (
     analyzes: IAnalysisCreated[]
@@ -42,6 +47,7 @@ export default function AnalyzesTable() {
       analyzes.map((analysis) => ({
         id: analysis.id,
         status: analysis.status,
+        date: analysis.createdAt,
         message: analysis.message,
         title: analysis.title,
         bucketUrl: analysis.bucketUrl,
@@ -49,10 +55,6 @@ export default function AnalyzesTable() {
       })) || []
 
     return result
-  }
-
-  const onClickStatus = () => {
-    setOpen(true)
   }
 
   function deleteItem(id: string) {
@@ -76,9 +78,13 @@ export default function AnalyzesTable() {
 
   return (
     <DashboardLayout>
-      <PageContainer pageTitle="Análises" pageSection="analyzes">
+      <PageContainer
+        pageTitle="Análises"
+        pageSection="analyzes"
+        customCallback={() => setOpenUser(true)}
+      >
         <SearchPrevNext />
-        {loading && <p>Carregando...</p>}
+        {/* {loading && <p>Carregando...</p>} */}
         <ul className="list-none mt-8 w-12/12">
           {!loading && !analyzesList.length && (
             <li className="flex items-center justify-center mt-5 bg-white h-12 w-full border rounded">
@@ -91,17 +97,39 @@ export default function AnalyzesTable() {
                 key={analysis.id}
                 className="flex md:gap-10 hover:bg-slate-100 bg-white w-full border rounded max-h-18"
               >
-                <ListAnalyzesItem data={analysis} onDelete={deleteItem} />
+                <ListAnalyzesItem
+                  data={analysis}
+                  onDelete={deleteItem}
+                  editAnalysis={openAdmin}
+                  setEditAnalysis={setOpenAdmin}
+                  setAnalysisId={setAnalysisId}
+                />
               </li>
             ))}
 
-          {open && (
+          {openUser && (
             <CustomModal
               size="w-[400px] h-[400px]"
-              open={open}
-              setOpen={setOpen}
+              open={openUser}
+              setOpen={setOpenUser}
             >
-              Analyses Uploader
+              {openUser && <UserAnalysisRegister setClose={setOpenUser} />}
+            </CustomModal>
+          )}
+          {openAdmin && (
+            <CustomModal
+              size="w-[400px] h-[400px]"
+              open={openAdmin}
+              setOpen={setOpenAdmin}
+            >
+              {openAdmin && (
+                <AdminAnalysisRegister
+                  analysis={analyzesListAdapted.find(
+                    (el: AnalyzesObject) => el.id === analysisId
+                  )}
+                  setClose={setOpenAdmin}
+                />
+              )}
             </CustomModal>
           )}
         </ul>
