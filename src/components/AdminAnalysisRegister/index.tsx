@@ -51,10 +51,9 @@ export default function AdminAnalysisRegister({ analysis, setClose }: any) {
         <h1>{analysis.title}</h1>
       </div>
       <div className="flex flex-col items-center justify-center py-2 mt-4">
-        {/* URL do BI*/}
         <div className="flex flex-col items-start mb-2">
           <label htmlFor="BIURL" className="text-left">
-            Link do BI:{' '}
+            Link do BI:
           </label>
           <input
             type="text"
@@ -67,10 +66,9 @@ export default function AdminAnalysisRegister({ analysis, setClose }: any) {
             }
           />
         </div>
-        {/* mensagem*/}
         <div className="flex flex-col items-start w-full">
           <label htmlFor="message" className="text-left">
-            Mensagem:{' '}
+            Mensagem:
           </label>
           <textarea
             name=""

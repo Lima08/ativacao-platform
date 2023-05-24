@@ -142,7 +142,7 @@ export default function UserAnalysisRegister({
         <div className="flex flex-col items-center justify-center py-2 mt-4">
           <div className="flex flex-col items-start mb-2">
             <label htmlFor="title" className="text-left">
-              Título:{' '}
+              Título:
             </label>
             <input
               type="text"
@@ -155,7 +155,7 @@ export default function UserAnalysisRegister({
           </div>
           <div className="flex flex-col items-start w-full">
             <label htmlFor="spreadsheet" className="text-left">
-              Planilha:{' '}
+              Planilha:
             </label>
             <div className="mt-2 mx-auto w-full flex justify-center rounded-lg border border-dashed border-gray-900/25 px-12 py-2">
               <div className="text-center">
@@ -200,8 +200,6 @@ export default function UserAnalysisRegister({
           <div className="py-2 mt-4 mb-2 w-full flex gap-4 items-baseline justify-center">
             {localLoading && <CircularIndeterminate />}
             <button
-              // onClick={() => {
-              // }}
               className={
                 `flex items-center justify-center w-1/2 px-5 py-3 text-gray-700 capitalize transition-colors duration-200 bg-white border border-grey-500 hover:bg-gray-600 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`
                 // ${
