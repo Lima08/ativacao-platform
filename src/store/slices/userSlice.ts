@@ -1,3 +1,4 @@
+import { IUserCreated, IUserModifier } from 'interfaces/entities/user'
 import httpServices from 'services/http'
 import useGlobalStore from 'store/useGlobalStore'
 import { StateCreator } from 'zustand'
@@ -5,8 +6,14 @@ import { StateCreator } from 'zustand'
 import { IUserStore } from '../types/iUserStore'
 
 const createUserSlice: StateCreator<IUserStore> = (set) => ({
-  // currentUser: null,
+  currentUser: null,
   usersList: [],
+  resetCurrentUser: async () => {
+    set((state) => ({
+      ...state,
+      currentUser: null
+    }))
+  },
   getAllUsers: async () => {
     useGlobalStore.getState().setLoading(true)
     try {
@@ -21,32 +28,53 @@ const createUserSlice: StateCreator<IUserStore> = (set) => ({
     } finally {
       useGlobalStore.getState().setLoading(false)
     }
+  },
+  getUserById: async (id) => {
+    useGlobalStore.getState().setLoading(true)
+    try {
+      const response = await httpServices.user.getById(id)
+      set((state) => {
+        return {
+          ...state,
+          currentUser: response?.data,
+          error: response?.error
+        }
+      })
+    } catch (error) {
+      useGlobalStore.getState().setError(error)
+      return
+    } finally {
+      useGlobalStore.getState().setLoading(false)
+    }
+  },
+  updateUser: async (id: string, updatedUser: IUserModifier) => {
+    useGlobalStore.getState().setLoading(true)
+
+    try {
+      const response = await httpServices.user.update(id, updatedUser)
+      set((state) => ({
+        ...state,
+        usersList: state.usersList.map((user) =>
+          user.id === id ? (response.data as IUserCreated) : user
+        )
+      }))
+    } catch (error) {
+      console.log('🚀 ~ file: userSlice.ts:62 ~ updateUser: ~ error:', error)
+      useGlobalStore.getState().setError(error)
+      return
+    } finally {
+      useGlobalStore.getState().setLoading(false)
+    }
   }
-  // resetCurrentUser: () => set(() => ({ currentUser: null })),
-  // getUserById: async (id) => {
-  //   try {
-  //     const response = await httpServices.Users.getById(id)
-  //     set((state) => ({
-  //       ...state,
-  //       currentUser: response?.data,
-  //       error: response?.error
-  //     }))
-  //   } catch (error) {
-  //     useGlobalStore.getState().setError(error)
-  //     return
-  //   } finally {
-  //     useGlobalStore.getState().setLoading(false)
-  //   }
-  // },
   // createUser: async (newUser: CreatePayloadStore) => {
   //   useGlobalStore.getState().setLoading(true)
 
   //   try {
-  //     const response = await httpServices.Users.create(newUser)
+  //     const response = await httpServices.user.create(newUser)
   //     set((state) => ({
   //       ...state,
-  //       usersList: [
-  //         ...state.usersList,
+  //       userList: [
+  //         ...state.userList,
   //         response.data as IUserCreated
   //       ]
   //     }))
@@ -57,34 +85,17 @@ const createUserSlice: StateCreator<IUserStore> = (set) => ({
   //     useGlobalStore.getState().setLoading(false)
   //   }
   // },
-  // updateUser: async (id: string, updatedUser: modifierUserDto) => {
-  //   useGlobalStore.getState().setLoading(true)
 
-  //   try {
-  //     const response = await httpServices.Users.update(id, updatedUser)
-  //     set((state) => ({
-  //       ...state,
-  //       usersList: state.usersList.map((c) =>
-  //         c.id === id ? (response.data as IUserCreated) : c
-  //       )
-  //     }))
-  //   } catch (error) {
-  //     useGlobalStore.getState().setError(error)
-  //     return
-  //   } finally {
-  //     useGlobalStore.getState().setLoading(false)
-  //   }
-  // },
   // handleUserActive: async (id: string, status: boolean) => {
   //   useGlobalStore.getState().setLoading(true)
 
   //   try {
-  //     const response = await httpServices.Users.update(id, {
+  //     const response = await httpServices.user.update(id, {
   //       active: status
   //     })
   //     set((state) => ({
   //       ...state,
-  //       trainingsList: state.usersList.map((c) =>
+  //       trainingsList: state.userList.map((c) =>
   //         c.id === id ? (response.data as IUserCreated) : c
   //       )
   //     }))

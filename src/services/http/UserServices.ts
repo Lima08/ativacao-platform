@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios'
-import { IUserCreated } from 'interfaces/entities/user'
+import { IUserCreated, IUserModifier } from 'interfaces/entities/user'
 import { ILoginResponse } from 'useCases/users'
 
 import { ApiResponse } from '../../../types'
@@ -11,24 +11,17 @@ type CreatePayload = {
   password: string
 }
 
-// type ModifierPayload = {
-//   name?: string
-//   password?: string
-//   isActive?: boolean
-//   imageUrl?: string
-//   role?: number
-// }
-
 export interface UserServiceInterface {
   create(payload: CreatePayload): Promise<ApiResponse<void>>
   login(
     payload: Pick<CreatePayload, 'email' | 'password'>
   ): Promise<ApiResponse<ILoginResponse>>
   getAll(): Promise<ApiResponse<IUserCreated[]>>
-  // update(
-  //   UserId: string,
-  //   payload: ModifierPayload
-  // ): Promise<ApiResponse<IUserCreated>>
+  getById(id: string): Promise<ApiResponse<IUserCreated>>
+  update(
+    UserId: string,
+    payload: IUserModifier
+  ): Promise<ApiResponse<IUserCreated>>
   // delete(userId: string): Promise<void>
 }
 
@@ -54,18 +47,24 @@ const UserService = (httpClient: AxiosInstance): UserServiceInterface => ({
   getAll: async () => {
     const response = await httpClient.get('/api/users/getAll')
     return response.data
+  },
+  getById: async (id) => {
+    const response = await httpClient.get(`/api/users/${id}`)
+    return response.data
+  },
+  update: async (id, { name, imageUrl, isActive, password, role }) => {
+    console.log('🚀 ~ file: UserServices.ts:56 ~ update: ~ imageUrl:', imageUrl)
+    const response = await httpClient.put(`/api/users/${id}`, {
+      name,
+      imageUrl,
+      isActive,
+      password,
+      role
+    })
+    console.log('🚀 ~ file: UserServices.ts:59 ~ update: ~ response:', response)
+
+    return response.data
   }
-
-  // update: async (UserId, { name, description, active, mediaIds }) => {
-  //     const response = await httpClient.put(`/api/users/${UserId}`, {
-  //       name,
-  //       description,
-  //       active,
-  //       mediaIds
-  //     })
-
-  //     return response.data
-  // },
 
   // delete: async (userId: string) => {
   //   await httpClient.delete(`/api/users/${userId}`)

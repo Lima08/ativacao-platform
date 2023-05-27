@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import DeleteIcon from '@mui/icons-material/Delete'
+// import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import {
   Avatar,
@@ -36,9 +36,10 @@ export default function UsersList() {
 
   const router = useRouter()
 
-  const [loading, error, setToaster] = useGlobalStore((state) => [
+  const [loading, error, setError, setToaster] = useGlobalStore((state) => [
     state.loading,
     state.error,
+    state.setError,
     state.setToaster
   ])
   const [usersList, getAllUsers] = useMainStore((state) => [
@@ -46,9 +47,9 @@ export default function UsersList() {
     state.getAllUsers
   ])
 
-  useEffect(() => {
-    console.log('🚀 ~ file: index.tsx:46 ~ UsersList ~ usersList:', usersList)
-  }, [usersList])
+  const handleEdit = async (id: string) => {
+    router.push(`/in/users/${id}`)
+  }
 
   useEffect(() => {
     getAllUsers()
@@ -62,50 +63,27 @@ export default function UsersList() {
       type: 'error',
       duration: 5000
     })
+
+    setError(null)
   }, [error, setToaster])
-
-  // useEffect(() => {
-  //   if (!usersList) return
-
-  //   const usersAdapted = usersAdapter(usersList)
-  //   setUsersListAdapted(usersAdapted)
-  // }, [usersList])
 
   return (
     <DashboardLayout>
-      {/* sx={{ borderRight: '1px solid #ccc' }}> */}
       <PageContainer pageTitle="Lista de usuários" pageSection="users">
         {loading && <div>Carregando...</div>}
         <Card>
-          {/* <itensToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} /> */}
-
-          {/* <scrollbars> */}
           {/* // TODO: Pensar em mobile */}
           <TableContainer sx={{ minWidth: 600 }}>
             <Table>
-              <TableHeadCustom
-                // order={order}
-                // orderBy={orderBy}
-                headLabel={TABLE_HEAD}
-                // rowCount={tableData.length}
-                // numSelected={selected.length}
-                // onRequestSort={handleRequestSort}
-                // onSelectAllClick={handleSelectAllClick}
-              />
+              <TableHeadCustom headLabel={TABLE_HEAD} />
               <TableBody>
                 {usersList &&
                   usersList.map((row: any) => {
-                    const { id, name, role, status, imageUrl, createdAt } = row
+                    const { id, name, role, isActive, imageUrl, createdAt } =
+                      row
 
                     return (
                       <TableRow hover key={id} tabIndex={-1} role="checkbox">
-                        {/* <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedUser}
-                      onChange={(event) => handleClick(event, name)}
-                    />
-                  </TableCell> */}
-
                         <TableCell
                           component="th"
                           scope="row"
@@ -129,8 +107,10 @@ export default function UsersList() {
                         </TableCell>
 
                         <TableCell align="left">
-                          {status && <Chip label="ativo" color="success" />}
-                          {!status && <Chip label="inativo" color="error" />}
+                          <Chip
+                            label={isActive ? 'ativo' : 'inativo'}
+                            color={isActive ? 'success' : 'error'}
+                          />
                         </TableCell>
 
                         <TableCell align="left">
@@ -139,49 +119,23 @@ export default function UsersList() {
                         {/* TODO: Ajustar esse btn */}
 
                         <TableCell align="right">
-                          <IconButton aria-label="edit" size="large">
+                          <IconButton
+                            aria-label="edit"
+                            size="large"
+                            onClick={() => handleEdit(id)}
+                          >
                             <EditIcon />
                           </IconButton>
-                          <IconButton aria-label="delete" size="large">
+                          {/* <IconButton aria-label="delete" size="large">
                             <DeleteIcon />
-                          </IconButton>
+                          </IconButton> */}
                         </TableCell>
                       </TableRow>
                     )
                   })}
-                {/* {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
-              </TableRow>
-            )} */}
               </TableBody>
-
-              {/* {isNotFound && (
-            <TableBody>
-              <TableRow>
-                <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                  <Paper
-                    sx={{
-                      textAlign: 'center'
-                    }}
-                  >
-                    <Typography variant="h6" paragraph>
-                      Not found
-                    </Typography>
-
-                    <Typography variant="body2">
-                      No results found for &nbsp;
-                      <strong>&quot;{filterName}&quot;</strong>.
-                      <br /> Try checking for typos or using complete words.
-                    </Typography>
-                  </Paper>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          )} */}
             </Table>
           </TableContainer>
-          {/* </scrollbars> */}
         </Card>
       </PageContainer>
     </DashboardLayout>
