@@ -21,6 +21,7 @@ import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
 import ToggleInput from 'components/ToggleInput'
+import Uploader from 'components/Uploader'
 
 export default function RegisterUser() {
   const router = useRouter()
@@ -196,38 +197,8 @@ export default function RegisterUser() {
             label="Administrador"
           />
         </div>
-        <div className="mt-6 hover:bg-gray-100">
-          <label
-            htmlFor="file-upload"
-            className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
-          >
-            <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25   hover:border-blue-500 py-6">
-              {loadingData && <CircularProgress />}
-              {!loadingData && (
-                <div className="text-center">
-                  <PhotoIcon
-                    className="mx-auto h-12 w-12 text-gray-300"
-                    aria-hidden="true"
-                  />
-                  <div className="mt-4 flex text-sm leading-6 text-gray-600">
-                    <input
-                      id="file-upload"
-                      name="file-upload"
-                      type="file"
-                      className="sr-only"
-                      multiple={false}
-                      disabled={loading}
-                      onChange={(e) => uploadFile(e)}
-                    />
-                  </div>
-                  <p className="text-xs leading-5 text-gray-600">
-                    PNG, JPG e JPEG, até 10MB
-                  </p>
-                </div>
-              )}
-            </div>
-          </label>
-        </div>
+        <Uploader uploadFile={uploadFile} multiple />
+
         {loading && (
           <div className="w-full flex justify-center align-middle px-3 py-2">
             <CircularProgress />

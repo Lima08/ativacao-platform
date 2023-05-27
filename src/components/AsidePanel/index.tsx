@@ -5,13 +5,13 @@ import { Box, List } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
 import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
-import AsidePanelItem from 'components/AsidePanelItem'
 
 import fourSquares from '../../../images/icons/fourSquares'
 // import homeIcon from '../../../images/icons/homeIcon'
 import inboxIcon from '../../../images/icons/inboxIcon'
 import megaphoneIcon from '../../../images/icons/megaphoneIcon'
 import pizzaGraph from '../../../images/icons/pizzaGraph'
+import AsidePanelItem from './AsidePanelItem'
 
 function AsidePanel() {
   const { user } = useAuthStore((state) => state) as IAuthStore

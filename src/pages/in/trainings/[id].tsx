@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import { PhotoIcon } from '@heroicons/react/24/solid'
 import httpServices from 'services/http'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
@@ -9,6 +8,7 @@ import DashboardLayout from 'wrappers/DashboardLayout'
 
 import FormCustom from 'components/FormCustom'
 import MediaList from 'components/MediaList'
+import Uploader from 'components/Uploader'
 
 import { MediaResponseType } from '../../../../types'
 
@@ -119,7 +119,6 @@ export default function RegisterTraining() {
       })
     }
     resetState()
-    router.push('/in/trainings')
   }
 
   const fetchTraining = async () => {
@@ -195,37 +194,7 @@ export default function RegisterTraining() {
                     />
                   </div>
                 </div>
-                {/* TRansformar no componente upload */}
-                <div className="mt-6">
-                  <label
-                    htmlFor="file-upload"
-                    className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
-                  >
-                    <div className="hover:border-blue-500 hover:bg-gray-100  mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
-                      <div className="text-center">
-                        <PhotoIcon
-                          className="mx-auto h-12 w-12 text-gray-300"
-                          aria-hidden="true"
-                        />
-                        <div className="mt-4 flex text-sm leading-6 text-gray-600">
-                          <span>Subir arquivo</span>
-                          <input
-                            id="file-upload"
-                            name="file-upload"
-                            type="file"
-                            className="sr-only"
-                            multiple={true}
-                            disabled={loading}
-                            onChange={(e) => uploadFile(e)}
-                          />
-                        </div>
-                        <p className="text-xs leading-5 text-gray-600">
-                          PNG, JPG, GIF up to 10MB
-                        </p>
-                      </div>
-                    </div>
-                  </label>
-                </div>
+                <Uploader uploadFile={uploadFile} multiple />
               </div>
             </div>
           </div>
@@ -246,12 +215,7 @@ export default function RegisterTraining() {
               Salvar
             </button>
           </div>
-          {loading && (
-            <div className="px-3 py-2 w-[100px] mt-3 flex items-end justify-center ml-auto rounded-lg font-semibold bg-blue-600 text-white">
-              Salvando item...
-            </div>
-          )}
-          <div></div>
+
           <MediaList mediasList={trainingsMedias} onDelete={removeMedia} />
         </FormCustom>
       </div>

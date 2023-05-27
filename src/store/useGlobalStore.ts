@@ -7,15 +7,18 @@ interface IToaster {
   duration?: number
 }
 export interface IAnalysisStore {
+  transferData: any
   loading: boolean
   error: any
   toaster: IToaster
   setToaster: (toaster: IToaster) => void
   setLoading: (isLoading: boolean) => void
   setError: (error: any) => void
+  setTransferData: (transferData: any) => void
 }
 
 const useGlobalStore = create<IAnalysisStore>((set) => ({
+  transferData: null,
   loading: false,
   error: null,
   toaster: {
@@ -26,7 +29,9 @@ const useGlobalStore = create<IAnalysisStore>((set) => ({
   },
   setToaster: (toaster) => set((state) => ({ ...state, toaster: toaster })),
   setLoading: (isLoading) => set((state) => ({ ...state, loading: isLoading })),
-  setError: (error) => set((state) => ({ ...state, error: error }))
+  setError: (error) => set((state) => ({ ...state, error: error })),
+  setTransferData: (transferData) =>
+    set((state) => ({ ...state, transferData }))
 }))
 
 export default useGlobalStore
