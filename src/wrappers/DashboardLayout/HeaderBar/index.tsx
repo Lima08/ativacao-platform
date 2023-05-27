@@ -12,8 +12,11 @@ import {
   Divider
 } from '@mui/material'
 
+import CompanySettings from '../Configurations/CompanySettings'
+
 function HeaderBar() {
   const [anchorEl, setAnchorEl] = useState<null | (EventTarget & Element)>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const open = Boolean(anchorEl)
 
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
@@ -22,6 +25,15 @@ function HeaderBar() {
 
   const handleClose = () => {
     setAnchorEl(null)
+  }
+
+  const handleOpenConfiguration = () => {
+    setIsModalOpen(true)
+    handleClose()
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
   }
 
   return (
@@ -76,9 +88,10 @@ function HeaderBar() {
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
-        <MenuItem onClick={handleClose}>Configurações</MenuItem>
+        <MenuItem onClick={handleOpenConfiguration}>Configurações</MenuItem>
         <MenuItem onClick={handleClose}>Logout</MenuItem>
       </Popover>
+      {isModalOpen && <CompanySettings handleCloseModal={handleCloseModal} />}
     </Box>
   )
 }

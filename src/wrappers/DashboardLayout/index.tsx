@@ -3,9 +3,8 @@ import { ReactNode } from 'react'
 import { Alert, Grid, Snackbar, Box, Divider } from '@mui/material'
 import useGlobalStore from 'store/useGlobalStore'
 
-import AsidePanel from 'components/AsidePanel'
-
-import HeaderBar from './components/HeaderBar'
+import AsidePanel from './AsidePanel'
+import HeaderBar from './HeaderBar'
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [toaster, setToaster] = useGlobalStore((state) => [

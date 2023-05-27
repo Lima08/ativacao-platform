@@ -6,11 +6,11 @@ import { ROLES } from 'constants/enums/eRoles'
 import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
 
-import fourSquares from '../../../images/icons/fourSquares'
+import fourSquares from '../../../../images/icons/fourSquares'
 // import homeIcon from '../../../images/icons/homeIcon'
-import inboxIcon from '../../../images/icons/inboxIcon'
-import megaphoneIcon from '../../../images/icons/megaphoneIcon'
-import pizzaGraph from '../../../images/icons/pizzaGraph'
+import inboxIcon from '../../../../images/icons/inboxIcon'
+import megaphoneIcon from '../../../../images/icons/megaphoneIcon'
+import pizzaGraph from '../../../../images/icons/pizzaGraph'
 import AsidePanelItem from './AsidePanelItem'
 
 function AsidePanel() {
