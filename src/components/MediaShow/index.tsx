@@ -2,11 +2,10 @@ import { Paper } from '@mui/material'
 
 type MediaShowProp = {
   url: string
-  id: string
   type: string
 }
 
-export default function MediaShow({ url, id, type }: MediaShowProp) {
+export default function MediaShow({ url,  type }: MediaShowProp) {
   return (
     <Paper>
       {type === 'video' ? (
@@ -15,7 +14,7 @@ export default function MediaShow({ url, id, type }: MediaShowProp) {
         <img
           className="w-full h-auto object-cover"
           src={url}
-          alt={`Arquivo ${id}`}
+          alt={`Arquivo de ${type}`}
         />
       )}
     </Paper>

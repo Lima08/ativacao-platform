@@ -11,7 +11,7 @@ export default function Uploader({ uploadFile, multiple }: UploaderProps) {
   const [loading] = useGlobalStore((state) => [state.loading])
 
   return (
-    <div className="mt-6  w-full">
+    <div className="w-full">
       <label
         htmlFor="file-upload"
         className="relative cursor-pointer rounded-md"

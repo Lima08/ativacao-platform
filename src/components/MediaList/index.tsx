@@ -26,7 +26,7 @@ export default function MediaList({ mediasList, onDelete }: MediaProps) {
               >
                 <HighlightOffIcon />
               </IconButton>
-              <MediaShow url={url} id={id} type={type} />
+              <MediaShow url={url} type={type} />
             </div>
           </Grid>
         ))}
