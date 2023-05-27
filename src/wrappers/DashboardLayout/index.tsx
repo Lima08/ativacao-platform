@@ -1,16 +1,18 @@
 import { ReactNode } from 'react'
 
-import { Alert, Snackbar } from '@mui/material'
+import { Alert, Grid, Snackbar, Box, Divider } from '@mui/material'
 import useGlobalStore from 'store/useGlobalStore'
 
 import AsidePanel from 'components/AsidePanel'
-import BaseNavbar from 'components/BaseNavbar'
+
+import HeaderBar from './components/HeaderBar'
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [toaster, setToaster] = useGlobalStore((state) => [
     state.toaster,
     state.setToaster
   ])
+
   const { isOpen, message, type, duration } = toaster
 
   function handleClose() {
@@ -18,22 +20,42 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div lang="en">
-      <BaseNavbar />
-      <AsidePanel />
-      <main className="w-full md:w-[calc(100%_-_257px)] h-[calc(100%_-_72px)] mt-[72px] md:ml-[257px]">
-        {children}
-      </main>
+    <>
+      <Grid container sx={{ height: '100vh' }}>
+        <Grid
+          item
+          xs={12}
+          sm={3}
+          md={2}
+          sx={{
+            borderRight: '1px solid #ccc',
+            pl: 2
+          }}
+        >
+          <AsidePanel />
+        </Grid>
+        <Divider />
+        <Grid item xs={12} sm={9} md={10}>
+          <Box sx={{ height: '4rem', background: 'white' }}>
+            <HeaderBar />
+          </Box>
+          <Divider />
+          <Box sx={{ pt: 6 }}>
+            <main>{children}</main>
+          </Box>
+        </Grid>
+      </Grid>
 
       <Snackbar
         onClose={handleClose}
         open={isOpen}
         autoHideDuration={duration || 5000}
+        role="alert"
       >
         <Alert onClose={handleClose} severity={type} sx={{ width: '100%' }}>
           {message}
         </Alert>
       </Snackbar>
-    </div>
+    </>
   )
 }

@@ -16,7 +16,7 @@ import path from 'path'
 import EmailService from 'services/emailService/IEmailService'
 import { getCompanyById } from 'useCases/company'
 
-interface IUserLoginResponse {
+export interface IUserLoginResponse {
   id: string
   name: string
   email: string
@@ -24,7 +24,7 @@ interface IUserLoginResponse {
   isActive: boolean
 }
 
-interface ICompanyLoginResponse {
+export interface ICompanyLoginResponse {
   id: string
   name: string
   slug: string

@@ -1,10 +1,15 @@
-import { ILoginResponse } from 'useCases/users'
+import {
+  ICompanyLoginResponse,
+  ILoginResponse,
+  IUserLoginResponse
+} from 'useCases/users'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 export interface IAuthStore {
-  company: Pick<ILoginResponse, 'company'> | null
-  user: Pick<ILoginResponse, 'user'> | null
+  company: ICompanyLoginResponse | null
+  user: IUserLoginResponse | null
+  setUserLogged: (userLogged: ILoginResponse) => void
 }
 
 export const useAuthStore = create(
@@ -12,9 +17,8 @@ export const useAuthStore = create(
     (set) => ({
       company: null,
       user: null,
-      setUserLogged: (
-        userLogged: Pick<ILoginResponse, 'company' | 'user'> | null
-      ) => set((state: IAuthStore) => ({ ...state, ...userLogged }))
+      setUserLogged: (userLogged: ILoginResponse) =>
+        set((state: IAuthStore) => ({ ...state, ...userLogged }))
     }),
     {
       name: 'user-logged'

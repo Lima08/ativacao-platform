@@ -1,4 +1,13 @@
 @tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  @apply text-slate-800;
+  /* @apply overflow-y-hidden; */
+  /* background-color: #1F1F1F */
+}
 
 /* Firefox */
 * {
@@ -17,25 +26,15 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: #ffd700;
-  /* border-radius: 14px; */
-  /* border: 3px solid var(--primary); */
+  /* background-color: #ffd700; */
+  display: none;
 }
-
-
-@tailwind components;
-@tailwind utilities;
-
-body {
-  @apply bg-gray-200;
-  @apply text-slate-800;
-}
-
 
 /* CHECKBOX TOGGLE SWITCH */
 .toggle-checkbox:checked {
   border-color: #68D391 !important;
 }
+
 /* .toggle-checkbox:checked + .toggle-label {
   background-color: #68D391 !important;
 } */

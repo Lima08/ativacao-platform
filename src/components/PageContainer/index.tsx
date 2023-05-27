@@ -5,7 +5,7 @@ import { ReactNode, useEffect, useState } from 'react'
 
 import { Button } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
-import { useAuthStore } from 'store/useAuthStore'
+import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
 type PageContainerProps = {
   children: ReactNode
@@ -20,8 +20,8 @@ export default function PageContainer({
   children,
   customCallback
 }: PageContainerProps) {
-  // @ts-ignore
-  const role = useAuthStore((state) => state.user?.role)
+  const { user } = useAuthStore((state) => state) as IAuthStore
+
   const [isAdmin, setIsAdmin] = useState(false)
 
   const router = useRouter()
@@ -31,23 +31,23 @@ export default function PageContainer({
   }
 
   useEffect(() => {
-    setIsAdmin(role >= ROLES.COMPANY_ADMIN)
-  }, [role])
+    if (!user) return
+    setIsAdmin(user.role >= ROLES.COMPANY_ADMIN)
+  }, [user])
   return (
-    <div className="w-full flex flex-col py-[25px] items-center">
-      <div className="w-9/12 flex flex-row justify-around items-center">
-        <h1 className="text-2xl font-medium">{pageTitle}</h1>
+    <div className=" flex flex-col items-center px-16 py-2">
+      <div className="w-full flex flex-row justify-between items-center ">
+        <h2 className="text-2xl font-medium">{pageTitle}</h2>
         {isAdmin && (
           <Button
-            onClick={customCallback || navToCreatePage}
             variant="contained"
-            className="bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600 font-bold"
+            onClick={customCallback || navToCreatePage}
           >
             <p>Adicionar</p>
           </Button>
         )}
       </div>
-      <div className="flex flex-col mx-auto">{children}</div>
+      <section className="w-full flex flex-col mt-8">{children}</section>
     </div>
   )
 }

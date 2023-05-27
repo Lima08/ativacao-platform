@@ -1,22 +1,33 @@
 import Link from 'next/link'
+import { ReactElement } from 'react'
 
-type AsidePanelItemProps = {
+import { ListItem, Typography, Box } from '@mui/material'
+
+interface AsidePanelItemProps {
   title: string
   linkSrc: string
-  icon: any
+  icon: ReactElement
 }
 
-function AsidePanelItem({ title, linkSrc, icon }: AsidePanelItemProps) {
+const AsidePanelItem = ({ title, linkSrc, icon }: AsidePanelItemProps) => {
   return (
-    <li>
-      <Link
-        href={linkSrc}
-        className="text-base text-gray-900 font-normal rounded-lg flex items-center p-2 hover:bg-gray-100 group"
-      >
-        {icon}
-        <span className="ml-3">{title}</span>
+    <ListItem disableGutters sx={{ ':hover': { backgroundColor: '#F3F4F6' } }}>
+      <Link href={linkSrc} passHref>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            color: 'text.primary',
+            borderRadius: 'lg'
+          }}
+        >
+          {icon}
+          <Typography variant="body1" component="span" sx={{ ml: 1 }}>
+            {title}
+          </Typography>
+        </Box>
       </Link>
-    </li>
+    </ListItem>
   )
 }
 

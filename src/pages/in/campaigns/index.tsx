@@ -8,8 +8,8 @@ import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
-import ListItem from 'components/ListItem'
-import type { DataList } from 'components/ListItem'
+import ListItemCustom from 'components/ListItemCustom'
+import type { DataList } from 'components/ListItemCustom'
 import Modal from 'components/MediaViewer'
 import PageContainer from 'components/PageContainer'
 import SearchPrevNext from 'components/SearchPrevNext'
@@ -143,7 +143,7 @@ export default function CampaignsList() {
           )}
           {!!campaignsListAdapted?.length &&
             campaignsListAdapted.map((campaign) => (
-              <ListItem
+              <ListItemCustom
                 key={campaign.id}
                 data={campaign}
                 onDelete={() => deleteItem(campaign.id)}
