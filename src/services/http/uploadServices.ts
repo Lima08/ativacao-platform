@@ -1,15 +1,15 @@
 import { AxiosInstance } from 'axios'
 
-type Media = {
-  id: string
-  url: string
-  type: string
-  key: string
-  campaignId?: string
-  trainingId?: string
-  createdAt: Date
-  updatedAt: Date
-}
+// type Media = {
+//   id: string
+//   url: string
+//   type: string
+//   key: string
+//   campaignId?: string
+//   trainingId?: string
+//   createdAt: Date
+//   updatedAt: Date
+// }
 
 type Error = {
   message: string

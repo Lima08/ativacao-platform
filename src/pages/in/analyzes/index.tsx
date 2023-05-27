@@ -29,11 +29,9 @@ type AnalyzesObject = {
 export default function AnalyzesTable() {
   const [loading] = useGlobalStore((state) => [state.loading])
 
-  const [analyzesList, getAll, deleteAnalysis] = useMainStore((state) => [
-    state.analyzesList,
-    state.getAll,
-    state.deleteAnalysis
-  ])
+  const [analyzesList, getAllAnalyzes, deleteAnalysis] = useMainStore(
+    (state) => [state.analyzesList, state.getAllAnalyzes, state.deleteAnalysis]
+  )
 
   const [analyzesListAdapted, setAnalyzesListAdapted] = useState<any>([])
   const [analysisId, setAnalysisId] = useState('')
@@ -66,8 +64,8 @@ export default function AnalyzesTable() {
   }
 
   useEffect(() => {
-    getAll()
-  }, [getAll])
+    getAllAnalyzes()
+  }, [getAllAnalyzes])
 
   useEffect(() => {
     if (!analyzesList.length) return

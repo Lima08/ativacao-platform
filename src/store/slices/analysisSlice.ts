@@ -26,7 +26,7 @@ const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  getAll: async () => {
+  getAllAnalyzes: async () => {
     useGlobalStore.getState().setLoading(true)
 
     try {

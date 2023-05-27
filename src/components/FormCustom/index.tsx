@@ -1,13 +1,10 @@
-// interface FormSubmitEvent extends Event {
-//   target: HTMLFormElement
-// }
 type FormCustomProps = {
   children: React.ReactNode
   submitForm: (event: any) => void
   customStyles?: string
 }
 
-export default function CampaignRegister({
+export default function FormCustom({
   children,
   submitForm,
   customStyles

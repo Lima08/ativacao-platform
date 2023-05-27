@@ -9,7 +9,7 @@ export interface IAnalysisStore {
   analyzesList: IAnalysisCreated[]
   resetCurrentAnalysis: () => void
   createAnalysis: (newAnalysis: CreateAnalysisPayload) => void
-  getAll: () => void
+  getAllAnalyzes: () => void
   done: (
     id: string,
     { biUrl, message }: { biUrl: string; message: string }
