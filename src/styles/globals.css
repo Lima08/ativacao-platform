@@ -6,13 +6,13 @@ html,
 body {
   @apply text-slate-800;
   /* @apply overflow-y-hidden; */
-  /* background-color: #1F1F1F */
+  background-color: rgb(239, 242, 244)
 }
 
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: white;
+  scrollbar-color: rgb(221, 215, 215);
 }
 
 /* Chrome, Edge, and Safari */

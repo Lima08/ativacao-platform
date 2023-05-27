@@ -8,26 +8,16 @@ import { getUserById, deleteUser, updateUser } from 'useCases/users'
 
 async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
   const id = req.query.id as string
+  // const {  role: requestRole, userId } = req.user!
+
   if (req.method === REQUEST_METHODS.GET) {
     const user = await getUserById(id)
     return res.status(HTTP_STATUS.OK).json({ data: user })
   }
 
-  if (req.method === REQUEST_METHODS.POST) {
+  if (req.method === REQUEST_METHODS.PUT) {
     const { name, password, imageUrl, role, isActive } = req.body
-    const { error } = user.updateSchema.validate({
-      name,
-      password,
-      imageUrl,
-      role,
-      isActive
-    })
-
-    if (error) {
-      return res
-        .status(HTTP_STATUS.BAD_REQUEST)
-        .json({ error: error.details[0].message })
-    }
+   
     try {
       const updatedCampaign = await updateUser(id, {
         name,

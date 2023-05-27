@@ -6,8 +6,9 @@ import { authCheck } from 'middlewares/authCheck'
 import { getUsers } from 'useCases/users'
 
 async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
+  const { companyId } = req.user!
+
   if (req.method === REQUEST_METHODS.GET) {
-    const { companyId } = req.user!
     try {
       const user = await getUsers({ companyId })
       return res.status(200).json({ data: user })

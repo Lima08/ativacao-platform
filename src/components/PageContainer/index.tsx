@@ -27,7 +27,11 @@ export default function PageContainer({
   const router = useRouter()
 
   function navToCreatePage() {
-    router.push(`/in/${pageSection}/new`)
+    if (customCallback) {
+      customCallback()
+    } else {
+      router.push(`/in/${pageSection}/new`)
+    }
   }
 
   useEffect(() => {
@@ -39,11 +43,8 @@ export default function PageContainer({
       <div className="w-full flex flex-row justify-between items-center ">
         <h2 className="text-2xl font-medium">{pageTitle}</h2>
         {isAdmin && (
-          <Button
-            variant="contained"
-            onClick={customCallback || navToCreatePage}
-          >
-            <p>Adicionar</p>
+          <Button variant="outlined" onClick={navToCreatePage}>
+            Adicionar
           </Button>
         )}
       </div>
