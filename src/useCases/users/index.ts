@@ -133,7 +133,20 @@ async function loginUser({
 async function getUsers(filter: IUserFilter): Promise<IUserCreated[]> {
   try {
     const users = await repository.getAll(filter)
-    return users
+    const usersToReturn = users.map(
+      ({ id, email, createdAt, imageUrl, name, isActive, role, companyId }) =>
+        ({
+          id,
+          email,
+          createdAt,
+          imageUrl,
+          name,
+          isActive,
+          role,
+          companyId
+        } as IUserCreated)
+    )
+    return usersToReturn
   } catch (error: any) {
     const meta = error.meta || error.message
     throw new CustomError('Error to get users', HTTP_STATUS.BAD_REQUEST, meta)

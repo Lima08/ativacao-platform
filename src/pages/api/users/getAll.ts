@@ -1,11 +1,12 @@
 import type { NextApiRequestCustom, NextApiResponse } from 'next'
 
 import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
+import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
 import { authCheck } from 'middlewares/authCheck'
 import { getUsers } from 'useCases/users'
 
 async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
-  if (req.method === 'GET') {
+  if (req.method === REQUEST_METHODS.GET) {
     const { companyId } = req.user!
     try {
       const user = await getUsers({ companyId })

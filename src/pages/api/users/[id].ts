@@ -1,17 +1,19 @@
 import type { NextApiRequestCustom, NextApiResponse } from 'next'
 
+import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
+import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
 import { authCheck } from 'middlewares/authCheck'
 import user from 'schemaValidation/user'
 import { getUserById, deleteUser, updateUser } from 'useCases/users'
 
 async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
   const id = req.query.id as string
-  if (req.method === 'GET') {
+  if (req.method === REQUEST_METHODS.GET) {
     const user = await getUserById(id)
-    return res.status(200).json({ data: user })
+    return res.status(HTTP_STATUS.OK).json({ data: user })
   }
 
-  if (req.method === 'PUT') {
+  if (req.method === REQUEST_METHODS.POST) {
     const { name, password, imageUrl, role, isActive } = req.body
     const { error } = user.updateSchema.validate({
       name,
@@ -22,9 +24,10 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
     })
 
     if (error) {
-      return res.status(400).json({ error: error.details[0].message })
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ error: error.details[0].message })
     }
-    //  TODO: Adicionar joi
     try {
       const updatedCampaign = await updateUser(id, {
         name,
@@ -34,17 +37,19 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
         isActive
       })
 
-      return res.status(200).json({ data: updatedCampaign })
+      return res.status(HTTP_STATUS.OK).json({ data: updatedCampaign })
     } catch (error: any) {
       return res.status(error.code).json({ error: { message: error.message } })
     }
   }
 
-  if (req.method === 'DELETE') {
+  if (req.method === REQUEST_METHODS.DELETE) {
     await deleteUser(id)
-    return res.status(204).end()
+    return res.status(HTTP_STATUS.NO_CONTENT).end()
   }
-  res.status(405).json({ error: { message: 'Method not allowed' } })
+  res
+    .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+    .json({ error: { message: 'Method not allowed' } })
 }
 
 export default authCheck(handler)

@@ -1,4 +1,5 @@
 import { AxiosInstance } from 'axios'
+import { IUserCreated } from 'interfaces/entities/user'
 import { ILoginResponse } from 'useCases/users'
 
 import { ApiResponse } from '../../../types'
@@ -23,56 +24,40 @@ export interface UserServiceInterface {
   login(
     payload: Pick<CreatePayload, 'email' | 'password'>
   ): Promise<ApiResponse<ILoginResponse>>
-  // getAll(): Promise<ApiResponse<IUserCreated[]>>
+  getAll(): Promise<ApiResponse<IUserCreated[]>>
   // update(
   //   UserId: string,
   //   payload: ModifierPayload
   // ): Promise<ApiResponse<IUserCreated>>
+  // delete(userId: string): Promise<void>
 }
 
 const UserService = (httpClient: AxiosInstance): UserServiceInterface => ({
   create: async ({ companyId, name, email, password }) => {
-    try {
-      const response = await httpClient.post('/api/users/create', {
-        companyId,
-        name,
-        email,
-        password
-      })
-  
+    const response = await httpClient.post('/api/users/create', {
+      companyId,
+      name,
+      email,
+      password
+    })
 
-      return response.data
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    return response.data
   },
   login: async ({ email, password }) => {
-    try {
-      const response = await httpClient.post('/api/login', {
-        email,
-        password
-      })
-    
+    const response = await httpClient.post('/api/login', {
+      email,
+      password
+    })
 
-      return response.data
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    return response.data
+  },
+  getAll: async () => {
+    const response = await httpClient.get('/api/users/getAll')
+    return response.data
   }
-  // getAll: async () => {
-  //   try {
-  //     const response = await httpClient.get('/api/Users/getAll')
-
-  //     return response.data
-  //   } catch (error) {
-  //     console.error('Error fetching Users:', error)
-  //     return error
-  //   }
-  // },
 
   // update: async (UserId, { name, description, active, mediaIds }) => {
-  //   try {
-  //     const response = await httpClient.put(`/api/Users/${UserId}`, {
+  //     const response = await httpClient.put(`/api/users/${UserId}`, {
   //       name,
   //       description,
   //       active,
@@ -80,11 +65,11 @@ const UserService = (httpClient: AxiosInstance): UserServiceInterface => ({
   //     })
 
   //     return response.data
-  //   } catch (error) {
-  //     console.error('Error to update User:', error)
-  //     return error
-  //   }
   // },
+
+  // delete: async (userId: string) => {
+  //   await httpClient.delete(`/api/users/${userId}`)
+  // }
 })
 
 export default UserService
