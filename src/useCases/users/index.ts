@@ -22,6 +22,7 @@ export interface IUserLoginResponse {
   email: string
   role: number
   isActive: boolean
+  imageUrl?: string
 }
 
 export interface ICompanyLoginResponse {
@@ -120,7 +121,8 @@ async function loginUser({
         name: user.name,
         email: user.email,
         role: user.role,
-        isActive: user.isActive
+        isActive: user.isActive,
+        imageUrl: user.imageUrl
       },
       company
     }

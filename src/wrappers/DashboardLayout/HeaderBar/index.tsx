@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router'
 import React, { MouseEvent, useState } from 'react'
 
 import { Notifications } from '@mui/icons-material'
@@ -12,9 +13,10 @@ import {
   Divider
 } from '@mui/material'
 
-import CompanySettings from '../Configurations/CompanySettings'
+import CompanySettings from './CompanySettings'
 
 function HeaderBar() {
+  const router = useRouter()
   const [anchorEl, setAnchorEl] = useState<null | (EventTarget & Element)>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const open = Boolean(anchorEl)
@@ -34,6 +36,11 @@ function HeaderBar() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
+  }
+
+  const logout = () => {
+    window.localStorage.clear()
+    router.push('/login')
   }
 
   return (
@@ -89,7 +96,7 @@ function HeaderBar() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
         <MenuItem onClick={handleOpenConfiguration}>Configurações</MenuItem>
-        <MenuItem onClick={handleClose}>Logout</MenuItem>
+        <MenuItem onClick={logout}>Sair</MenuItem>
       </Popover>
       {isModalOpen && <CompanySettings handleCloseModal={handleCloseModal} />}
     </Box>

@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 
-import { Box, TextField, Button } from '@mui/material'
+import HighlightOffIcon from '@mui/icons-material/HighlightOff'
+import { Box, TextField, Button, IconButton } from '@mui/material'
 import httpServices from 'services/http'
 import useGlobalStore from 'store/useGlobalStore'
 
+import MediaShow from 'components/MediaShow'
 import ModalCustom from 'components/ModalCustom'
 import Uploader from 'components/Uploader'
 
@@ -18,7 +20,7 @@ function CompanySettings({
   ])
 
   const [companyName, setCompanyName] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
 
   const uploadFile = async (e: any) => {
     e.preventDefault()
@@ -78,9 +80,21 @@ function CompanySettings({
           alignItems: 'center'
         }}
       >
-        <Uploader uploadFile={uploadFile} />
+        {!imageUrl && <Uploader uploadFile={uploadFile} />}
+        {imageUrl && (
+          <div className="relative ">
+            <IconButton
+              style={{ zIndex: 1 }}
+              className="absolute right-0 top-0 m-1 hover:bg-red-500 hover:text-white"
+              onClick={() => setImageUrl(null)}
+            >
+              <HighlightOffIcon />
+            </IconButton>
+            <MediaShow url={imageUrl} type="image" />
+          </div>
+        )}
       </Box>
-      <Button variant="contained" onClick={handleSaveConfiguration}>
+      <Button variant="outlined" onClick={handleSaveConfiguration}>
         Salvar
       </Button>
     </ModalCustom>

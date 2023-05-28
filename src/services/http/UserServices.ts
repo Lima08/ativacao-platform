@@ -15,14 +15,13 @@ export interface UserServiceInterface {
   create(payload: CreatePayload): Promise<ApiResponse<void>>
   login(
     payload: Pick<CreatePayload, 'email' | 'password'>
-  ): Promise<ApiResponse<ILoginResponse>>
+  ): Promise<ILoginResponse>
   getAll(): Promise<ApiResponse<IUserCreated[]>>
   getById(id: string): Promise<ApiResponse<IUserCreated>>
   update(
     UserId: string,
     payload: IUserModifier
   ): Promise<ApiResponse<IUserCreated>>
-  // delete(userId: string): Promise<void>
 }
 
 const UserService = (httpClient: AxiosInstance): UserServiceInterface => ({
@@ -61,14 +60,9 @@ const UserService = (httpClient: AxiosInstance): UserServiceInterface => ({
       password,
       role
     })
-    console.log('🚀 ~ file: UserServices.ts:59 ~ update: ~ response:', response)
 
     return response.data
   }
-
-  // delete: async (userId: string) => {
-  //   await httpClient.delete(`/api/users/${userId}`)
-  // }
 })
 
 export default UserService
