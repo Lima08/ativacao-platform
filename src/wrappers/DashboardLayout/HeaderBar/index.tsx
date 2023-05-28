@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import React, { MouseEvent, useState } from 'react'
+import React, { MouseEvent, useEffect, useState } from 'react'
 
 import { Notifications } from '@mui/icons-material'
 import {
@@ -12,15 +12,18 @@ import {
   Typography,
   Divider
 } from '@mui/material'
+import { useAuthStore } from 'store/useAuthStore'
 
 import CompanySettings from './CompanySettings'
 
 function HeaderBar() {
   const router = useRouter()
+  const loggedUser = useAuthStore((state: any) => state.user)
+
   const [anchorEl, setAnchorEl] = useState<null | (EventTarget & Element)>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [userImage, setUserImage] = useState('')
   const open = Boolean(anchorEl)
-
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -43,6 +46,12 @@ function HeaderBar() {
     router.push('/login')
   }
 
+  useEffect(() => {
+    if (!loggedUser || !loggedUser.imageUrl) return
+
+    setUserImage(loggedUser.imageUrl)
+  }, [loggedUser])
+
   return (
     <Box
       sx={{
@@ -60,11 +69,7 @@ function HeaderBar() {
         </Badge>
       </IconButton>
 
-      <Avatar
-        src="/public/logo-ativacao.png"
-        alt="photoURL"
-        onClick={handleClick}
-      />
+      <Avatar src={userImage} alt="photoURL" onClick={handleClick} />
 
       <Popover
         open={Boolean(open)}

@@ -102,6 +102,8 @@ export default function RegisterUser() {
 
     if (newPassWord) {
       if (newPassWord !== confirmedPassword) {
+        setNewPassWord(null)
+        setConfirmedPassword(null)
         setToaster({
           isOpen: true,
           message: 'As senhas não coincidem!',
@@ -180,12 +182,14 @@ export default function RegisterUser() {
           <TextField
             variant="outlined"
             label="Nova senha"
+            type="password"
             value={newPassWord}
             onChange={(e) => setNewPassWord(e.target.value)}
           />
           <TextField
             variant="outlined"
             label="Confirme sua senha"
+            type="password"
             value={confirmedPassword}
             onChange={(e) => setConfirmedPassword(e.target.value)}
           />
@@ -199,13 +203,13 @@ export default function RegisterUser() {
         </div>
         <Uploader uploadFile={uploadFile} multiple />
 
-        {loading && (
+        {loadingData && (
           <div className="w-full flex justify-center align-middle px-3 py-2">
             <CircularProgress />
           </div>
         )}
 
-        {!loading && (
+        {!loadingData && (
           <button
             type="submit"
             onClick={handleSubmit}
