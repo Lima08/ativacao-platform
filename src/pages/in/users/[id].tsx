@@ -3,7 +3,6 @@
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useState } from 'react'
 
-import { PhotoIcon } from '@heroicons/react/24/solid'
 import {
   Avatar,
   Card,

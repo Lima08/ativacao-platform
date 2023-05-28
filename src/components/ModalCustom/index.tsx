@@ -4,10 +4,10 @@ import { IconButton, Box, Typography } from '@mui/material'
 interface ModalCustomProps {
   title?: string
   children: React.ReactNode
-  handleCloseModal: () => void
+  closeModal: () => void
 }
 
-function ModalCustom({ children, title, handleCloseModal }: ModalCustomProps) {
+function ModalCustom({ children, title, closeModal }: ModalCustomProps) {
   return (
     <Box
       sx={{
@@ -42,7 +42,7 @@ function ModalCustom({ children, title, handleCloseModal }: ModalCustomProps) {
           }}
         >
           {title && <Typography variant="h6">{title}</Typography>}
-          <IconButton onClick={handleCloseModal}>
+          <IconButton onClick={closeModal}>
             <Close />
           </IconButton>
         </Box>

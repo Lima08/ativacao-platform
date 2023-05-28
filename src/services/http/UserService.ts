@@ -52,7 +52,6 @@ const UserService = (httpClient: AxiosInstance): UserServiceInterface => ({
     return response.data
   },
   update: async (id, { name, imageUrl, isActive, password, role }) => {
-    console.log('🚀 ~ file: UserServices.ts:56 ~ update: ~ imageUrl:', imageUrl)
     const response = await httpClient.put(`/api/users/${id}`, {
       name,
       imageUrl,

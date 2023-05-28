@@ -29,7 +29,7 @@ export interface ICompanyLoginResponse {
   id: string
   name: string
   slug: string
-  imageUrl?: string
+  imageUrl?: string | null
 }
 
 export interface ILoginResponse {
@@ -113,6 +113,7 @@ async function loginUser({
     )
 
     const company = await getCompanyById(user.companyId)
+    console.log('🚀 ~ file: index.ts:116 ~ company:', company)
 
     return {
       token,
