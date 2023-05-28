@@ -12,7 +12,6 @@ import ListItemCustom from 'components/ListItemCustom'
 import type { DataList } from 'components/ListItemCustom'
 import Modal from 'components/MediaViewer'
 import PageContainer from 'components/PageContainer'
-import SearchPrevNext from 'components/SearchPrevNext'
 
 interface mediaObject {
   url: string
@@ -134,7 +133,6 @@ export default function TrainingsPage() {
   return (
     <DashboardLayout>
       <PageContainer pageTitle="Treinamentos" pageSection="trainings">
-        <SearchPrevNext />
         {loading && <p>Carregando...</p>}
         {!loading && !trainingListAdapted.length && (
           <li className="flex items-center justify-center mt-5 bg-white h-12 w-full border rounded">

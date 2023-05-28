@@ -69,12 +69,12 @@ type AnalyzesObject = {
 
 export default function AnalyzesTable() {
   const TABLE_HEAD = [
-    { id: 'status', label: 'Status', alignRight: false },
-    { id: 'title', label: 'Título', alignRight: false },
-    { id: 'updatedAt', label: 'Atualizado em', alignRight: false },
-    { id: 'bi', label: 'Ver análise', alignRight: false },
-    { id: 'message', label: 'Ver mensagem', alignRight: false },
-    { id: 'actions', label: 'Ações', alignRight: true }
+    { id: 'status', label: 'Status', align: 'left' },
+    { id: 'title', label: 'Título', align: 'left' },
+    { id: 'updatedAt', label: 'Atualizado em', align: 'left' },
+    { id: 'bi', label: 'Ver análise', align: 'left' },
+    { id: 'message', label: 'Ver mensagem', align: 'left' },
+    { id: 'actions', label: 'Ações', align: 'right' }
   ]
 
   const [analyzesList, getAllAnalyzes, deleteAnalysis] = useMainStore(

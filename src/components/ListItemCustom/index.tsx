@@ -1,3 +1,4 @@
+// DEPRECATED
 import { useEffect, useState } from 'react'
 
 import { ROLES } from 'constants/enums/eRoles'
@@ -45,7 +46,6 @@ export default function ListItemCustom({
       <div className="flex justify-evenly">
         <div className="px-4 py-4 text-sm whitespace-nowrap">
           <div className="flex items-center flex-col">
-            {/* TODO: Ter ícone padrão para colocar no logar da imagem quando vier vzo */}
             <img
               className="object-fill w-14 h-12 -mx-1 rounded"
               src={data.img.source}
@@ -58,12 +58,7 @@ export default function ListItemCustom({
             {data.name}
           </h2>
         </div>
-        {/* TODO: Para admin mostra btn para usuário comum mostra descrição */}
-        {/* <div className="px-4 py-4 text-sm  hidden sm:flex items-center">
-          <h4 className="text-gray-700 dark:text-gray-200">
-            {data.description}
-          </h4>
-        </div> */}
+        
       </div>
 
       {isAdmin && (

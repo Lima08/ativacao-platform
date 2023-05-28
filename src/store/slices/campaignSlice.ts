@@ -87,14 +87,14 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
   updateCampaign: async (id: string, updatedCampaign: modifierCampaignDto) => {
     useGlobalStore.getState().setLoading(true)
 
+    set((state) => ({
+      ...state,
+      campaignsList: state.campaignsList.map((campaign) =>
+        campaign.id === id ? { ...campaign, ...updatedCampaign } : campaign
+      )
+    }))
     try {
-      const response = await httpServices.campaigns.update(id, updatedCampaign)
-      set((state) => ({
-        ...state,
-        campaignsList: state.campaignsList.map((c) =>
-          c.id === id ? (response.data as ICampaignCreated) : c
-        )
-      }))
+      await httpServices.campaigns.update(id, updatedCampaign)
     } catch (error) {
       useGlobalStore.getState().setError(error)
       return
@@ -102,19 +102,19 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  handleCampaignActive: async (id: string, status: boolean) => {
+  handleCampaignActive: async (id: string, active: boolean) => {
     useGlobalStore.getState().setLoading(true)
 
+    set((state) => ({
+      ...state,
+      campaignsList: state.campaignsList.map((campaign) =>
+        campaign.id === id ? { ...campaign, active } : campaign
+      )
+    }))
     try {
-      const response = await httpServices.campaigns.update(id, {
-        active: status
+      await httpServices.campaigns.update(id, {
+        active
       })
-      set((state) => ({
-        ...state,
-        trainingsList: state.campaignsList.map((c) =>
-          c.id === id ? (response.data as ICampaignCreated) : c
-        )
-      }))
     } catch (error) {
       useGlobalStore.getState().setError(error)
       return

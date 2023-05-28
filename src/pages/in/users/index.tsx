@@ -26,11 +26,11 @@ import { formatDate } from '../../../../utils'
 
 export default function UsersList() {
   const TABLE_HEAD = [
-    { id: 'name', label: 'Name', alignRight: false },
-    { id: 'role', label: 'Cargo', alignRight: false },
-    { id: 'status', label: 'Status', alignRight: false },
-    { id: 'createdAt', label: 'Data criação', alignRight: false },
-    { id: 'actions', label: 'Ações', alignRight: true }
+    { id: 'name', label: 'Name', alignRight: 'left' },
+    { id: 'role', label: 'Cargo', alignRight: 'left' },
+    { id: 'status', label: 'Status', alignRight: 'left' },
+    { id: 'createdAt', label: 'Data criação', alignRight: 'left' },
+    { id: 'actions', label: 'Ações', alignRight: 'right' }
   ]
 
   const router = useRouter()
@@ -64,7 +64,7 @@ export default function UsersList() {
     })
 
     setError(null)
-  }, [error, setToaster])
+  }, [error, setToaster, setError])
 
   return (
     <DashboardLayout>
