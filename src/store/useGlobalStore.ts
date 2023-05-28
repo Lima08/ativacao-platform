@@ -6,7 +6,7 @@ interface IToaster {
   type: 'success' | 'error' | 'warning' | 'info'
   duration?: number
 }
-export interface IAnalysisStore {
+export interface IGlobalStore {
   transferData: any
   loading: boolean
   error: any
@@ -17,7 +17,7 @@ export interface IAnalysisStore {
   setTransferData: (transferData: any) => void
 }
 
-const useGlobalStore = create<IAnalysisStore>((set) => ({
+const useGlobalStore = create<IGlobalStore>((set) => ({
   transferData: null,
   loading: false,
   error: null,

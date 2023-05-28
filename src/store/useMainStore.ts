@@ -1,15 +1,10 @@
 import { create } from 'zustand'
 
-import createAnalysisSlice from './slices/analysisSlice'
-import createCampaignsSlice from './slices/campaignSlice'
-import createCompanySlice from './slices/companySlice'
-import createTrainingsSlice from './slices/trainingSlice'
-import createUserSlice from './slices/userSlice'
-import { IAnalysisStore } from './types/IAnalysisStore'
-import { ICampaignStore } from './types/iCampaignStore'
-import { ICompanyStore } from './types/iCompanyStore'
-import { ITrainingStore } from './types/iTrainingStore'
-import { IUserStore } from './types/iUserStore'
+import createAnalysisSlice, { IAnalysisStore } from './slices/analysisSlice'
+import createCampaignsSlice, { ICampaignStore } from './slices/campaignSlice'
+import createCompanySlice, { ICompanyStore } from './slices/companySlice'
+import createTrainingsSlice, { ITrainingStore } from './slices/trainingSlice'
+import createUserSlice, { IUserStore } from './slices/userSlice'
 
 interface IMainStore
   extends IAnalysisStore,
