@@ -103,19 +103,18 @@ export default function RegisterTraining() {
         ? trainingsMedias.map((media) => media.id)
         : []
 
-    const mediasIdsFiltered = mediaIds.filter((id) => id) as string[]
 
     if (!trainingId || trainingId === 'new') {
       createTraining({
         name: trainingName,
         description: trainingDescription,
-        mediaIds: mediasIdsFiltered
+        mediaIds
       })
     } else {
       updateTraining(String(trainingId), {
         name: trainingName,
         description: trainingDescription,
-        mediaIds: mediasIdsFiltered
+        mediaIds
       })
     }
     resetState()

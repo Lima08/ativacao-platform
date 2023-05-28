@@ -4,11 +4,17 @@ import useGlobalStore from 'store/useGlobalStore'
 import { modifierTrainingDto } from 'useCases/trainings/dto'
 import { StateCreator } from 'zustand'
 
+export interface ITrainingDto {
+  name: string
+  description: string
+  mediaIds: string[]
+}
+
 export interface ITrainingStore {
   currentTraining: ITrainingCreated | null
   trainingsList: ITrainingCreated[]
   resetCurrentTraining: () => void
-  createTraining: (newTraining: ITraining) => void
+  createTraining: (newTraining: ITrainingDto) => void
   getTrainingById: (id: string) => void
   getAllTrainings: () => void
   deleteTraining: (id: string) => void
@@ -48,7 +54,7 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  createTraining: async (newTraining: ITraining) => {
+  createTraining: async (newTraining) => {
     try {
       const response = await httpServices.trainings.create(newTraining)
       set((state) => ({
@@ -65,7 +71,7 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  updateTraining: async (id: string, updatedTraining: modifierTrainingDto) => {
+  updateTraining: async (id, updatedTraining) => {
     try {
       const response = await httpServices.trainings.update(id, updatedTraining)
       set((state) => ({
@@ -81,7 +87,7 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  handleTrainingActive: async (id: string, status: boolean) => {
+  handleTrainingActive: async (id, status) => {
     try {
       const response = await httpServices.trainings.update(id, {
         active: status
@@ -99,7 +105,7 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  deleteTraining: async (id: string) => {
+  deleteTraining: async (id) => {
     try {
       set((state) => ({
         ...state,

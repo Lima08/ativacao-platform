@@ -8,7 +8,7 @@ export interface IAnalysisStore {
   currentAnalysis: IAnalysisCreated | null
   analyzesList: IAnalysisCreated[]
   resetCurrentAnalysis: () => void
-  createAnalysis: (newAnalysis: IAnalysisCreated) => void
+  createAnalysis: (newAnalysis: { title: string; bucketUrl: string }) => void
   getAllAnalyzes: () => void
   done: (
     id: string,
