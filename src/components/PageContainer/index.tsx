@@ -3,14 +3,14 @@
 import { useRouter } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
 
-import { Button} from '@mui/material'
+import { Button } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
 import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
 type PageContainerProps = {
   children: ReactNode
   pageTitle: string
-  pageSection: string
+  pageSection?: string
   customCallback?: () => void
 }
 
@@ -43,13 +43,13 @@ export default function PageContainer({
       <div className="w-full flex flex-row justify-between items-center ">
         <h2 className="text-2xl font-medium">{pageTitle}</h2>
 
-        {isAdmin && (
+        {isAdmin && pageSection &&(
           <Button variant="outlined" onClick={navToCreatePage}>
             Adicionar
           </Button>
         )}
       </div>
-      <section className="w-full flex flex-col mt-8">{children}</section>
+      <section className="w-full flex flex-col mt-4">{children}</section>
     </div>
   )
 }

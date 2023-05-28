@@ -1,11 +1,12 @@
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import EditIcon from '@mui/icons-material/Edit'
 import {
   Avatar,
   Card,
   Chip,
+  Divider,
   IconButton,
   Stack,
   Table,
@@ -19,6 +20,8 @@ import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 
 import PageContainer from 'components/PageContainer'
+import PaginationTableCustom from 'components/TableCustom/PaginationTableCustom'
+import SearchTableCustom from 'components/TableCustom/SearchTableCustom'
 import TableHeadCustom from 'components/TableCustom/TableHeadCustom'
 
 import { formatDate } from '../../../../utils'
@@ -34,20 +37,43 @@ export default function UsersList() {
 
   const router = useRouter()
 
-  const [loading, error, setError, setToaster] = useGlobalStore((state) => [
-    state.loading,
-    state.error,
-    state.setError,
-    state.setToaster
-  ])
+  const [loading, error, setError, setToaster, page, rowsPerPage] =
+    useGlobalStore((state) => [
+      state.loading,
+      state.error,
+      state.setError,
+      state.setToaster,
+      state.page,
+      state.rowsPerPage
+    ])
   const [usersList, getAllUsers] = useMainStore((state) => [
     state.usersList,
     state.getAllUsers
   ])
+  const [filteredUsers, setFilteredUsers] = useState<any[]>([])
 
   const handleEdit = async (id: string) => {
     router.push(`/in/users/${id}`)
   }
+
+  const searchByName = (searchQuery: string) => {
+    const filteredUsers = usersList.filter((user) => {
+      const userName = user.name.toLowerCase()
+      const query = searchQuery.toLowerCase()
+      return userName.includes(query)
+    })
+    setFilteredUsers(
+      filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    )
+  }
+
+  useEffect(() => {
+    if (!usersList) return
+
+    setFilteredUsers(
+      usersList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    )
+  }, [setFilteredUsers, usersList, page, rowsPerPage])
 
   useEffect(() => {
     getAllUsers()
@@ -66,16 +92,18 @@ export default function UsersList() {
   }, [error, setToaster, setError])
 
   return (
-    <PageContainer pageTitle="Lista de usuários" pageSection="users">
+    <PageContainer pageTitle="Lista de usuários">
       {loading && <div>Carregando...</div>}
       <Card>
         {/* // TODO: Pensar em mobile */}
-        <TableContainer sx={{ minWidth: 600 }}>
+        <TableContainer sx={{ maxHeight: '68vh' }}>
+          <SearchTableCustom onSearch={searchByName} />
+
           <Table>
             <TableHeadCustom headLabel={TABLE_HEAD} />
             <TableBody>
-              {usersList &&
-                usersList.map((row: any) => {
+              {filteredUsers &&
+                filteredUsers.map((row: any) => {
                   const { id, name, role, isActive, imageUrl, createdAt } = row
 
                   return (
@@ -125,6 +153,8 @@ export default function UsersList() {
             </TableBody>
           </Table>
         </TableContainer>
+        <Divider />
+        <PaginationTableCustom tableItems={usersList} />
       </Card>
     </PageContainer>
   )

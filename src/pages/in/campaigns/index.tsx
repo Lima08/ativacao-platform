@@ -13,6 +13,7 @@ import {
   Avatar,
   Card,
   Chip,
+  Divider,
   IconButton,
   MenuItem,
   Popover,
@@ -30,6 +31,8 @@ import useMainStore from 'store/useMainStore'
 
 import Modal from 'components/MediaViewer'
 import PageContainer from 'components/PageContainer'
+import PaginationTableCustom from 'components/TableCustom/PaginationTableCustom'
+import SearchTableCustom from 'components/TableCustom/SearchTableCustom'
 import TableHeadCustom from 'components/TableCustom/TableHeadCustom'
 
 import { formatDate } from '../../../../utils'
@@ -76,10 +79,12 @@ export default function CampaignsList() {
   const [campaignsListAdapted, setCampaignsListAdapted] = useState<DataList[]>(
     []
   )
-  const [loading, error, setToaster] = useGlobalStore((state) => [
-    state.loading,
+  const [filteredCampaigns, setFilteredCampaigns] = useState<DataList[]>([])
+  const [error, setToaster, page, rowsPerPage] = useGlobalStore((state) => [
     state.error,
-    state.setToaster
+    state.setToaster,
+    state.page,
+    state.rowsPerPage
   ])
 
   const [isModalOpen, setOpenModal] = useState(false)
@@ -134,11 +139,6 @@ export default function CampaignsList() {
     return mediaURLs
   }
 
-  function defineCover(medias: any[]) {
-    const cover = medias.find((media) => media.type === 'image')
-    return cover?.url || null
-  }
-
   function deleteItem(id: string) {
     const userDecision = confirm('Confirmar deleção?')
 
@@ -155,9 +155,14 @@ export default function CampaignsList() {
   const initCampaignsList = useCallback(async () => {
     if (!campaignsList) return
 
-    function campaignsAdapter(campaignsList: ICampaignCreated[]) {
-      const campaignsAdapted = campaignsList.map((campaign) => {
-        return {
+    function defineCover(medias: any[]) {
+      const cover = medias.find((media) => media.type === 'image')
+      return cover?.url || null
+    }
+
+    function campaignsAdapter(list: ICampaignCreated[]) {
+      return list
+        .map((campaign) => ({
           id: campaign.id,
           name: campaign.name,
           description: campaign.description || null,
@@ -167,14 +172,24 @@ export default function CampaignsList() {
             alt: `Image ${campaign.name} `
           },
           updatedAt: campaign.updatedAt
-        }
-      })
-
-      return campaignsAdapted
+        }))
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     }
-    const campaignsAdapted = campaignsAdapter(campaignsList)
-    setCampaignsListAdapted(campaignsAdapted)
-  }, [campaignsList, setCampaignsListAdapted])
+
+    const AllCampaigns = campaignsAdapter(campaignsList)
+
+    setCampaignsListAdapted(AllCampaigns)
+    setFilteredCampaigns(AllCampaigns)
+  }, [campaignsList, setCampaignsListAdapted, page, rowsPerPage])
+
+  const searchByName = (searchQuery: string) => {
+    const filteredCampaigns = campaignsListAdapted.filter((campaign) => {
+      const campaignName = campaign.name.toLowerCase()
+      const query = searchQuery.toLowerCase()
+      return campaignName.includes(query)
+    })
+    setFilteredCampaigns(filteredCampaigns)
+  }
 
   useEffect(() => {
     initCampaignsList()
@@ -198,33 +213,18 @@ export default function CampaignsList() {
     <PageContainer pageTitle="Campanhas" pageSection="campaigns">
       <Card>
         {/* // TODO: Pensar em mobile */}
-        <TableContainer sx={{ minWidth: 600 }}>
+        <TableContainer sx={{ maxHeight: '68vh' }}>
+          <SearchTableCustom onSearch={searchByName} />
           <Table>
             <TableHeadCustom headLabel={TABLE_HEAD} />
             <TableBody>
-              {!loading && !campaignsListAdapted.length && (
-                <TableCell
-                  align="center"
-                  sx={{ px: 1 }}
-                  component="th"
-                  scope="row"
-                >
-                  <p className="flex items-center justify-center mt-5 bg-white h-12 w-full border rounded">
-                    Nenhum Campanha encontrada
-                  </p>
-                </TableCell>
-              )}
-              {campaignsListAdapted &&
-                campaignsListAdapted.map((row: any) => {
+              {filteredCampaigns &&
+                filteredCampaigns.map((row: any) => {
                   const { id, img, name, active, updatedAt } = row
+
                   return (
                     <TableRow hover key={id} tabIndex={-1} role="checkbox">
-                      <TableCell
-                        align="center"
-                        sx={{ px: 1 }}
-                        component="th"
-                        scope="row"
-                      >
+                      <TableCell align="center" component="th" scope="row">
                         {img.source && (
                           <Stack alignItems="center" justifyContent="center">
                             <Avatar
@@ -239,14 +239,17 @@ export default function CampaignsList() {
                         )}
                         {!img.source && <CampaignIcon fontSize="large" />}
                       </TableCell>
+
                       <TableCell align="left">
                         <Stack direction="row" alignItems="center">
                           <Typography variant="subtitle2">{name}</Typography>
                         </Stack>
                       </TableCell>
+
                       <TableCell align="left">
                         {formatDate(updatedAt)}
                       </TableCell>
+
                       <TableCell align="left">
                         <Chip
                           label={active ? 'Ativo' : 'Desativo'}
@@ -254,6 +257,7 @@ export default function CampaignsList() {
                           sx={{ width: 80 }}
                         />
                       </TableCell>
+
                       <TableCell align="left">
                         {active && (
                           <IconButton
@@ -292,6 +296,8 @@ export default function CampaignsList() {
             </TableBody>
           </Table>
         </TableContainer>
+        <Divider />
+        <PaginationTableCustom tableItems={campaignsList} />
       </Card>
 
       <Popover

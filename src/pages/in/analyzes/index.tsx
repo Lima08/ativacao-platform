@@ -12,6 +12,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import {
   Card,
   Chip,
+  Divider,
   IconButton,
   MenuItem,
   Popover,
@@ -25,11 +26,14 @@ import {
 } from '@mui/material'
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
 import { eAnalysisStatusType } from 'interfaces/entities/analysis/EAnalysisStatus'
+import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 
 import AdminAnalysisRegister from 'components/AdminAnalysisRegister'
 import ModalCustom from 'components/ModalCustom'
 import PageContainer from 'components/PageContainer'
+import PaginationTableCustom from 'components/TableCustom/PaginationTableCustom'
+import SearchTableCustom from 'components/TableCustom/SearchTableCustom'
 import TableHeadCustom from 'components/TableCustom/TableHeadCustom'
 import UserAnalysisRegister from 'components/UserAnalysisRegister'
 
@@ -76,10 +80,15 @@ export default function AnalyzesTable() {
     { id: 'actions', label: 'Ações', align: 'right' }
   ]
 
+  const [page, rowsPerPage] = useGlobalStore((state) => [
+    state.page,
+    state.rowsPerPage
+  ])
   const [analyzesList, getAllAnalyzes, deleteAnalysis] = useMainStore(
     (state) => [state.analyzesList, state.getAllAnalyzes, state.deleteAnalysis]
   )
 
+  const [filteredAnalyzes, setFilteredAnalyzes] = useState<any[]>([])
   const [analyzesListAdapted, setAnalyzesListAdapted] = useState<any>([])
   const [currentAnalysis, setCurrentAnalysis] = useState<{
     id: string
@@ -145,12 +154,22 @@ export default function AnalyzesTable() {
           updatedAt: analysis.createdAt
         })) || []
 
-      return result
+      return result.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     }
 
     const listAdapted = analyzesAdapter(analyzesList)
     setAnalyzesListAdapted(listAdapted)
-  }, [setAnalyzesListAdapted, analyzesList])
+    setFilteredAnalyzes(listAdapted)
+  }, [setAnalyzesListAdapted, analyzesList, page, rowsPerPage])
+
+  const searchByTitle = (searchQuery: string) => {
+    const filteredAnalyzes = analyzesListAdapted.filter((analysis: any) => {
+      const analysisTitle = analysis.title.toLowerCase()
+      const query = searchQuery.toLowerCase()
+      return analysisTitle.includes(query)
+    })
+    setFilteredAnalyzes(filteredAnalyzes)
+  }
 
   useEffect(() => {
     getAllAnalyzes()
@@ -168,12 +187,14 @@ export default function AnalyzesTable() {
     >
       <Card>
         {/* // TODO: Pensar em mobile */}
-        <TableContainer sx={{ minWidth: 600 }}>
+        <TableContainer sx={{ maxHeight: '68vh' }}>
+          <SearchTableCustom onSearch={searchByTitle} />
+
           <Table>
             <TableHeadCustom headLabel={TABLE_HEAD} />
             <TableBody>
-              {analyzesListAdapted &&
-                analyzesListAdapted.map((row: any) => {
+              {filteredAnalyzes &&
+                filteredAnalyzes.map((row: any) => {
                   const { id, title, message, biUrl, status, updatedAt } = row
 
                   return (
@@ -242,6 +263,8 @@ export default function AnalyzesTable() {
             </TableBody>
           </Table>
         </TableContainer>
+        <Divider />
+        <PaginationTableCustom tableItems={analyzesList} />
       </Card>
 
       <Popover

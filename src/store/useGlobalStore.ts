@@ -11,10 +11,14 @@ export interface IGlobalStore {
   loading: boolean
   error: any
   toaster: IToaster
+  page: number
+  rowsPerPage: number
   setToaster: (toaster: IToaster) => void
   setLoading: (isLoading: boolean) => void
   setError: (error: any) => void
   setTransferData: (transferData: any) => void
+  setPage: (page: number) => void
+  setRowsPerPage: (rows: number) => void
 }
 
 const useGlobalStore = create<IGlobalStore>((set) => ({
@@ -27,11 +31,15 @@ const useGlobalStore = create<IGlobalStore>((set) => ({
     type: 'success',
     duration: 5000
   },
+  page: 1,
+  rowsPerPage: 5,
   setToaster: (toaster) => set((state) => ({ ...state, toaster: toaster })),
   setLoading: (isLoading) => set((state) => ({ ...state, loading: isLoading })),
   setError: (error) => set((state) => ({ ...state, error: error })),
   setTransferData: (transferData) =>
-    set((state) => ({ ...state, transferData }))
+    set((state) => ({ ...state, transferData })),
+  setPage: (page) => set((state) => ({ ...state, page })),
+  setRowsPerPage: (rows) => set((state) => ({ ...state, rowsPerPage: rows }))
 }))
 
 export default useGlobalStore

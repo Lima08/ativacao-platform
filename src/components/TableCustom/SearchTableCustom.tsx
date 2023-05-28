@@ -18,8 +18,8 @@ export default function SearchTableCustom({ onSearch }: SearchProps) {
   }
 
   return (
-    <Box display="flex" alignItems="baseline" p={1}>
-      <div className="mx-1">
+    <Box display="flex" alignItems="baseline">
+      <div className="mx-2">
         <SearchIcon />
       </div>
       <TextField

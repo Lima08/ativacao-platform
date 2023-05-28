@@ -14,6 +14,7 @@ import {
   Avatar,
   Card,
   Chip,
+  Divider,
   IconButton,
   MenuItem,
   Popover,
@@ -31,6 +32,8 @@ import useMainStore from 'store/useMainStore'
 
 import Modal from 'components/MediaViewer'
 import PageContainer from 'components/PageContainer'
+import PaginationTableCustom from 'components/TableCustom/PaginationTableCustom'
+import SearchTableCustom from 'components/TableCustom/SearchTableCustom'
 import TableHeadCustom from 'components/TableCustom/TableHeadCustom'
 
 import { formatDate } from '../../../../utils'
@@ -73,13 +76,18 @@ export default function TrainingsPage() {
     id: string
     active: boolean
   } | null>(null)
+
+  const [filteredTrainings, setFilteredTrainings] = useState<DataList[]>([])
   const [trainingListAdapted, setTrainingListAdapted] = useState<DataList[]>([])
-  const [error, setToaster] = useGlobalStore((state) => [
+  const [error, setToaster, page, rowsPerPage] = useGlobalStore((state) => [
     state.error,
-    state.setToaster
+    state.setToaster,
+    state.page,
+    state.rowsPerPage
   ])
 
   const [isModalOpen, setOpenModal] = useState(false)
+
   const [training, setTraining] = useState<{
     title: string
     active: boolean
@@ -133,11 +141,6 @@ export default function TrainingsPage() {
     return mediaURLs
   }
 
-  function defineCover(medias: any[]) {
-    const cover = medias.find((media) => media.type === 'image')
-    return cover?.url || null
-  }
-
   function deleteItem(id: string) {
     const userDecision = confirm('Confirmar deleção?')
 
@@ -154,9 +157,14 @@ export default function TrainingsPage() {
   const initTrainingsList = useCallback(async () => {
     if (!trainingsList || trainingsList.length === 0) return
 
+    function defineCover(medias: any[]) {
+      const cover = medias.find((media) => media.type === 'image')
+      return cover?.url || null
+    }
+
     function trainingsAdapter(trainingList: ITrainingCreated[]) {
-      const trainingsAdapted = trainingList.map((training) => {
-        return {
+      return trainingList
+        .map((training) => ({
           id: training.id,
           name: training.name,
           description: training.description || null,
@@ -166,13 +174,24 @@ export default function TrainingsPage() {
             alt: `Image ${training.name} `
           },
           updatedAt: training.updatedAt
-        }
-      })
-      return trainingsAdapted
+        }))
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     }
+
     const trainingAdapted = trainingsAdapter(trainingsList)
     setTrainingListAdapted(trainingAdapted)
-  }, [setTrainingListAdapted, trainingsList])
+    setFilteredTrainings(trainingAdapted)
+  }, [setTrainingListAdapted, trainingsList, page, rowsPerPage])
+
+  const searchByName = (searchQuery: string) => {
+    const filteredTrainings = trainingListAdapted.filter((training) => {
+      const trainingName = training.name.toLowerCase()
+      const query = searchQuery.toLowerCase()
+      return trainingName.includes(query)
+    })
+
+    setFilteredTrainings(filteredTrainings)
+  }
 
   useEffect(() => {
     if (trainingsList.length > 0) return
@@ -197,13 +216,16 @@ export default function TrainingsPage() {
     <PageContainer pageTitle="Treinamentos" pageSection="trainings">
       <Card>
         {/* // TODO: Pensar em mobile */}
-        <TableContainer sx={{ minWidth: 600 }}>
+        <TableContainer sx={{ maxHeight: '68vh' }}>
+          <SearchTableCustom onSearch={searchByName} />
+
           <Table>
             <TableHeadCustom headLabel={TABLE_HEAD} />
             <TableBody>
-              {trainingListAdapted &&
-                trainingListAdapted.map((row: any) => {
+              {filteredTrainings &&
+                filteredTrainings.map((row: any) => {
                   const { id, img, name, active, updatedAt } = row
+
                   return (
                     <TableRow hover key={id} tabIndex={-1} role="checkbox">
                       <TableCell
@@ -279,6 +301,9 @@ export default function TrainingsPage() {
             </TableBody>
           </Table>
         </TableContainer>
+
+        <Divider />
+        <PaginationTableCustom tableItems={trainingsList} />
       </Card>
 
       <Popover
