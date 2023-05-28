@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-// import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import {
   Avatar,
@@ -116,7 +115,6 @@ export default function UsersList() {
                         <TableCell align="left">
                           {formatDate(createdAt)}
                         </TableCell>
-                        {/* TODO: Ajustar esse btn */}
 
                         <TableCell align="right">
                           <IconButton
@@ -126,9 +124,6 @@ export default function UsersList() {
                           >
                             <EditIcon />
                           </IconButton>
-                          {/* <IconButton aria-label="delete" size="large">
-                            <DeleteIcon />
-                          </IconButton> */}
                         </TableCell>
                       </TableRow>
                     )

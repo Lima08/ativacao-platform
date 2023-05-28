@@ -1,8 +1,8 @@
-import { EAnalysisStatusType } from './EAnalysisStatus'
+import { eAnalysisStatusType } from './EAnalysisStatus'
 
-export interface IAnalysisFilter  {
+export interface IAnalysisFilter {
   userId?: string
-  status?: EAnalysisStatusType
+  status?: eAnalysisStatusType
   companyId?: string
   id?: string
 }

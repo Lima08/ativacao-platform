@@ -3,7 +3,7 @@ import {
   IAnalysisCreated,
   IAnalysisModifier
 } from 'interfaces/entities/analysis'
-import { EAnalysisStatusType } from 'interfaces/entities/analysis/EAnalysisStatus'
+import { eAnalysisStatusType } from 'interfaces/entities/analysis/EAnalysisStatus'
 
 import { ApiResponse } from '../../../types'
 
@@ -48,7 +48,7 @@ const AnalysisService = (
   },
   done: async (id, { biUrl, message }) => {
     const response = await httpClient.put(`/api/analyzes/${id}`, {
-      status: EAnalysisStatusType.done,
+      status: eAnalysisStatusType.done,
       message,
       biUrl
     })
@@ -56,7 +56,7 @@ const AnalysisService = (
   },
   reject: async (id, message) => {
     const response = await httpClient.put(`/api/analyzes/${id}`, {
-      status: EAnalysisStatusType.rejected,
+      status: eAnalysisStatusType.rejected,
       message
     })
     return response.data

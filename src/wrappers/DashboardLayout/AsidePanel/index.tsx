@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-import { Box, List } from '@mui/material'
+import { Box, Divider, List } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
 import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
@@ -30,11 +30,21 @@ function AsidePanel() {
         <Box
           component="img"
           src={company?.imageUrl ? company.imageUrl : '/logo-ativacao.png'}
-          sx={{ mt: 2, width: '156px', height: 'auto' }}
+          sx={{
+            mt: 1,
+            mx: 'auto',
+            px: 1,
+            py: 1,
+            width: '100%',
+            height: 'auto',
+            maxWidth: '160px',
+            alignSelf: 'center'
+          }}
           alt="Ativacao Logo"
         />
       </Link>
       <div className="flex flex-col mt-4">
+        <Divider />
         <List>
           {/* <AsidePanelItem title="Home" linkSrc="/in" icon={homeIcon} /> */}
           <AsidePanelItem

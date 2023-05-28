@@ -102,12 +102,14 @@ function CompanySettings({
             label="Nome da Empresa"
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
+            sx={{ width: '100%', mt: 2 }}
           />
           <Box
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              mt: 1
             }}
           >
             {!imageUrl && <Uploader uploadFile={uploadFile} />}
@@ -124,7 +126,11 @@ function CompanySettings({
               </div>
             )}
           </Box>
-          <Button variant="outlined" onClick={handleSaveConfiguration}>
+          <Button
+            variant="outlined"
+            onClick={handleSaveConfiguration}
+            sx={{ width: '100%', mt: 2 }}
+          >
             Salvar
           </Button>
         </div>

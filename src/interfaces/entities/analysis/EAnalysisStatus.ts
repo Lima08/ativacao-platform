@@ -1,4 +1,4 @@
-export enum EAnalysisStatusType {
+export enum eAnalysisStatusType {
   pending = 'pending',
   rejected = 'rejected',
   done = 'done'
