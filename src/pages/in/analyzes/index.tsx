@@ -4,12 +4,17 @@ import { useCallback, useEffect, useState } from 'react'
 
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
+import MoreVertSharpIcon from '@mui/icons-material/MoreVertSharp'
+import SmsIcon from '@mui/icons-material/Sms'
+import SpeakerNotesOffIcon from '@mui/icons-material/SpeakerNotesOff'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import {
   Card,
   Chip,
   IconButton,
+  MenuItem,
+  Popover,
   Stack,
   Table,
   TableBody,
@@ -20,14 +25,12 @@ import {
 } from '@mui/material'
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
 import { eAnalysisStatusType } from 'interfaces/entities/analysis/EAnalysisStatus'
-import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
 import AdminAnalysisRegister from 'components/AdminAnalysisRegister'
-import CustomModal from 'components/CustomModal'
+import ModalCustom from 'components/ModalCustom'
 import PageContainer from 'components/PageContainer'
-import SearchPrevNext from 'components/SearchPrevNext'
 import TableHeadCustom from 'components/TableCustom/TableHeadCustom'
 import UserAnalysisRegister from 'components/UserAnalysisRegister'
 
@@ -70,19 +73,22 @@ export default function AnalyzesTable() {
     { id: 'title', label: 'Título', alignRight: false },
     { id: 'updatedAt', label: 'Atualizado em', alignRight: false },
     { id: 'bi', label: 'Ver análise', alignRight: false },
+    { id: 'message', label: 'Ver mensagem', alignRight: false },
     { id: 'actions', label: 'Ações', alignRight: true }
   ]
-
-  const [loading] = useGlobalStore((state) => [state.loading])
 
   const [analyzesList, getAllAnalyzes, deleteAnalysis] = useMainStore(
     (state) => [state.analyzesList, state.getAllAnalyzes, state.deleteAnalysis]
   )
 
   const [analyzesListAdapted, setAnalyzesListAdapted] = useState<any>([])
-  const [analysisId, setAnalysisId] = useState('')
+  const [currentAnalysis, setCurrentAnalysis] = useState<{
+    id: string
+    title: string
+  } | null>(null)
   const [openUser, setOpenUser] = useState(false)
   const [openAdmin, setOpenAdmin] = useState(false)
+  const [openOptions, setOpenOptions] = useState<any>(null)
 
   const analysisStatusAdapter = (
     status: eAnalysisStatusType
@@ -96,16 +102,31 @@ export default function AnalyzesTable() {
     return statusMappers[status]
   }
 
-  const handleEdit = async (id: string) => {
-    setOpenAdmin(true)
-    // router.push(`/in/users/${id}`)
+  const openCreateAnalysisModal = async () => {
+    setOpenUser(true)
+    setOpenOptions(null)
   }
 
-  function deleteItem(id: string) {
-    const userDecision = confirm('Confirmar deleção?')
+  const openAdminAnalysisModal = async () => {
+    setOpenAdmin(true)
+    setOpenOptions(null)
+  }
 
-    if (userDecision) {
-      deleteAnalysis(id)
+  const openMenu = (event: any, analysis: { id: string; title: string }) => {
+    setOpenOptions(event.currentTarget)
+    setCurrentAnalysis(analysis)
+  }
+
+  const closeMenu = () => {
+    setOpenOptions(null)
+    setCurrentAnalysis(null)
+  }
+
+  function deleteItem() {
+    const userDecision = confirm('Deseja realmente deletar a análise?')
+
+    if (userDecision && currentAnalysis) {
+      deleteAnalysis(currentAnalysis.id)
     }
   }
 
@@ -145,138 +166,137 @@ export default function AnalyzesTable() {
       <PageContainer
         pageTitle="Análises"
         pageSection="analyzes"
-        customCallback={() => setOpenUser(true)}
+        customCallback={() => openCreateAnalysisModal()}
       >
-        <SearchPrevNext />
-        {/* {loading && <p>Carregando...</p>} */}
-        <ul className="list-none mt-8 w-12/12">
-          {!loading && !analyzesList.length && (
-            <li className="flex items-center justify-center mt-5 bg-white h-12 w-full border rounded">
-              Nenhuma analise encontrada
-            </li>
-          )}
-          {/* {!!analyzesListAdapted?.length &&
-            analyzesListAdapted.map((analysis: AnalyzesObject) => (
-              <li
-                key={analysis.id}
-                className="flex md:gap-10 hover:bg-slate-100 bg-white w-full border rounded max-h-18"
-              >
-                <ListAnalyzesItem
-                  data={analysis}
-                  onDelete={deleteItem}
-                  editAnalysis={openAdmin}
-                  setEditAnalysis={setOpenAdmin}
-                  setAnalysisId={setAnalysisId}
-                />
-              </li>
-            ))} */}
+        <Card>
+          {/* // TODO: Pensar em mobile */}
+          <TableContainer sx={{ minWidth: 600 }}>
+            <Table>
+              <TableHeadCustom headLabel={TABLE_HEAD} />
+              <TableBody>
+                {analyzesListAdapted &&
+                  analyzesListAdapted.map((row: any) => {
+                    const { id, title, message, biUrl, status, updatedAt } = row
 
-          <Card>
-            {/* // TODO: Pensar em mobile */}
-            <TableContainer sx={{ minWidth: 600 }}>
-              <Table>
-                <TableHeadCustom headLabel={TABLE_HEAD} />
-                <TableBody>
-                  {analyzesListAdapted &&
-                    analyzesListAdapted.map((row: any) => {
-                      const {
-                        id,
-                        title,
-                        message,
-                        bucketUrl,
-                        biUrl,
-                        status,
-                        updatedAt
-                      } = row
-
-                      return (
-                        <TableRow hover key={id} tabIndex={-1} role="checkbox">
-                          <TableCell
-                            align="left"
-                            sx={{ px: 1 }}
-                            component="th"
-                            scope="row"
-                          >
-                            <Chip label={status.label} color={status.color} />
-                          </TableCell>
-                          <TableCell align="left">
-                            <Stack direction="row" alignItems="center">
-                              <Typography variant="subtitle2">
-                                {title}
-                              </Typography>
-                            </Stack>
-                          </TableCell>
-                          <TableCell align="left">
-                            {formatDate(updatedAt)}
-                          </TableCell>
-                          <TableCell align="left">
-                            {biUrl && (
-                              <Link href={`${biUrl}`} target="_blank">
-                                <IconButton aria-label="bi" size="large">
-                                  <VisibilityIcon />
-                                </IconButton>
-                              </Link>
-                            )}
-
-                            {!biUrl && (
-                              <IconButton aria-label="bi" size="large" disabled>
-                                <VisibilityOffIcon />
+                    return (
+                      <TableRow hover key={id} tabIndex={-1} role="checkbox">
+                        <TableCell
+                          align="left"
+                          sx={{ px: 1 }}
+                          component="th"
+                          scope="row"
+                        >
+                          <Chip label={status.label} color={status.color} />
+                        </TableCell>
+                        <TableCell align="left">
+                          <Stack direction="row" alignItems="center">
+                            <Typography variant="subtitle2">{title}</Typography>
+                          </Stack>
+                        </TableCell>
+                        <TableCell align="left">
+                          {formatDate(updatedAt)}
+                        </TableCell>
+                        <TableCell align="left">
+                          {biUrl && (
+                            <Link href={`${biUrl}`} target="_blank">
+                              <IconButton aria-label="bi" size="large">
+                                <VisibilityIcon />
                               </IconButton>
-                            )}
-                          </TableCell>
+                            </Link>
+                          )}
 
-                          <TableCell align="right">
-                            <IconButton
-                              aria-label="edit"
-                              size="large"
-                              onClick={() => handleEdit(id)}
-                            >
-                              <EditIcon />
+                          {!biUrl && (
+                            <IconButton aria-label="bi" size="large" disabled>
+                              <VisibilityOffIcon />
                             </IconButton>
-                            <IconButton
-                              aria-label="delete"
-                              size="large"
-                              onClick={() => deleteItem(id)}
-                            >
-                              <DeleteIcon />
+                          )}
+                        </TableCell>
+                        <TableCell align="left">
+                          {message && message.length > 1 && (
+                            <IconButton aria-label="message" size="large">
+                              <SmsIcon />
                             </IconButton>
-                          </TableCell>
-                          {/* ver detalhes - deletar - editar? -  */}
-                        </TableRow>
-                      )
-                    })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Card>
+                          )}
 
-          {/* --------------------------------------------------- */}
-          {openUser && (
-            <CustomModal
-              size="w-[400px] h-[400px]"
-              open={openUser}
-              setOpen={setOpenUser}
-            >
-              {openUser && <UserAnalysisRegister setClose={setOpenUser} />}
-            </CustomModal>
-          )}
-          {openAdmin && (
-            <CustomModal
-              size="w-[400px] h-[400px]"
-              open={openAdmin}
-              setOpen={setOpenAdmin}
-            >
-              {openAdmin && (
-                <AdminAnalysisRegister
-                  analysis={analyzesListAdapted.find(
-                    (el: AnalyzesObject) => el.id === analysisId
-                  )}
-                  setClose={setOpenAdmin}
-                />
+                          {!message && (
+                            <IconButton
+                              aria-label="message"
+                              size="large"
+                              disabled
+                            >
+                              <SpeakerNotesOffIcon />
+                            </IconButton>
+                          )}
+                        </TableCell>
+
+                        <TableCell align="right">
+                          <IconButton
+                            size="large"
+                            color="inherit"
+                            onClick={(event) => openMenu(event, { id, title })}
+                          >
+                            <MoreVertSharpIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Card>
+
+        <Popover
+          open={Boolean(openOptions)}
+          anchorEl={openOptions}
+          onClose={() => closeMenu()}
+          anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          PaperProps={{
+            sx: {
+              p: 1,
+              width: 150,
+              '& .MuiMenuItem-root': {
+                px: 1,
+                typography: 'body2',
+                borderRadius: 0.75
+              }
+            }
+          }}
+        >
+          <MenuItem onClick={() => openAdminAnalysisModal()}>
+            <IconButton aria-label="edit">
+              <EditIcon />
+            </IconButton>
+            Analisar
+          </MenuItem>
+          <MenuItem sx={{ color: 'error.main' }} onClick={() => deleteItem()}>
+            <IconButton aria-label="delete" sx={{ color: 'error.main' }}>
+              <DeleteIcon />
+            </IconButton>
+            Deletar
+          </MenuItem>
+        </Popover>
+
+        {openUser && (
+          <ModalCustom closeModal={() => setOpenUser(false)}>
+            <UserAnalysisRegister closeModal={() => setOpenUser(false)} />
+          </ModalCustom>
+        )}
+
+        {openAdmin && (
+          <ModalCustom
+            title={currentAnalysis?.title}
+            closeModal={() => setOpenAdmin(false)}
+          >
+            <AdminAnalysisRegister
+              analysis={analyzesListAdapted.find(
+                (el: AnalyzesObject) => el.id === currentAnalysis?.id
               )}
-            </CustomModal>
-          )}
-        </ul>
+              closeModal={() => setOpenAdmin(false)}
+            />
+          </ModalCustom>
+        )}
       </PageContainer>
     </DashboardLayout>
   )

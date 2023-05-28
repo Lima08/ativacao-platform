@@ -9,33 +9,19 @@ import useMainStore from 'store/useMainStore'
 
 import FormCustom from '../../components/FormCustom'
 
-type AnalysisMediaResponseType = {
-  // type: string
-  // key: string
-  url: string
-  // bucket: string
-  // name: string
-}
-
 type UserAnalysisRegisterProps = {
-  setClose: Dispatch<SetStateAction<boolean>>
+  closeModal: Dispatch<SetStateAction<boolean>>
 }
 
 export default function UserAnalysisRegister({
-  setClose
+  closeModal
 }: UserAnalysisRegisterProps) {
-  const router = useRouter()
-
-  const [loading, setLoading, setToaster] = useGlobalStore((state) => [
-    state.loading,
+  const [setLoading, setToaster] = useGlobalStore((state) => [
     state.setLoading,
     state.setToaster
   ])
 
-  const [createAnalysis, deleteAnalysis] = useMainStore((state) => [
-    state.createAnalysis,
-    state.deleteAnalysis
-  ])
+  const [createAnalysis] = useMainStore((state) => [state.createAnalysis])
 
   const [analysisTitle, setAnalysisTitle] = useState('')
   const [analysisFile, setAnalysisFile] = useState(null)
@@ -56,8 +42,6 @@ export default function UserAnalysisRegister({
     }
 
     const formData = new FormData()
-    // formData.append('files', files)
-
     for (const file of files) {
       formData.append('files', file)
     }
@@ -65,10 +49,8 @@ export default function UserAnalysisRegister({
     try {
       setLoading(true)
       setLocalLoading(true)
-      // TODO: passar pra zustand
 
       const { data, error } = await httpServices.upload.save(formData)
-
       if (!!error || !data || !data.url) {
         setToaster({
           isOpen: true,
@@ -123,9 +105,7 @@ export default function UserAnalysisRegister({
       type: 'success'
     })
     setLocalLoading(false)
-    setClose(false)
-    // router.push('/in/analyzes')
-    // resetState()
+    closeModal(false)
   }
 
   return (
@@ -195,16 +175,7 @@ export default function UserAnalysisRegister({
           <div className="py-2 mt-4 mb-2 w-full flex gap-4 items-baseline justify-center">
             {localLoading && <CircularIndeterminate />}
             <button
-              // onClick={() => {
-              // }}
-              className={
-                `flex items-center justify-center w-1/2 px-5 py-3 text-gray-700 capitalize transition-colors duration-200 bg-white border border-grey-500 hover:bg-gray-600 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`
-                // ${
-                //   data.status === 'pending'
-                //     ? 'pointer-events-none border-gray-200 op-50'
-                //     : ''
-                // }`
-              }
+              className={`flex items-center justify-center w-1/2 px-5 py-3 text-gray-700 capitalize transition-colors duration-200 bg-white border border-grey-500 hover:bg-gray-600 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`}
             >
               Enviar
             </button>

@@ -1,12 +1,10 @@
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-import { Box, Divider, List } from '@mui/material'
+import { Box, List } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
 import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
 import fourSquares from '../../../../images/icons/fourSquares'
-// import homeIcon from '../../../images/icons/homeIcon'
 import inboxIcon from '../../../../images/icons/inboxIcon'
 import megaphoneIcon from '../../../../images/icons/megaphoneIcon'
 import pizzaGraph from '../../../../images/icons/pizzaGraph'
@@ -16,35 +14,50 @@ function AsidePanel() {
   const { user, company } = useAuthStore((state) => state) as IAuthStore
 
   const [isAdmin, setIsAdmin] = useState(false)
+  const [logoSrl, setLogoSrl] = useState('/logo-ativacao.png')
 
   useEffect(() => {
     if (!user) return
     setIsAdmin(user.role >= ROLES.COMPANY_ADMIN)
   }, [user])
+
+  useEffect(() => {
+    if (!company || !company.imageUrl) return
+    setLogoSrl(company?.imageUrl)
+  }, [company])
+
   return (
     <aside
       className="h-full flex flex-col border-gray-200 bg-white px-2 "
       aria-label="Sidebar"
     >
-      <Link href="/in/campaigns">
-        <Box
-          component="img"
-          src={company?.imageUrl ? company.imageUrl : '/logo-ativacao.png'}
-          sx={{
-            mt: 1,
-            mx: 'auto',
-            px: 1,
-            py: 1,
-            width: '100%',
-            height: 'auto',
-            maxWidth: '160px',
-            alignSelf: 'center'
+      <Box
+        component="div"
+        sx={{
+          mt: 1,
+          ml: 0,
+          px: 1,
+          py: 1,
+          width: '100%',
+          height: 'auto',
+          maxHeight: '80px',
+          display: 'flex',
+          justifyContent: 'start',
+          alignItems: 'center'
+        }}
+      >
+        <img
+          src={logoSrl}
+          alt="Lodo da empresa"
+          style={{
+            maxWidth: '100%',
+            maxHeight: '100%',
+            objectFit: 'contain',
+            objectPosition: 'center'
           }}
-          alt="Ativacao Logo"
         />
-      </Link>
+      </Box>
       <div className="flex flex-col mt-4">
-        <Divider />
         <List>
           {/* <AsidePanelItem title="Home" linkSrc="/in" icon={homeIcon} /> */}
           <AsidePanelItem
