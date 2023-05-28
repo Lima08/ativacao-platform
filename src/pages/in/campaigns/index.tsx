@@ -27,7 +27,6 @@ import {
 import type { ICampaignCreated } from 'interfaces/entities/campaign'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
-import DashboardLayout from 'wrappers/DashboardLayout'
 
 import Modal from 'components/MediaViewer'
 import PageContainer from 'components/PageContainer'
@@ -57,12 +56,8 @@ export default function CampaignsList() {
     { id: 'see', label: 'Ver campanha', align: 'left' },
     { id: 'actions', label: 'Ações', align: 'right' }
   ]
-  const router = useRouter()
 
-  const [error, setToaster] = useGlobalStore((state) => [
-    state.error,
-    state.setToaster
-  ])
+  const router = useRouter()
   const [campaignsList, getAllCampaigns, handleCampaignActive, deleteCampaign] =
     useMainStore((state) => [
       state.campaignsList,
@@ -81,6 +76,12 @@ export default function CampaignsList() {
   const [campaignsListAdapted, setCampaignsListAdapted] = useState<DataList[]>(
     []
   )
+  const [loading, error, setToaster] = useGlobalStore((state) => [
+    state.loading,
+    state.error,
+    state.setToaster
+  ])
+
   const [isModalOpen, setOpenModal] = useState(false)
   const [campaign, setCampaign] = useState<{
     title: string
@@ -138,24 +139,6 @@ export default function CampaignsList() {
     return cover?.url || null
   }
 
-  function campaignsAdapter(campaignsList: ICampaignCreated[]) {
-    const campaignsAdapted = campaignsList.map((campaign) => {
-      return {
-        id: campaign.id,
-        name: campaign.name,
-        description: campaign.description || null,
-        active: campaign.active,
-        img: {
-          source: defineCover(campaign?.medias),
-          alt: `Image ${campaign.name} `
-        },
-        updatedAt: campaign.updatedAt
-      }
-    })
-
-    return campaignsAdapted
-  }
-
   function deleteItem(id: string) {
     const userDecision = confirm('Confirmar deleção?')
 
@@ -169,6 +152,38 @@ export default function CampaignsList() {
     setAnchorEl(null)
   }
 
+  const initCampaignsList = useCallback(async () => {
+    if (!campaignsList) return
+
+    function campaignsAdapter(campaignsList: ICampaignCreated[]) {
+      const campaignsAdapted = campaignsList.map((campaign) => {
+        return {
+          id: campaign.id,
+          name: campaign.name,
+          description: campaign.description || null,
+          active: campaign.active,
+          img: {
+            source: defineCover(campaign?.medias),
+            alt: `Image ${campaign.name} `
+          },
+          updatedAt: campaign.updatedAt
+        }
+      })
+
+      return campaignsAdapted
+    }
+    const campaignsAdapted = campaignsAdapter(campaignsList)
+    setCampaignsListAdapted(campaignsAdapted)
+  }, [campaignsList, setCampaignsListAdapted])
+
+  useEffect(() => {
+    initCampaignsList()
+  }, [initCampaignsList])
+
+  useEffect(() => {
+    getAllCampaigns()
+  }, [getAllCampaigns])
+
   useEffect(() => {
     if (!error) return
     setToaster({
@@ -179,178 +194,168 @@ export default function CampaignsList() {
     })
   }, [error, setToaster])
 
-  const initCampaignsList = useCallback(async () => {
-    if (!campaignsList) return
-
-    const campaignsAdapted = campaignsAdapter(campaignsList)
-    setCampaignsListAdapted(campaignsAdapted)
-  }, [campaignsList, setCampaignsListAdapted, campaignsAdapter])
-  useEffect(() => {
-    initCampaignsList()
-  }, [initCampaignsList])
-
-  useEffect(() => {
-    getAllCampaigns()
-  }, [getAllCampaigns])
-
   return (
-    <DashboardLayout>
-      <PageContainer pageTitle="Campanhas" pageSection="campaigns">
-        <Card>
-          {/* // TODO: Pensar em mobile */}
-          <TableContainer sx={{ minWidth: 600 }}>
-            <Table>
-              <TableHeadCustom headLabel={TABLE_HEAD} />
-              <TableBody>
-                {campaignsListAdapted &&
-                  campaignsListAdapted.map((row: any) => {
-                    const { id, img, name, active, updatedAt } = row
-
-                    return (
-                      <TableRow hover key={id} tabIndex={-1} role="checkbox">
-                        <TableCell
-                          align="center"
-                          sx={{ px: 1 }}
-                          component="th"
-                          scope="row"
-                        >
-                          {img.source && (
-                            <Stack alignItems="center" justifyContent="center">
-                              <Avatar
-                                variant="square"
-                                src={img.source}
-                                sx={{
-                                  width: 70,
-                                  height: 70
-                                }}
-                              />
-                            </Stack>
-                          )}
-                          {!img.source && (
-                            <Stack alignItems="center" justifyContent="center">
-                              <CampaignIcon fontSize="large" />
-                            </Stack>
-                          )}
-                        </TableCell>
-                        <TableCell align="left">
-                          <Stack direction="row" alignItems="center">
-                            <Typography variant="subtitle2">{name}</Typography>
-                          </Stack>
-                        </TableCell>
-                        <TableCell align="left">
-                          {formatDate(updatedAt)}
-                        </TableCell>
-                        <TableCell align="left">
-                          <IconButton aria-label="active" size="large">
-                            <Chip
-                              label={active ? 'Ativo' : 'Desativo'}
-                              color={active ? 'success' : 'error'}
+    <PageContainer pageTitle="Campanhas" pageSection="campaigns">
+      <Card>
+        {/* // TODO: Pensar em mobile */}
+        <TableContainer sx={{ minWidth: 600 }}>
+          <Table>
+            <TableHeadCustom headLabel={TABLE_HEAD} />
+            <TableBody>
+              {!loading && !campaignsListAdapted.length && (
+                <TableCell
+                  align="center"
+                  sx={{ px: 1 }}
+                  component="th"
+                  scope="row"
+                >
+                  <p className="flex items-center justify-center mt-5 bg-white h-12 w-full border rounded">
+                    Nenhum Campanha encontrada
+                  </p>
+                </TableCell>
+              )}
+              {campaignsListAdapted &&
+                campaignsListAdapted.map((row: any) => {
+                  const { id, img, name, active, updatedAt } = row
+                  return (
+                    <TableRow hover key={id} tabIndex={-1} role="checkbox">
+                      <TableCell
+                        align="center"
+                        sx={{ px: 1 }}
+                        component="th"
+                        scope="row"
+                      >
+                        {img.source && (
+                          <Stack alignItems="center" justifyContent="center">
+                            <Avatar
+                              variant="square"
+                              src={img.source}
+                              sx={{
+                                width: 70,
+                                height: 70
+                              }}
                             />
-                          </IconButton>
-                        </TableCell>
-                        <TableCell align="left">
-                          {active && (
-                            <IconButton
-                              aria-label="visibility"
-                              size="large"
-                              onClick={() => onClickRow(id)}
-                            >
-                              <VisibilityIcon />
-                            </IconButton>
-                          )}
-                          {!active && (
-                            <IconButton
-                              aria-label="visibility"
-                              size="large"
-                              disabled
-                            >
-                              <VisibilityOffIcon />
-                            </IconButton>
-                          )}
-                        </TableCell>
-
-                        <TableCell align="right">
+                          </Stack>
+                        )}
+                        {!img.source && <CampaignIcon fontSize="large" />}
+                      </TableCell>
+                      <TableCell align="left">
+                        <Stack direction="row" alignItems="center">
+                          <Typography variant="subtitle2">{name}</Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell align="left">
+                        {formatDate(updatedAt)}
+                      </TableCell>
+                      <TableCell align="left">
+                        <Chip
+                          label={active ? 'Ativo' : 'Desativo'}
+                          color={active ? 'success' : 'error'}
+                          sx={{ width: 80 }}
+                        />
+                      </TableCell>
+                      <TableCell align="left">
+                        {active && (
                           <IconButton
+                            aria-label="visibility"
                             size="large"
-                            color="inherit"
-                            onClick={(event) =>
-                              handleOpenMenu(event, { active, id })
-                            }
+                            onClick={() => onClickRow(id)}
                           >
-                            <MoreVertSharpIcon />
+                            <VisibilityIcon />
                           </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Card>
+                        )}
+                        {!active && (
+                          <IconButton
+                            aria-label="visibility"
+                            size="large"
+                            disabled
+                          >
+                            <VisibilityOffIcon />
+                          </IconButton>
+                        )}
+                      </TableCell>
 
-        <Popover
-          open={Boolean(openPopover)}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-          PaperProps={{
-            sx: {
-              p: 1,
-              width: 150,
-              '& .MuiMenuItem-root': {
-                px: 1,
-                typography: 'body2',
-                borderRadius: 0.75
-              }
+                      <TableCell align="right">
+                        <IconButton
+                          size="large"
+                          color="inherit"
+                          onClick={(event) =>
+                            handleOpenMenu(event, { active, id })
+                          }
+                        >
+                          <MoreVertSharpIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Card>
+
+      <Popover
+        open={Boolean(openPopover)}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        PaperProps={{
+          sx: {
+            p: 1,
+            width: 150,
+            '& .MuiMenuItem-root': {
+              px: 1,
+              typography: 'body2',
+              borderRadius: 0.75
             }
-          }}
+          }
+        }}
+      >
+        <MenuItem
+          onClick={() => currentCampaign && handleEdit(currentCampaign.id)}
         >
-          <MenuItem
-            onClick={() => currentCampaign && handleEdit(currentCampaign.id)}
-          >
-            <IconButton aria-label="edit">
-              <EditIcon />
-            </IconButton>
-            Editar
-          </MenuItem>
-          <MenuItem
-            onClick={() =>
-              currentCampaign &&
-              handleCampaignStatus(currentCampaign.id, !currentCampaign.active)
-            }
-          >
-            <IconButton aria-label="activation">
-              <ToggleOnIcon />
-            </IconButton>
-            {currentCampaign?.active ? 'Desativar' : 'Ativar'}
-          </MenuItem>
-          <MenuItem
-            sx={{ color: 'error.main' }}
-            onClick={() => currentCampaign && deleteItem(currentCampaign.id)}
-          >
-            <IconButton aria-label="delete" sx={{ color: 'error.main' }}>
-              <DeleteIcon />
-            </IconButton>
-            Deletar
-          </MenuItem>
-        </Popover>
+          <IconButton aria-label="edit">
+            <EditIcon />
+          </IconButton>
+          Editar
+        </MenuItem>
+        <MenuItem
+          onClick={() =>
+            currentCampaign &&
+            handleCampaignStatus(currentCampaign.id, !currentCampaign.active)
+          }
+        >
+          <IconButton aria-label="activation">
+            <ToggleOnIcon />
+          </IconButton>
+          {currentCampaign?.active ? 'Desativar' : 'Ativar'}
+        </MenuItem>
+        <MenuItem
+          sx={{ color: 'error.main' }}
+          onClick={() => currentCampaign && deleteItem(currentCampaign.id)}
+        >
+          <IconButton aria-label="delete" sx={{ color: 'error.main' }}>
+            <DeleteIcon />
+          </IconButton>
+          Deletar
+        </MenuItem>
+      </Popover>
 
-        {isModalOpen && (
-          <Modal
-            title={campaign.title}
-            description={campaign.description}
-            imageSource={
-              campaign.media[0].type === 'image'
-                ? campaign.media[0]
-                : 'default img src'
-            }
-            medias={campaign.media}
-            open={isModalOpen}
-            setOpen={setOpenModal}
-          />
-        )}
-      </PageContainer>
-    </DashboardLayout>
+      {isModalOpen && (
+        <Modal
+          title={campaign.title}
+          description={campaign.description}
+          imageSource={
+            campaign.media[0].type === 'image'
+              ? campaign.media[0]
+              : 'default img src'
+          }
+          medias={campaign.media}
+          open={isModalOpen}
+          setOpen={setOpenModal}
+        />
+      )}
+    </PageContainer>
   )
 }

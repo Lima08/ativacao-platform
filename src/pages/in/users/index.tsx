@@ -17,7 +17,6 @@ import {
 } from '@mui/material'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
-import DashboardLayout from 'wrappers/DashboardLayout'
 
 import PageContainer from 'components/PageContainer'
 import TableHeadCustom from 'components/TableCustom/TableHeadCustom'
@@ -67,72 +66,66 @@ export default function UsersList() {
   }, [error, setToaster, setError])
 
   return (
-    <DashboardLayout>
-      <PageContainer pageTitle="Lista de usuários" pageSection="users">
-        {loading && <div>Carregando...</div>}
-        <Card>
-          {/* // TODO: Pensar em mobile */}
-          <TableContainer sx={{ minWidth: 600 }}>
-            <Table>
-              <TableHeadCustom headLabel={TABLE_HEAD} />
-              <TableBody>
-                {usersList &&
-                  usersList.map((row: any) => {
-                    const { id, name, role, isActive, imageUrl, createdAt } =
-                      row
+    <PageContainer pageTitle="Lista de usuários" pageSection="users">
+      {loading && <div>Carregando...</div>}
+      <Card>
+        {/* // TODO: Pensar em mobile */}
+        <TableContainer sx={{ minWidth: 600 }}>
+          <Table>
+            <TableHeadCustom headLabel={TABLE_HEAD} />
+            <TableBody>
+              {usersList &&
+                usersList.map((row: any) => {
+                  const { id, name, role, isActive, imageUrl, createdAt } = row
 
-                    return (
-                      <TableRow hover key={id} tabIndex={-1} role="checkbox">
-                        <TableCell
-                          component="th"
-                          scope="row"
-                          padding="none"
-                          sx={{ px: 1 }}
+                  return (
+                    <TableRow hover key={id} tabIndex={-1} role="checkbox">
+                      <TableCell
+                        component="th"
+                        scope="row"
+                        padding="none"
+                        sx={{ px: 1 }}
+                      >
+                        <Stack direction="row" alignItems="center" spacing={2}>
+                          <Avatar alt={name} src={imageUrl} />
+                          <Typography variant="subtitle2" noWrap>
+                            {name}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+
+                      <TableCell align="left">
+                        {role > 100 ? 'Administrador' : 'Usuário'}
+                      </TableCell>
+
+                      <TableCell align="left">
+                        <Chip
+                          label={isActive ? 'ativo' : 'inativo'}
+                          color={isActive ? 'success' : 'error'}
+                          sx={{ width: 80 }}
+                        />
+                      </TableCell>
+
+                      <TableCell align="left">
+                        {formatDate(createdAt)}
+                      </TableCell>
+
+                      <TableCell align="right">
+                        <IconButton
+                          aria-label="edit"
+                          size="large"
+                          onClick={() => handleEdit(id)}
                         >
-                          <Stack
-                            direction="row"
-                            alignItems="center"
-                            spacing={2}
-                          >
-                            <Avatar alt={name} src={imageUrl} />
-                            <Typography variant="subtitle2" noWrap>
-                              {name}
-                            </Typography>
-                          </Stack>
-                        </TableCell>
-
-                        <TableCell align="left">
-                          {role > 100 ? 'Administrador' : 'Usuário'}
-                        </TableCell>
-
-                        <TableCell align="left">
-                          <Chip
-                            label={isActive ? 'ativo' : 'inativo'}
-                            color={isActive ? 'success' : 'error'}
-                          />
-                        </TableCell>
-
-                        <TableCell align="left">
-                          {formatDate(createdAt)}
-                        </TableCell>
-
-                        <TableCell align="right">
-                          <IconButton
-                            aria-label="edit"
-                            size="large"
-                            onClick={() => handleEdit(id)}
-                          >
-                            <EditIcon />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Card>
-      </PageContainer>
-    </DashboardLayout>
+                          <EditIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Card>
+    </PageContainer>
   )
 }

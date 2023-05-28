@@ -17,7 +17,6 @@ import { IUserModifier } from 'interfaces/entities/user'
 import httpServices from 'services/http'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
-import DashboardLayout from 'wrappers/DashboardLayout'
 
 import ToggleInput from 'components/ToggleInput'
 import Uploader from 'components/Uploader'
@@ -26,10 +25,7 @@ export default function RegisterUser() {
   const router = useRouter()
   const userId = router.query.id
 
-  const [loading, setToaster] = useGlobalStore((state) => [
-    state.loading,
-    state.setToaster
-  ])
+  const [setToaster] = useGlobalStore((state) => [state.setToaster])
   const [currentUser, getUserById, resetCurrentUser, updateUser] = useMainStore(
     (state) => [
       state.currentUser,
@@ -142,82 +138,80 @@ export default function RegisterUser() {
     setIsAdmin(event.target.checked)
   }
   return (
-    <DashboardLayout>
-      <Card
-        onSubmit={handleSubmit}
-        sx={{
-          maxWidth: 800,
-          margin: '0 auto',
-          p: 2
-        }}
+    <Card
+      onSubmit={handleSubmit}
+      sx={{
+        maxWidth: 800,
+        margin: '0 auto',
+        p: 2
+      }}
+    >
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ p: 2, minWidth: 500 }}
       >
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          sx={{ p: 2, minWidth: 500 }}
-        >
-          <div>
-            <Avatar
-              src={imageUrl}
-              sx={{ width: 80, height: 80, alignSelf: 'center' }}
-            />
-            {currentUser && <p className="my-2">{currentUser?.email}</p>}
-          </div>
-
-          <ToggleInput
-            toggleId={currentUser?.id || ''}
-            defaultActive={activeStatus}
-            onClickToggle={() => setActiveStatus(!activeStatus)}
+        <div>
+          <Avatar
+            src={imageUrl}
+            sx={{ width: 80, height: 80, alignSelf: 'center' }}
           />
-        </Stack>
-        <div className="flex flex-col gap-2 ">
-          <TextField
-            variant="outlined"
-            label="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <TextField
-            variant="outlined"
-            label="Nova senha"
-            type="password"
-            value={newPassWord}
-            onChange={(e) => setNewPassWord(e.target.value)}
-          />
-          <TextField
-            variant="outlined"
-            label="Confirme sua senha"
-            type="password"
-            value={confirmedPassword}
-            onChange={(e) => setConfirmedPassword(e.target.value)}
-          />
-
-          <FormControlLabel
-            control={
-              <Checkbox checked={isAdmin} onChange={handleCheckboxChange} />
-            }
-            label="Administrador"
-          />
+          {currentUser && <p className="my-2">{currentUser?.email}</p>}
         </div>
-        <Uploader uploadFile={uploadFile} multiple />
 
-        {loadingData && (
-          <div className="w-full flex justify-center align-middle px-3 py-2">
-            <CircularProgress />
-          </div>
-        )}
+        <ToggleInput
+          toggleId={currentUser?.id || ''}
+          defaultActive={activeStatus}
+          onClickToggle={() => setActiveStatus(!activeStatus)}
+        />
+      </Stack>
+      <div className="flex flex-col gap-2 ">
+        <TextField
+          variant="outlined"
+          label="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <TextField
+          variant="outlined"
+          label="Nova senha"
+          type="password"
+          value={newPassWord}
+          onChange={(e) => setNewPassWord(e.target.value)}
+        />
+        <TextField
+          variant="outlined"
+          label="Confirme sua senha"
+          type="password"
+          value={confirmedPassword}
+          onChange={(e) => setConfirmedPassword(e.target.value)}
+        />
 
-        {!loadingData && (
-          <button
-            type="submit"
-            onClick={handleSubmit}
-            className="w-full rounded-md bg-blue-600 px-3 py-2 mt-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
-            Salvar
-          </button>
-        )}
-      </Card>
-    </DashboardLayout>
+        <FormControlLabel
+          control={
+            <Checkbox checked={isAdmin} onChange={handleCheckboxChange} />
+          }
+          label="Administrador"
+        />
+      </div>
+      <Uploader uploadFile={uploadFile} multiple />
+
+      {loadingData && (
+        <div className="w-full flex justify-center align-middle px-3 py-2">
+          <CircularProgress />
+        </div>
+      )}
+
+      {!loadingData && (
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          className="w-full rounded-md bg-blue-600 px-3 py-2 mt-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        >
+          Salvar
+        </button>
+      )}
+    </Card>
   )
 }

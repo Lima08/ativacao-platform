@@ -72,14 +72,16 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
     }
   },
   updateTraining: async (id, updatedTraining) => {
+    useGlobalStore.getState().setLoading(true)
+
+    set((state) => ({
+      ...state,
+      trainingsList: state.trainingsList.map((training) =>
+        training.id === id ? { ...training, ...updatedTraining } : training
+      )
+    }))
     try {
-      const response = await httpServices.trainings.update(id, updatedTraining)
-      set((state) => ({
-        ...state,
-        trainingsList: state.trainingsList.map((c) =>
-          c.id === id ? (response.data as ITrainingCreated) : c
-        )
-      }))
+      await httpServices.trainings.update(id, updatedTraining)
     } catch (error) {
       useGlobalStore.getState().setError(error)
       return
@@ -87,17 +89,19 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  handleTrainingActive: async (id, status) => {
+  handleTrainingActive: async (id, active) => {
+    useGlobalStore.getState().setLoading(true)
+
+    set((state) => ({
+      ...state,
+      trainingsList: state.trainingsList.map((training) =>
+        training.id === id ? { ...training, active } : training
+      )
+    }))
     try {
-      const response = await httpServices.trainings.update(id, {
-        active: status
+      await httpServices.trainings.update(id, {
+        active
       })
-      set((state) => ({
-        ...state,
-        trainingsList: state.trainingsList.map((c) =>
-          c.id === id ? (response.data as ITrainingCreated) : c
-        )
-      }))
     } catch (error) {
       useGlobalStore.getState().setError(error)
       return

@@ -26,7 +26,6 @@ import {
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
 import { eAnalysisStatusType } from 'interfaces/entities/analysis/EAnalysisStatus'
 import useMainStore from 'store/useMainStore'
-import DashboardLayout from 'wrappers/DashboardLayout'
 
 import AdminAnalysisRegister from 'components/AdminAnalysisRegister'
 import ModalCustom from 'components/ModalCustom'
@@ -162,142 +161,140 @@ export default function AnalyzesTable() {
   }, [startAnalyzesList])
 
   return (
-    <DashboardLayout>
-      <PageContainer
-        pageTitle="Análises"
-        pageSection="analyzes"
-        customCallback={() => openCreateAnalysisModal()}
-      >
-        <Card>
-          {/* // TODO: Pensar em mobile */}
-          <TableContainer sx={{ minWidth: 600 }}>
-            <Table>
-              <TableHeadCustom headLabel={TABLE_HEAD} />
-              <TableBody>
-                {analyzesListAdapted &&
-                  analyzesListAdapted.map((row: any) => {
-                    const { id, title, message, biUrl, status, updatedAt } = row
+    <PageContainer
+      pageTitle="Análises"
+      pageSection="analyzes"
+      customCallback={() => openCreateAnalysisModal()}
+    >
+      <Card>
+        {/* // TODO: Pensar em mobile */}
+        <TableContainer sx={{ minWidth: 600 }}>
+          <Table>
+            <TableHeadCustom headLabel={TABLE_HEAD} />
+            <TableBody>
+              {analyzesListAdapted &&
+                analyzesListAdapted.map((row: any) => {
+                  const { id, title, message, biUrl, status, updatedAt } = row
 
-                    return (
-                      <TableRow hover key={id} tabIndex={-1} role="checkbox">
-                        <TableCell
-                          align="left"
-                          sx={{ px: 1 }}
-                          component="th"
-                          scope="row"
-                        >
-                          <Chip label={status.label} color={status.color} />
-                        </TableCell>
-                        <TableCell align="left">
-                          <Stack direction="row" alignItems="center">
-                            <Typography variant="subtitle2">{title}</Typography>
-                          </Stack>
-                        </TableCell>
-                        <TableCell align="left">
-                          {formatDate(updatedAt)}
-                        </TableCell>
-                        <TableCell align="left">
-                          {biUrl && (
-                            <Link href={`${biUrl}`} target="_blank">
-                              <IconButton aria-label="bi" size="large">
-                                <VisibilityIcon />
-                              </IconButton>
-                            </Link>
-                          )}
-
-                          {!biUrl && (
-                            <IconButton aria-label="bi" size="large" disabled>
-                              <VisibilityOffIcon />
+                  return (
+                    <TableRow hover key={id} tabIndex={-1} role="checkbox">
+                      <TableCell
+                        align="left"
+                        sx={{ px: 1 }}
+                        component="th"
+                        scope="row"
+                      >
+                        <Chip label={status.label} color={status.color} />
+                      </TableCell>
+                      <TableCell align="left">
+                        <Stack direction="row" alignItems="center">
+                          <Typography variant="subtitle2">{title}</Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell align="left">
+                        {formatDate(updatedAt)}
+                      </TableCell>
+                      <TableCell align="left">
+                        {biUrl && (
+                          <Link href={`${biUrl}`} target="_blank">
+                            <IconButton aria-label="bi" size="large">
+                              <VisibilityIcon />
                             </IconButton>
-                          )}
-                        </TableCell>
-                        <TableCell align="left">
-                          {message && message.length > 1 && (
-                            <IconButton aria-label="message" size="large">
-                              <SmsIcon />
-                            </IconButton>
-                          )}
+                          </Link>
+                        )}
 
-                          {!message && (
-                            <IconButton
-                              aria-label="message"
-                              size="large"
-                              disabled
-                            >
-                              <SpeakerNotesOffIcon />
-                            </IconButton>
-                          )}
-                        </TableCell>
-
-                        <TableCell align="right">
-                          <IconButton
-                            size="large"
-                            color="inherit"
-                            onClick={(event) => openMenu(event, { id, title })}
-                          >
-                            <MoreVertSharpIcon />
+                        {!biUrl && (
+                          <IconButton aria-label="bi" size="large" disabled>
+                            <VisibilityOffIcon />
                           </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Card>
+                        )}
+                      </TableCell>
+                      <TableCell align="left">
+                        {message && message.length > 1 && (
+                          <IconButton aria-label="message" size="large">
+                            <SmsIcon />
+                          </IconButton>
+                        )}
 
-        <Popover
-          open={Boolean(openOptions)}
-          anchorEl={openOptions}
-          onClose={() => closeMenu()}
-          anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-          PaperProps={{
-            sx: {
-              p: 1,
-              width: 150,
-              '& .MuiMenuItem-root': {
-                px: 1,
-                typography: 'body2',
-                borderRadius: 0.75
-              }
+                        {!message && (
+                          <IconButton
+                            aria-label="message"
+                            size="large"
+                            disabled
+                          >
+                            <SpeakerNotesOffIcon />
+                          </IconButton>
+                        )}
+                      </TableCell>
+
+                      <TableCell align="right">
+                        <IconButton
+                          size="large"
+                          color="inherit"
+                          onClick={(event) => openMenu(event, { id, title })}
+                        >
+                          <MoreVertSharpIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Card>
+
+      <Popover
+        open={Boolean(openOptions)}
+        anchorEl={openOptions}
+        onClose={() => closeMenu()}
+        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        PaperProps={{
+          sx: {
+            p: 1,
+            width: 150,
+            '& .MuiMenuItem-root': {
+              px: 1,
+              typography: 'body2',
+              borderRadius: 0.75
             }
-          }}
+          }
+        }}
+      >
+        <MenuItem onClick={() => openAdminAnalysisModal()}>
+          <IconButton aria-label="edit">
+            <EditIcon />
+          </IconButton>
+          Analisar
+        </MenuItem>
+        <MenuItem sx={{ color: 'error.main' }} onClick={() => deleteItem()}>
+          <IconButton aria-label="delete" sx={{ color: 'error.main' }}>
+            <DeleteIcon />
+          </IconButton>
+          Deletar
+        </MenuItem>
+      </Popover>
+
+      {openUser && (
+        <ModalCustom closeModal={() => setOpenUser(false)}>
+          <UserAnalysisRegister closeModal={() => setOpenUser(false)} />
+        </ModalCustom>
+      )}
+
+      {openAdmin && (
+        <ModalCustom
+          title={currentAnalysis?.title}
+          closeModal={() => setOpenAdmin(false)}
         >
-          <MenuItem onClick={() => openAdminAnalysisModal()}>
-            <IconButton aria-label="edit">
-              <EditIcon />
-            </IconButton>
-            Analisar
-          </MenuItem>
-          <MenuItem sx={{ color: 'error.main' }} onClick={() => deleteItem()}>
-            <IconButton aria-label="delete" sx={{ color: 'error.main' }}>
-              <DeleteIcon />
-            </IconButton>
-            Deletar
-          </MenuItem>
-        </Popover>
-
-        {openUser && (
-          <ModalCustom closeModal={() => setOpenUser(false)}>
-            <UserAnalysisRegister closeModal={() => setOpenUser(false)} />
-          </ModalCustom>
-        )}
-
-        {openAdmin && (
-          <ModalCustom
-            title={currentAnalysis?.title}
+          <AdminAnalysisRegister
+            analysis={analyzesListAdapted.find(
+              (el: AnalyzesObject) => el.id === currentAnalysis?.id
+            )}
             closeModal={() => setOpenAdmin(false)}
-          >
-            <AdminAnalysisRegister
-              analysis={analyzesListAdapted.find(
-                (el: AnalyzesObject) => el.id === currentAnalysis?.id
-              )}
-              closeModal={() => setOpenAdmin(false)}
-            />
-          </ModalCustom>
-        )}
-      </PageContainer>
-    </DashboardLayout>
+          />
+        </ModalCustom>
+      )}
+    </PageContainer>
   )
 }
