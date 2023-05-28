@@ -1,13 +1,12 @@
 import Joi from 'joi'
+import { minNameLength } from 'schemasValidation/constants'
 
-import { eUserValidation } from './eSchemaValidation'
-
-const createSchema = Joi.object({
+const createCampaignSchema = Joi.object({
   companyId: Joi.string().required(),
   userId: Joi.string().required(),
-  name: Joi.string().min(eUserValidation.minNameLength).required(),
+  name: Joi.string().min(minNameLength).required(),
   description: Joi.string().allow('', null).optional(),
   mediaIds: Joi.array().items(Joi.string()).allow(null).optional()
 })
 
-export default { createSchema }
+export default createCampaignSchema

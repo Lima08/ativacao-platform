@@ -4,7 +4,7 @@ import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
 import { ROLES } from 'constants/enums/eRoles'
 import { authCheck } from 'middlewares/authCheck'
-import training from 'schemaValidation/trainingSchema'
+import createCampaignSchema from 'schemasValidation/campaign/createCampaignSchema'
 import { createTraining } from 'useCases/trainings'
 
 async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
@@ -18,7 +18,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
     }
 
     const { name, description, mediaIds } = req.body
-    const { error } = training.createSchema.validate({
+    const { error } = createCampaignSchema.validate({
       companyId,
       userId,
       name,

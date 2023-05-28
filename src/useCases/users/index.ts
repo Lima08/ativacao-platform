@@ -14,7 +14,7 @@ import { prisma } from 'lib/prisma'
 import { User } from 'models/User'
 import path from 'path'
 import EmailService from 'services/emailService/IEmailService'
-import { getCompanyById } from 'useCases/company'
+import { getCompanyById } from 'useCases/companies'
 
 export interface IUserLoginResponse {
   id: string

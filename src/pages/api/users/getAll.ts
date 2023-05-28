@@ -11,7 +11,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
   if (req.method === REQUEST_METHODS.GET) {
     try {
       const user = await getUsers({ companyId })
-      return res.status(200).json({ data: user })
+      return res.status(HTTP_STATUS.OK).json({ data: user })
     } catch (error: any) {
       return res.status(error.code).json({ error: { message: error.message } })
     }

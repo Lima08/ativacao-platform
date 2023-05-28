@@ -5,7 +5,7 @@ import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
 import { IUserModifier } from 'interfaces/entities/user'
 import { authCheck } from 'middlewares/authCheck'
-import updateSchema from 'schemaValidation/userSchemas/updateSchema'
+import updateUserSchema from 'schemasValidation/user/updateUserSchema'
 import { getUserById, deleteUser, updateUser } from 'useCases/users'
 
 async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
@@ -18,7 +18,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
 
   if (req.method === REQUEST_METHODS.PUT) {
     const { name, password, imageUrl, role, isActive } = req.body
-    const { error } = updateSchema.validate({
+    const { error } = updateUserSchema.validate({
       name,
       password,
       imageUrl,

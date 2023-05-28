@@ -3,7 +3,7 @@ import type { NextApiRequestCustom, NextApiResponse } from 'next'
 import bcrypt from 'bcryptjs'
 import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
-import loginSchema from 'schemaValidation/userSchemas/loginSchema'
+import loginSchema from 'schemasValidation/user/loginSchema'
 import { createUser } from 'useCases/users'
 
 export default async function handler(
