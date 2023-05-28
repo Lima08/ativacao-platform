@@ -1,13 +1,11 @@
-import Router from 'next/router'
-
 import axios from 'axios'
-import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 
-import AnalysisService from './analysisServices '
-import CampaignService from './campaignServices'
-import TrainingService from './trainingServices'
-import UploadService from './uploadServices'
-import UserService from './UserServices'
+import AnalysisService from './analysisServices'
+import CampaignService from './campaignService'
+import CompanyService from './companyService'
+import TrainingService from './trainingService'
+import UploadService from './uploadService'
+import UserService from './UserService'
 
 const httpClient = axios.create()
 
@@ -46,7 +44,8 @@ const httpServices = {
   trainings: TrainingService(httpClient),
   analysis: AnalysisService(httpClient),
   upload: UploadService(httpClient),
-  user: UserService(httpClient)
+  user: UserService(httpClient),
+  company: CompanyService(httpClient)
 }
 
 export default httpServices

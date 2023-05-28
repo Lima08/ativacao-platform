@@ -4,7 +4,7 @@ import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
 import { ROLES } from 'constants/enums/eRoles'
 import { authCheck } from 'middlewares/authCheck'
-import campaign from 'schemaValidation/campaignSchema'
+import createCampaignSchema from 'schemasValidation/campaign/createCampaignSchema'
 import { createCampaign } from 'useCases/campaigns'
 
 async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
@@ -16,9 +16,9 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
         .status(HTTP_STATUS.UNAUTHORIZED)
         .json({ error: { message: 'Unauthorized' } })
     }
-    
+
     const { name, description, mediaIds } = req.body
-    const { error } = campaign.createSchema.validate({
+    const { error } = createCampaignSchema.validate({
       companyId,
       userId,
       name,

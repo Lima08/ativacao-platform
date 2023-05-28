@@ -5,12 +5,12 @@ import { ReactNode, useEffect, useState } from 'react'
 
 import { Button } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
-import { useAuthStore } from 'store/useAuthStore'
+import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
 type PageContainerProps = {
   children: ReactNode
   pageTitle: string
-  pageSection: string
+  pageSection?: string
   customCallback?: () => void
 }
 
@@ -20,34 +20,36 @@ export default function PageContainer({
   children,
   customCallback
 }: PageContainerProps) {
-  // @ts-ignore
-  const role = useAuthStore((state) => state.user?.role)
+  const { user } = useAuthStore((state) => state) as IAuthStore
+
   const [isAdmin, setIsAdmin] = useState(false)
 
   const router = useRouter()
 
   function navToCreatePage() {
-    router.push(`/in/${pageSection}/new`)
+    if (customCallback) {
+      customCallback()
+    } else {
+      router.push(`/in/${pageSection}/new`)
+    }
   }
 
   useEffect(() => {
-    setIsAdmin(role >= ROLES.COMPANY_ADMIN)
-  }, [role])
+    if (!user) return
+    setIsAdmin(user.role >= ROLES.COMPANY_ADMIN)
+  }, [user])
   return (
-    <div className="w-full flex flex-col py-[25px] items-center">
-      <div className="w-9/12 flex flex-row justify-around items-center">
-        <h1 className="text-2xl font-medium">{pageTitle}</h1>
-        {isAdmin && (
-          <Button
-            onClick={customCallback || navToCreatePage}
-            variant="contained"
-            className="bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600 font-bold"
-          >
-            <p>Adicionar</p>
+    <div className=" flex flex-col items-center px-8 py-1">
+      <div className="w-full flex flex-row justify-between items-center ">
+        <h2 className="text-2xl font-medium">{pageTitle}</h2>
+
+        {isAdmin && pageSection &&(
+          <Button variant="outlined" onClick={navToCreatePage}>
+            Adicionar
           </Button>
         )}
       </div>
-      <div className="flex flex-col mx-auto">{children}</div>
+      <section className="w-full flex flex-col mt-4">{children}</section>
     </div>
   )
 }

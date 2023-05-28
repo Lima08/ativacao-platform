@@ -1,5 +1,6 @@
 import { updateStatus } from 'useCases/users/userTrainings'
 
+// TODO: Em desenvolvimento
 export default async function handler(req: any, res: any) {
   const id = req.query.id as string
 

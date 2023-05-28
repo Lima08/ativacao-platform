@@ -10,7 +10,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
     const exampleId = process.env.EXAMPLE_ANALYSIS_ID
 
     const exampleAnalysis = await getAnalysisBy(String(exampleId))
-    return res.status(200).json({ data: exampleAnalysis })
+    return res.status(HTTP_STATUS.OK).json({ data: exampleAnalysis })
   }
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)

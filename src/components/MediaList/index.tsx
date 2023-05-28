@@ -1,7 +1,9 @@
 import React from 'react'
 
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
-import { IconButton, Grid, Paper } from '@mui/material'
+import { IconButton, Grid } from '@mui/material'
+
+import MediaShow from 'components/MediaShow'
 
 import { MediaResponseType } from '../../../types'
 
@@ -24,21 +26,7 @@ export default function MediaList({ mediasList, onDelete }: MediaProps) {
               >
                 <HighlightOffIcon />
               </IconButton>
-              <Paper>
-                {type === 'video' ? (
-                  <video
-                    className="w-full h-auto object-cover"
-                    src={url}
-                    controls
-                  />
-                ) : (
-                  <img
-                    className="w-full h-auto object-cover"
-                    src={url}
-                    alt={`Arquivo ${id}`}
-                  />
-                )}
-              </Paper>
+              <MediaShow url={url} type={type} />
             </div>
           </Grid>
         ))}

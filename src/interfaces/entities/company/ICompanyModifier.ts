@@ -1,5 +1,6 @@
 export interface ICompanyModifier {
   name?: string
   slug?: string,
-  imageUrl?: string
+  imageUrl?: string | null
 }
+ 

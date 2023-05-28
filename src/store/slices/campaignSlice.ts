@@ -4,7 +4,32 @@ import useGlobalStore from 'store/useGlobalStore'
 import { modifierCampaignDto } from 'useCases/campaigns/dto'
 import { StateCreator } from 'zustand'
 
-import { CreatePayloadStore, ICampaignStore } from '../types/iCampaignStore'
+export interface ICampaign {
+  id: string
+  name: string
+  description: string
+  media: string[]
+  createdAt: string
+  updatedAt: string
+}
+
+export type CreatePayloadStore = {
+  name: string
+  description?: string
+  mediaIds?: string[] | []
+}
+
+export interface ICampaignStore {
+  currentCampaign: ICampaignCreated | null
+  campaignsList: ICampaignCreated[]
+  resetCurrentCampaign: () => void
+  createCampaign: (newCampaign: CreatePayloadStore) => void
+  getCampaignById: (id: string) => void
+  getAllCampaigns: () => void
+  deleteCampaign: (id: string) => void
+  updateCampaign: (id: string, updatedCampaign: modifierCampaignDto) => void
+  handleCampaignActive: (id: string, status: boolean) => void
+}
 
 const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
   currentCampaign: null,
@@ -62,14 +87,14 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
   updateCampaign: async (id: string, updatedCampaign: modifierCampaignDto) => {
     useGlobalStore.getState().setLoading(true)
 
+    set((state) => ({
+      ...state,
+      campaignsList: state.campaignsList.map((campaign) =>
+        campaign.id === id ? { ...campaign, ...updatedCampaign } : campaign
+      )
+    }))
     try {
-      const response = await httpServices.campaigns.update(id, updatedCampaign)
-      set((state) => ({
-        ...state,
-        campaignsList: state.campaignsList.map((c) =>
-          c.id === id ? (response.data as ICampaignCreated) : c
-        )
-      }))
+      await httpServices.campaigns.update(id, updatedCampaign)
     } catch (error) {
       useGlobalStore.getState().setError(error)
       return
@@ -77,19 +102,19 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  handleCampaignActive: async (id: string, status: boolean) => {
+  handleCampaignActive: async (id: string, active: boolean) => {
     useGlobalStore.getState().setLoading(true)
 
+    set((state) => ({
+      ...state,
+      campaignsList: state.campaignsList.map((campaign) =>
+        campaign.id === id ? { ...campaign, active } : campaign
+      )
+    }))
     try {
-      const response = await httpServices.campaigns.update(id, {
-        active: status
+      await httpServices.campaigns.update(id, {
+        active
       })
-      set((state) => ({
-        ...state,
-        trainingsList: state.campaignsList.map((c) =>
-          c.id === id ? (response.data as ICampaignCreated) : c
-        )
-      }))
     } catch (error) {
       useGlobalStore.getState().setError(error)
       return

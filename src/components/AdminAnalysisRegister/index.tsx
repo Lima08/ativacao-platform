@@ -3,7 +3,7 @@ import { useState } from 'react'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 
-export default function AdminAnalysisRegister({ analysis, setClose }: any) {
+export default function AdminAnalysisRegister({ analysis, closeModal }: any) {
   const [setToaster] = useGlobalStore((state) => [state.setToaster])
   const [done, reject] = useMainStore((state) => [state.done, state.reject])
 
@@ -25,14 +25,14 @@ export default function AdminAnalysisRegister({ analysis, setClose }: any) {
       message: 'Análise concluída com sucesso'
     })
 
-    setClose()
+    closeModal()
   }
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="py-2 bg-blue-600 rounded-b-md w-2/4 text-white text-center">
-        <h1>{analysis.title}</h1>
-      </div>
+      <button className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+        <a href={analysis.bucketUrl}>Baixar arquivo</a>
+      </button>
       <div className="flex flex-col items-center justify-center py-2 mt-4">
         <div className="flex flex-col items-start mb-2">
           <label htmlFor="BIURL" className="text-left">

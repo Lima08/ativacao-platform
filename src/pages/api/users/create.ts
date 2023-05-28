@@ -3,7 +3,7 @@ import type { NextApiRequestCustom, NextApiResponse } from 'next'
 import bcrypt from 'bcryptjs'
 import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import { REQUEST_METHODS } from 'constants/enums/eRequestMethods'
-import loginSchema from 'schemaValidation/loginSchema'
+import loginSchema from 'schemasValidation/user/loginSchema'
 import { createUser } from 'useCases/users'
 
 export default async function handler(
@@ -16,7 +16,6 @@ export default async function handler(
     const { error } = loginSchema.validate({ email, password, name, companyId })
 
     if (error) {
-      // TODO: Verificar se esse erro está funcionando
       return res
         .status(HTTP_STATUS.BAD_REQUEST)
         .json({ error: error.details[0].message })

@@ -14,21 +14,22 @@ import { prisma } from 'lib/prisma'
 import { User } from 'models/User'
 import path from 'path'
 import EmailService from 'services/emailService/IEmailService'
-import { getCompanyById } from 'useCases/company'
+import { getCompanyById } from 'useCases/companies'
 
-interface IUserLoginResponse {
+export interface IUserLoginResponse {
   id: string
   name: string
   email: string
   role: number
   isActive: boolean
+  imageUrl?: string
 }
 
-interface ICompanyLoginResponse {
+export interface ICompanyLoginResponse {
   id: string
   name: string
   slug: string
-  imageUrl?: string
+  imageUrl?: string | null
 }
 
 export interface ILoginResponse {
@@ -120,7 +121,8 @@ async function loginUser({
         name: user.name,
         email: user.email,
         role: user.role,
-        isActive: user.isActive
+        isActive: user.isActive,
+        imageUrl: user.imageUrl
       },
       company
     }
@@ -133,7 +135,20 @@ async function loginUser({
 async function getUsers(filter: IUserFilter): Promise<IUserCreated[]> {
   try {
     const users = await repository.getAll(filter)
-    return users
+    const usersToReturn = users.map(
+      ({ id, email, createdAt, imageUrl, name, isActive, role, companyId }) =>
+        ({
+          id,
+          email,
+          createdAt,
+          imageUrl,
+          name,
+          isActive,
+          role,
+          companyId
+        } as IUserCreated)
+    )
+    return usersToReturn
   } catch (error: any) {
     const meta = error.meta || error.message
     throw new CustomError('Error to get users', HTTP_STATUS.BAD_REQUEST, meta)
@@ -155,6 +170,7 @@ async function updateUser(
   params: IUserModifier
 ): Promise<IUserCreated> {
   try {
+    // TODO: Caso não seja admin ou o dono mão pode alterar
     const updatedUser = await repository.update(id, params)
 
     if (!!updatedUser && params.isActive) {

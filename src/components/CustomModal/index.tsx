@@ -1,3 +1,4 @@
+// DEPRECATED - remover apos migração
 import { Dispatch, Fragment, SetStateAction, useRef } from 'react'
 
 import { Dialog, Transition } from '@headlessui/react'

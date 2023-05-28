@@ -1,10 +1,26 @@
-import { ITrainingCreated } from 'interfaces/entities/training'
+import { ITraining, ITrainingCreated } from 'interfaces/entities/training'
 import httpServices from 'services/http'
 import useGlobalStore from 'store/useGlobalStore'
 import { modifierTrainingDto } from 'useCases/trainings/dto'
 import { StateCreator } from 'zustand'
 
-import { CreatePayloadStore, ITrainingStore } from '../types/iTrainingStore'
+export interface ITrainingDto {
+  name: string
+  description: string
+  mediaIds: string[]
+}
+
+export interface ITrainingStore {
+  currentTraining: ITrainingCreated | null
+  trainingsList: ITrainingCreated[]
+  resetCurrentTraining: () => void
+  createTraining: (newTraining: ITrainingDto) => void
+  getTrainingById: (id: string) => void
+  getAllTrainings: () => void
+  deleteTraining: (id: string) => void
+  updateTraining: (id: string, updatedTraining: modifierTrainingDto) => void
+  handleTrainingActive: (id: string, status: boolean) => void
+}
 
 const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
   currentTraining: null,
@@ -38,7 +54,7 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  createTraining: async (newTraining: CreatePayloadStore) => {
+  createTraining: async (newTraining) => {
     try {
       const response = await httpServices.trainings.create(newTraining)
       set((state) => ({
@@ -55,15 +71,17 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  updateTraining: async (id: string, updatedTraining: modifierTrainingDto) => {
+  updateTraining: async (id, updatedTraining) => {
+    useGlobalStore.getState().setLoading(true)
+
+    set((state) => ({
+      ...state,
+      trainingsList: state.trainingsList.map((training) =>
+        training.id === id ? { ...training, ...updatedTraining } : training
+      )
+    }))
     try {
-      const response = await httpServices.trainings.update(id, updatedTraining)
-      set((state) => ({
-        ...state,
-        trainingsList: state.trainingsList.map((c) =>
-          c.id === id ? (response.data as ITrainingCreated) : c
-        )
-      }))
+      await httpServices.trainings.update(id, updatedTraining)
     } catch (error) {
       useGlobalStore.getState().setError(error)
       return
@@ -71,17 +89,19 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  handleTrainingActive: async (id: string, status: boolean) => {
+  handleTrainingActive: async (id, active) => {
+    useGlobalStore.getState().setLoading(true)
+
+    set((state) => ({
+      ...state,
+      trainingsList: state.trainingsList.map((training) =>
+        training.id === id ? { ...training, active } : training
+      )
+    }))
     try {
-      const response = await httpServices.trainings.update(id, {
-        active: status
+      await httpServices.trainings.update(id, {
+        active
       })
-      set((state) => ({
-        ...state,
-        trainingsList: state.trainingsList.map((c) =>
-          c.id === id ? (response.data as ITrainingCreated) : c
-        )
-      }))
     } catch (error) {
       useGlobalStore.getState().setError(error)
       return
@@ -89,7 +109,7 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  deleteTraining: async (id: string) => {
+  deleteTraining: async (id) => {
     try {
       set((state) => ({
         ...state,
