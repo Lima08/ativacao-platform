@@ -4,9 +4,18 @@ import {
   ICompanyModifier
 } from 'interfaces/entities/company'
 import httpServices from 'services/http'
-import { ICompanyStore } from 'store/types/iCompanyStore'
 import useGlobalStore from 'store/useGlobalStore'
 import { StateCreator } from 'zustand'
+
+export interface ICompanyStore {
+  currentCompany: ICompanyCreated | null
+  companiesList: ICompanyCreated[]
+  resetCurrentCompany: () => void
+  getCompanyById: (id: string) => void
+  getAllCompanies: () => void
+  createCompany: (newCompany: ICompany) => void
+  updateCompany: (id: string, updatedCompany: ICompanyModifier) => void
+}
 
 const createCompanySlice: StateCreator<ICompanyStore> = (set) => ({
   currentCompany: null,

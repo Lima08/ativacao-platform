@@ -4,7 +4,32 @@ import useGlobalStore from 'store/useGlobalStore'
 import { modifierCampaignDto } from 'useCases/campaigns/dto'
 import { StateCreator } from 'zustand'
 
-import { CreatePayloadStore, ICampaignStore } from '../types/iCampaignStore'
+export interface ICampaign {
+  id: string
+  name: string
+  description: string
+  media: string[]
+  createdAt: string
+  updatedAt: string
+}
+
+export type CreatePayloadStore = {
+  name: string
+  description?: string
+  mediaIds?: string[] | []
+}
+
+export interface ICampaignStore {
+  currentCampaign: ICampaignCreated | null
+  campaignsList: ICampaignCreated[]
+  resetCurrentCampaign: () => void
+  createCampaign: (newCampaign: CreatePayloadStore) => void
+  getCampaignById: (id: string) => void
+  getAllCampaigns: () => void
+  deleteCampaign: (id: string) => void
+  updateCampaign: (id: string, updatedCampaign: modifierCampaignDto) => void
+  handleCampaignActive: (id: string, status: boolean) => void
+}
 
 const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
   currentCampaign: null,

@@ -1,9 +1,23 @@
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
+import { IAnalysisModifier } from 'interfaces/entities/analysis'
 import httpServices from 'services/http'
-import { IAnalysisStore } from 'store/types/IAnalysisStore'
 import useGlobalStore from 'store/useGlobalStore'
 import { StateCreator } from 'zustand'
 
+export interface IAnalysisStore {
+  currentAnalysis: IAnalysisCreated | null
+  analyzesList: IAnalysisCreated[]
+  resetCurrentAnalysis: () => void
+  createAnalysis: (newAnalysis: IAnalysisCreated) => void
+  getAllAnalyzes: () => void
+  done: (
+    id: string,
+    { biUrl, message }: { biUrl: string; message: string }
+  ) => void
+  reject: (id: string, message: string) => void
+  update: (id: string, modifierData: IAnalysisModifier) => void
+  deleteAnalysis: (id: string) => void
+}
 const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
   currentAnalysis: null,
   analyzesList: [],
@@ -18,7 +32,6 @@ const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
         loading: false,
         analyzesList: [...state.analyzesList, response.data as IAnalysisCreated]
       }))
-    
     } catch (error) {
       useGlobalStore.getState().setError(error)
       return
@@ -64,7 +77,6 @@ const createAnalysisSlice: StateCreator<IAnalysisStore> = (set) => ({
     try {
       useGlobalStore.getState().setLoading(true)
       const response = await httpServices.analysis.reject(id, message)
-   
 
       set((state) => ({
         ...state,

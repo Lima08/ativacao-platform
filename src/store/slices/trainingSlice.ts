@@ -1,10 +1,20 @@
-import { ITrainingCreated } from 'interfaces/entities/training'
+import { ITraining, ITrainingCreated } from 'interfaces/entities/training'
 import httpServices from 'services/http'
 import useGlobalStore from 'store/useGlobalStore'
 import { modifierTrainingDto } from 'useCases/trainings/dto'
 import { StateCreator } from 'zustand'
 
-import { CreatePayloadStore, ITrainingStore } from '../types/iTrainingStore'
+export interface ITrainingStore {
+  currentTraining: ITrainingCreated | null
+  trainingsList: ITrainingCreated[]
+  resetCurrentTraining: () => void
+  createTraining: (newTraining: ITraining) => void
+  getTrainingById: (id: string) => void
+  getAllTrainings: () => void
+  deleteTraining: (id: string) => void
+  updateTraining: (id: string, updatedTraining: modifierTrainingDto) => void
+  handleTrainingActive: (id: string, status: boolean) => void
+}
 
 const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
   currentTraining: null,
@@ -38,7 +48,7 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
       useGlobalStore.getState().setLoading(false)
     }
   },
-  createTraining: async (newTraining: CreatePayloadStore) => {
+  createTraining: async (newTraining: ITraining) => {
     try {
       const response = await httpServices.trainings.create(newTraining)
       set((state) => ({

@@ -3,7 +3,16 @@ import httpServices from 'services/http'
 import useGlobalStore from 'store/useGlobalStore'
 import { StateCreator } from 'zustand'
 
-import { IUserStore } from '../types/iUserStore'
+export interface IUserStore {
+  currentUser: IUserCreated | null
+  usersList: IUserCreated[]
+  resetCurrentUser: () => void
+  // createUser: (newUser: CreatePayloadStore) => void
+  getUserById: (id: string) => void
+  getAllUsers: () => void
+  // deleteUser: (id: string) => void
+  updateUser: (id: string, updatedUser: IUserModifier) => void
+}
 
 const createUserSlice: StateCreator<IUserStore> = (set) => ({
   currentUser: null,
