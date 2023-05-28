@@ -39,7 +39,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             <HeaderBar />
           </Box>
           <Divider />
-          <Box sx={{ pt: 6 }}>
+          <Box sx={{ pt: 4 }}>
             <main>{children}</main>
           </Box>
         </Grid>

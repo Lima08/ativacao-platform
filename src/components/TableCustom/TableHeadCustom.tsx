@@ -6,7 +6,11 @@ type ITableHead = {
 
 export default function TableHeadCustom({ headLabel }: ITableHead) {
   return (
-    <TableHead>
+    <TableHead
+      sx={{
+        background: '#F3F3F3'
+      }}
+    >
       <TableRow>
         {headLabel.map((headCell: any) => (
           <TableCell key={headCell.id} align={headCell.align || 'left'}>

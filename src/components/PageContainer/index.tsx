@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
 
-import { Button } from '@mui/material'
+import { Button} from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
 import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
@@ -39,9 +39,10 @@ export default function PageContainer({
     setIsAdmin(user.role >= ROLES.COMPANY_ADMIN)
   }, [user])
   return (
-    <div className=" flex flex-col items-center px-16 py-2">
+    <div className=" flex flex-col items-center px-8 py-1">
       <div className="w-full flex flex-row justify-between items-center ">
         <h2 className="text-2xl font-medium">{pageTitle}</h2>
+
         {isAdmin && (
           <Button variant="outlined" onClick={navToCreatePage}>
             Adicionar
