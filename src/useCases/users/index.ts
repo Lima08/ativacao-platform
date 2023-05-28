@@ -113,7 +113,6 @@ async function loginUser({
     )
 
     const company = await getCompanyById(user.companyId)
-    console.log('🚀 ~ file: index.ts:116 ~ company:', company)
 
     return {
       token,

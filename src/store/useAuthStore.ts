@@ -10,6 +10,7 @@ export interface IAuthStore {
   company: ICompanyLoginResponse | null
   user: IUserLoginResponse | null
   setUserLogged: (userLogged: ILoginResponse) => void
+  setCompany: (company: ILoginResponse['company']) => void
 }
 
 export const useAuthStore = create(
@@ -18,7 +19,9 @@ export const useAuthStore = create(
       company: null,
       user: null,
       setUserLogged: (userLogged: ILoginResponse) =>
-        set((state: IAuthStore) => ({ ...state, ...userLogged }))
+        set((state: IAuthStore) => ({ ...state, ...userLogged })),
+      setCompany: (company: ILoginResponse['company']) =>
+        set((state: IAuthStore) => ({ ...state, company }))
     }),
     {
       name: 'user-logged'

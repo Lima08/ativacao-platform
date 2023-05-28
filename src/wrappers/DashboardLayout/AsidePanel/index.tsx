@@ -5,7 +5,6 @@ import { Box, List } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
 import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
-
 import fourSquares from '../../../../images/icons/fourSquares'
 // import homeIcon from '../../../images/icons/homeIcon'
 import inboxIcon from '../../../../images/icons/inboxIcon'
@@ -14,7 +13,7 @@ import pizzaGraph from '../../../../images/icons/pizzaGraph'
 import AsidePanelItem from './AsidePanelItem'
 
 function AsidePanel() {
-  const { user } = useAuthStore((state) => state) as IAuthStore
+  const { user, company } = useAuthStore((state) => state) as IAuthStore
 
   const [isAdmin, setIsAdmin] = useState(false)
 
@@ -30,7 +29,7 @@ function AsidePanel() {
       <Link href="/in/campaigns">
         <Box
           component="img"
-          src="/logo-ativacao.png"
+          src={company?.imageUrl ? company.imageUrl : '/logo-ativacao.png'}
           sx={{ mt: 2, width: '156px', height: 'auto' }}
           alt="Ativacao Logo"
         />
