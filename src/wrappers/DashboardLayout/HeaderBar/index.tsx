@@ -22,7 +22,6 @@ import CompanySettings from './CompanySettings'
 function HeaderBar() {
   const router = useRouter()
 
-  const loggedUser = useAuthStore((state: any) => state.user)
   const { user } = useAuthStore((state) => state) as IAuthStore
   const [userImage, setUserImage] = useState('')
 
@@ -57,10 +56,10 @@ function HeaderBar() {
   }
 
   useEffect(() => {
-    if (!loggedUser || !loggedUser.imageUrl) return
+    if (!user || !user.imageUrl) return
 
-    setUserImage(loggedUser.imageUrl)
-  }, [loggedUser])
+    setUserImage(user.imageUrl)
+  }, [user])
 
   return (
     <Box

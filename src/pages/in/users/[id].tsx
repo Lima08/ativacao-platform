@@ -27,7 +27,10 @@ export default function RegisterUser() {
   const userId = router.query.id
 
   const [setToaster] = useGlobalStore((state) => [state.setToaster])
-  const { user } = useAuthStore((state) => state) as IAuthStore
+  const [user, setUserLogged] = useAuthStore((state: any) => [
+    state.user,
+    state.setUserLogged
+  ])
   const [currentUser, getUserById, resetCurrentUser, updateUser] = useMainStore(
     (state) => [
       state.currentUser,
@@ -114,6 +117,7 @@ export default function RegisterUser() {
 
     if (imageUrl.length > 0) updatedUserData.imageUrl = imageUrl
     updateUser(String(userId), updatedUserData)
+    setUserLogged({ ...user, name, imageUrl })
     setNewPassWord(null)
     setConfirmedPassword(null)
     router.push('/in/users/')

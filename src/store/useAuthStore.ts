@@ -18,8 +18,8 @@ export const useAuthStore = create(
     (set) => ({
       company: null,
       user: null,
-      setUserLogged: (userLogged: ILoginResponse) =>
-        set((state: IAuthStore) => ({ ...state, ...userLogged })),
+      setUserLogged: (user: ILoginResponse) =>
+        set((state: IAuthStore) => ({ ...state, user })),
       setCompany: (company: ILoginResponse['company']) =>
         set((state: IAuthStore) => ({ ...state, company }))
     }),

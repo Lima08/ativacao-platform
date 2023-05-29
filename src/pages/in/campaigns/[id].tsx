@@ -209,7 +209,7 @@ export default function RegisterCampaign() {
               type="button"
               className="text-sm font-semibold leading-6 text-gray-900"
             >
-              Cancelar
+              Voltar
             </button>
           </Link>
           <button

@@ -27,7 +27,7 @@ function AsidePanel() {
   useEffect(() => {
     if (!company || !company.imageUrl) return
     setLogoSrl(company?.imageUrl)
-  }, [company])
+  }, [company, company?.imageUrl])
 
   return (
     <aside

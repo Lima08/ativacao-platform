@@ -79,7 +79,7 @@ function CompanySettings({
 
   const handleSaveConfiguration = () => {
     updateCompany(String(company!.id), { name: companyName, imageUrl })
-    setCompany({ ...company })
+    setCompany({ ...company, imageUrl })
     setShowSuccess(true)
   }
 
