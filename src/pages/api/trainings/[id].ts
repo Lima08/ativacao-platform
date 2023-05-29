@@ -21,14 +21,15 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
     }
   }
   if (req.method === REQUEST_METHODS.PUT) {
-    const { name, description, mediaIds, active } = req.body
+    const { name, description, mediaIds, active, mediasToExclude } = req.body
 
     try {
       const updatedTraining = await updateTraining(id, {
         name,
         description,
         mediaIds,
-        active
+        active,
+        mediasToExclude
       })
       return res.status(HTTP_STATUS.OK).json({ data: updatedTraining })
     } catch (error: any) {

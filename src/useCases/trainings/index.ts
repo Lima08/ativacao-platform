@@ -104,7 +104,7 @@ async function getAllTrainings(
 
 async function updateTraining(
   id: string,
-  { name, description, mediaIds, active }: modifierTrainingDto
+  { name, description, mediaIds, active, mediasToExclude }: modifierTrainingDto
 ): Promise<createdTrainingDto> {
   const updatedTraining = await repository
     .update(id, { name, description, active })
@@ -134,6 +134,20 @@ async function updateTraining(
           meta
         )
       })
+
+    if (mediasToExclude?.length) {
+      const promisesToExclude = mediasToExclude.map((id) => deleteMedia(id))
+
+      await Promise.all(promisesToExclude)
+        .catch((error: any) => {
+          const meta = error.meta || error.message
+          throw new CustomError(
+            'Error to update Training media',
+            HTTP_STATUS.BAD_REQUEST,
+            meta
+          )
+        })
+    }
   }
 
   return { ...updatedTraining, medias }

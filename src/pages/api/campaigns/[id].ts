@@ -20,13 +20,14 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
     }
   }
   if (req.method === REQUEST_METHODS.PUT) {
-    const { name, description, active, mediaIds } = req.body
+    const { name, description, active, mediaIds, mediasToExclude } = req.body
     try {
       const updatedCampaign = await updateCampaign(id, {
         name,
         description,
         active,
-        mediaIds
+        mediaIds,
+        mediasToExclude
       })
 
       return res.status(HTTP_STATUS.OK).json({ data: updatedCampaign })

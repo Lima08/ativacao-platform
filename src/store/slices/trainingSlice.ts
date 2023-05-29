@@ -78,15 +78,28 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
   },
   updateTraining: async (id, updatedTraining) => {
     useGlobalStore.getState().setLoading(true)
-
+ 
     set((state) => ({
       ...state,
-      trainingsList: state.trainingsList.map((training) =>
-        training.id === id ? { ...training, ...updatedTraining } : training
-      )
+      trainingsList: state.trainingsList.map((training) => {
+        if (training.id !== id) return training
+
+        const { mediasToExclude } = updatedTraining
+        if (!mediasToExclude?.length) return { ...training, ...updatedTraining }
+
+        const updatedMedias = training.medias.filter(
+          (media) => !mediasToExclude.includes(media.id)
+        )
+        return { ...training, ...updatedTraining, medias: updatedMedias }
+      })
     }))
     try {
-      await httpServices.trainings.update(id, updatedTraining)
+      let mediaIds: string[] = []
+      if (updatedTraining?.medias) {
+        mediaIds = updatedTraining.medias.map((media) => media.id)
+      }
+
+      await httpServices.trainings.update(id, { ...updatedTraining, mediaIds })
     } catch (error) {
       useGlobalStore.getState().setError(error)
       return

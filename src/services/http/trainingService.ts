@@ -14,6 +14,7 @@ type ModifierPayload = {
   description?: string
   active?: boolean
   mediaIds?: string[] | []
+  mediasToExclude?: string[] | []
 }
 
 export interface TrainingServiceInterface {
@@ -52,12 +53,16 @@ const TrainingService = (
     return response.data
   },
 
-  update: async (trainingId, { name, description, active, mediaIds }) => {
+  update: async (
+    trainingId,
+    { name, description, active, mediaIds, mediasToExclude }
+  ) => {
     const response = await httpClient.put(`/api/trainings/${trainingId}`, {
       name,
       description,
       active,
-      mediaIds
+      mediaIds,
+      mediasToExclude
     })
 
     return response.data

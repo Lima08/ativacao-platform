@@ -14,6 +14,7 @@ type ModifierPayload = {
   description?: string
   active?: boolean
   mediaIds?: string[] | []
+  mediasToExclude?: string[] | []
 }
 
 export interface CampaignServiceInterface {
@@ -50,12 +51,16 @@ const CampaignService = (
     return response.data
   },
 
-  update: async (campaignId, { name, description, active, mediaIds }) => {
+  update: async (
+    campaignId,
+    { name, description, active, mediaIds, mediasToExclude }
+  ) => {
     const response = await httpClient.put(`/api/campaigns/${campaignId}`, {
       name,
       description,
       active,
-      mediaIds
+      mediaIds,
+      mediasToExclude
     })
 
     return response.data

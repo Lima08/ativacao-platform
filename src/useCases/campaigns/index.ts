@@ -105,7 +105,7 @@ async function getAllCampaigns(
 
 async function updateCampaign(
   id: string,
-  { name, description, active, mediaIds }: modifierCampaignDto
+  { name, description, active, mediaIds, mediasToExclude }: modifierCampaignDto
 ): Promise<createdCampaignDto> {
   const updatedCampaign = await repository
     .update(id, { name, description, active })
@@ -135,6 +135,19 @@ async function updateCampaign(
           meta
         )
       })
+
+    if (mediasToExclude?.length) {
+      const promisesToExclude = mediasToExclude.map((id) => deleteMedia(id))
+
+      await Promise.all(promisesToExclude).catch((error: any) => {
+        const meta = error.meta || error.message
+        throw new CustomError(
+          'Error to update campaign media',
+          HTTP_STATUS.BAD_REQUEST,
+          meta
+        )
+      })
+    }
   }
 
   return { ...updatedCampaign, medias }

@@ -40,6 +40,7 @@ export default function RegisterCampaign() {
   const [campaignName, setCampaignName] = useState('')
   const [campaignDescription, setCampaignDescription] = useState('')
   const [campaignMedias, setCampaignMedias] = useState<MediaResponseType[]>([])
+  const [mediasToExclude, setMediasToExclude] = useState<any[]>([])
 
   const uploadFile = async (e: any) => {
     e.preventDefault()
@@ -119,10 +120,13 @@ export default function RegisterCampaign() {
       updateCampaign(String(campaignId), {
         name: campaignName,
         description: campaignDescription,
-        mediaIds: mediasIdsFiltered
+        mediaIds: mediasIdsFiltered,
+        mediasToExclude
       })
     }
     resetState()
+    router.push('/in/campaigns/new')
+
   }
 
   const fetchCampaign = useCallback(async () => {
@@ -134,12 +138,14 @@ export default function RegisterCampaign() {
   const removeMedia = (id: string) => {
     const medias = campaignMedias.filter((media) => media.id !== id)
     setCampaignMedias(medias)
+    setMediasToExclude((prevMedias) => [...prevMedias, id])
   }
 
   useEffect(() => {
     if (!currentCampaign) return
     setCampaignName(currentCampaign.name)
     setCampaignDescription(currentCampaign?.description || '')
+    setCampaignMedias(currentCampaign?.medias || [])
   }, [currentCampaign])
 
   useEffect(() => {

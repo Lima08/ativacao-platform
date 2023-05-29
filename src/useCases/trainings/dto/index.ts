@@ -14,5 +14,7 @@ export interface createdTrainingDto extends ITrainingCreated {
 }
 
 export interface modifierTrainingDto extends ITrainingModifier {
+  medias?: any[]
   mediaIds?: string[]
+  mediasToExclude?: string[]
 }

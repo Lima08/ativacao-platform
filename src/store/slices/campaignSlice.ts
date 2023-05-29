@@ -89,9 +89,17 @@ const createCampaignsSlice: StateCreator<ICampaignStore> = (set) => ({
 
     set((state) => ({
       ...state,
-      campaignsList: state.campaignsList.map((campaign) =>
-        campaign.id === id ? { ...campaign, ...updatedCampaign } : campaign
-      )
+      campaignList: state.campaignsList.map((campaign) => {
+        if (campaign.id !== id) return campaign
+
+        const { mediasToExclude } = updatedCampaign
+        if (!mediasToExclude?.length) return { ...campaign, ...updatedCampaign}
+
+        const updatedMedias = campaign.medias.filter(
+          (media) => !mediasToExclude.includes(media.id)
+        )
+        return { ...campaign, ...updatedCampaign, medias: updatedMedias }
+      })
     }))
     try {
       await httpServices.campaigns.update(id, updatedCampaign)
