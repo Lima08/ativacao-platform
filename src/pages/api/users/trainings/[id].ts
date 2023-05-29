@@ -1,7 +1,7 @@
+// TODO: WORK IN PROGRESS
 import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 // import { updateStatus } from 'useCases/users/userTrainings'
 
-// TODO: ON PROGRESS
 
 export default async function handler(req: any, res: any) {
   // const id = req.query.id as string
