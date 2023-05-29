@@ -26,7 +26,9 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
+import { ROLES } from 'constants/enums/eRoles'
 import type { ITrainingCreated } from 'interfaces/entities/training'
+import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 
@@ -77,6 +79,8 @@ export default function TrainingsPage() {
     active: boolean
   } | null>(null)
 
+  const { user } = useAuthStore((state) => state) as IAuthStore
+  const [isAdmin, setIsAdmin] = useState(false)
   const [filteredTrainings, setFilteredTrainings] = useState<DataList[]>([])
   const [trainingListAdapted, setTrainingListAdapted] = useState<DataList[]>([])
   const [error, setToaster, page, rowsPerPage] = useGlobalStore((state) => [
@@ -197,6 +201,11 @@ export default function TrainingsPage() {
     if (trainingsList.length > 0) return
     getAllTrainings()
   }, [getAllTrainings, trainingsList])
+
+  useEffect(() => {
+    if (!user) return
+    setIsAdmin(user.role >= ROLES.COMPANY_ADMIN)
+  }, [user])
 
   useEffect(() => {
     initTrainingsList()
@@ -332,26 +341,33 @@ export default function TrainingsPage() {
           </IconButton>
           Editar
         </MenuItem>
-        <MenuItem
-          onClick={() =>
-            currentTraining &&
-            handleTrainingStatus(currentTraining.id, !currentTraining.active)
-          }
-        >
-          <IconButton aria-label="activation">
-            <ToggleOnIcon />
-          </IconButton>
-          {currentTraining?.active ? 'Desativar' : 'Ativar'}
-        </MenuItem>
-        <MenuItem
-          sx={{ color: 'error.main' }}
-          onClick={() => currentTraining && deleteItem(currentTraining.id)}
-        >
-          <IconButton aria-label="delete" sx={{ color: 'error.main' }}>
-            <DeleteIcon />
-          </IconButton>
-          Deletar
-        </MenuItem>
+        {isAdmin && (
+          <>
+            <MenuItem
+              onClick={() =>
+                currentTraining &&
+                handleTrainingStatus(
+                  currentTraining.id,
+                  !currentTraining.active
+                )
+              }
+            >
+              <IconButton aria-label="activation">
+                <ToggleOnIcon />
+              </IconButton>
+              {currentTraining?.active ? 'Desativar' : 'Ativar'}
+            </MenuItem>
+            <MenuItem
+              sx={{ color: 'error.main' }}
+              onClick={() => currentTraining && deleteItem(currentTraining.id)}
+            >
+              <IconButton aria-label="delete" sx={{ color: 'error.main' }}>
+                <DeleteIcon />
+              </IconButton>
+              Deletar
+            </MenuItem>
+          </>
+        )}
       </Popover>
 
       {isModalOpen && (

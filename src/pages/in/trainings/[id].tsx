@@ -86,17 +86,14 @@ export default function RegisterTraining() {
   }
 
   const resetState = () => {
-    return () => {
-      setTrainingName('')
-      setTrainingDescription('')
-      setTrainingMedias([])
-      resetCurrentTraining()
-    }
+    setTrainingName('')
+    setTrainingDescription('')
+    setTrainingMedias([])
+    resetCurrentTraining()
   }
 
   const submitTraining = async (e: any) => {
     e.preventDefault()
-
     const mediaIds =
       trainingsMedias && trainingsMedias.length
         ? trainingsMedias.map((media) => media.id)
@@ -118,18 +115,17 @@ export default function RegisterTraining() {
     resetState()
   }
 
-  const fetchTraining = async () => {
-    if (!trainingId || trainingId === 'new') return
-
-    getTrainingById(String(trainingId))
-  }
-
   const removeMedia = (id: string) => {
     const medias = trainingsMedias.filter((media) => media.id !== id)
     setTrainingMedias(medias)
   }
 
   const initTraining = useCallback(() => {
+    const fetchTraining = async () => {
+      if (!trainingId || trainingId === 'new') return
+
+      getTrainingById(String(trainingId))
+    }
     resetCurrentTraining()
     setTrainingName('')
     setTrainingDescription('')
@@ -138,7 +134,8 @@ export default function RegisterTraining() {
     resetCurrentTraining,
     setTrainingName,
     setTrainingDescription,
-    fetchTraining
+    trainingId,
+    getTrainingById
   ])
 
   useEffect(() => {
