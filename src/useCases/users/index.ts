@@ -168,7 +168,6 @@ async function updateUser(
   params: IUserModifier
 ): Promise<IUserCreated> {
   try {
-    // TODO: Caso não seja admin ou o dono mão pode alterar
     const updatedUser = await repository.update(id, params)
 
     if (!!updatedUser && params.isActive) {

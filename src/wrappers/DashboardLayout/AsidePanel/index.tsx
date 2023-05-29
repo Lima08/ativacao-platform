@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { Box, List } from '@mui/material'
+import { Box, List, useMediaQuery, useTheme } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
 import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
@@ -15,6 +15,9 @@ function AsidePanel() {
 
   const [isAdmin, setIsAdmin] = useState(false)
   const [logoSrl, setLogoSrl] = useState('/logo-ativacao.png')
+
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   useEffect(() => {
     if (!user) return
@@ -31,35 +34,36 @@ function AsidePanel() {
       className="h-full flex flex-col border-gray-200 bg-white px-2 "
       aria-label="Sidebar"
     >
-      <Box
-        component="div"
-        sx={{
-          mt: 1,
-          ml: 0,
-          px: 1,
-          py: 1,
-          width: '100%',
-          height: 'auto',
-          maxHeight: '80px',
-          display: 'flex',
-          justifyContent: 'start',
-          alignItems: 'center'
-        }}
-      >
-        <img
-          src={logoSrl}
-          alt="Lodo da empresa"
-          style={{
-            maxWidth: '100%',
-            maxHeight: '100%',
-            objectFit: 'contain',
-            objectPosition: 'center'
+      {!isMobile && (
+        <Box
+          component="div"
+          sx={{
+            mt: 1,
+            ml: 0,
+            px: 2,
+            py: 1,
+            width: '100%',
+            height: 'auto',
+            maxHeight: '80px',
+            display: 'flex',
+            justifyContent: 'start',
+            alignItems: 'center'
           }}
-        />
-      </Box>
+        >
+          <img
+            src={logoSrl}
+            alt="Lodo da empresa"
+            style={{
+              maxWidth: '100%',
+              maxHeight: '100%',
+              objectFit: 'contain',
+              objectPosition: 'center'
+            }}
+          />
+        </Box>
+      )}
       <div className="flex flex-col mt-4">
         <List>
-          {/* <AsidePanelItem title="Home" linkSrc="/in" icon={homeIcon} /> */}
           <AsidePanelItem
             title="Campanhas"
             linkSrc="/in/campaigns"

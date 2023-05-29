@@ -1,6 +1,14 @@
 import { ReactNode } from 'react'
 
-import { Alert, Grid, Snackbar, Box, Divider } from '@mui/material'
+import {
+  Alert,
+  Grid,
+  Snackbar,
+  Box,
+  Divider,
+  useTheme,
+  useMediaQuery
+} from '@mui/material'
 import useGlobalStore from 'store/useGlobalStore'
 
 import AsidePanel from './AsidePanel'
@@ -18,21 +26,23 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     setToaster({ ...toaster, isOpen: false })
   }
 
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+
   return (
     <>
       <Grid container sx={{ height: '100vh' }}>
-        <Grid
-          item
-          xs={12}
-          sm={3}
-          md={2}
-          sx={{
-            borderRight: '1px solid #ccc',
-            pl: 2
-          }}
-        >
-          <AsidePanel />
-        </Grid>
+        {!isMobile && (
+          <Grid
+            item
+            xs={12}
+            sm={3}
+            md={2}
+            sx={{ border: 'solid 1px rgb(229, 231, 235)' }}
+          >
+            <AsidePanel />
+          </Grid>
+        )}
         <Divider />
         <Grid item xs={12} sm={9} md={10}>
           <Box sx={{ height: '4rem', background: 'white' }}>

@@ -2,30 +2,38 @@ import { useRouter } from 'next/router'
 import React, { MouseEvent, useEffect, useState } from 'react'
 
 // import { Notifications } from '@mui/icons-material'
+import MoreVertSharpIcon from '@mui/icons-material/MoreVertSharp'
 import {
   Avatar,
-  // IconButton,
   Box,
-  // Badge,
   MenuItem,
   Popover,
   Typography,
-  Divider
+  Divider,
+  useMediaQuery,
+  useTheme
 } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
 import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
+import AsidePanelMobile from '../AsidePanel/AsidePanelMobile'
 import CompanySettings from './CompanySettings'
 
 function HeaderBar() {
   const router = useRouter()
-  const loggedUser = useAuthStore((state: any) => state.user)
 
+  const loggedUser = useAuthStore((state: any) => state.user)
   const { user } = useAuthStore((state) => state) as IAuthStore
-  const [anchorEl, setAnchorEl] = useState<null | (EventTarget & Element)>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [userImage, setUserImage] = useState('')
+
+  const [anchorEl, setAnchorEl] = useState<null | (EventTarget & Element)>(null)
   const open = Boolean(anchorEl)
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -58,20 +66,25 @@ function HeaderBar() {
     <Box
       sx={{
         display: 'flex',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
         px: 2,
         py: 1,
         alignItems: 'center',
         gap: 2
       }}
     >
+      {isMobile && <AsidePanelMobile />}
+
       {/* <IconButton color="inherit">
         <Badge badgeContent={4} color="error">
           <Notifications />
         </Badge>
       </IconButton> */}
 
-      <Avatar src={userImage} alt="photoURL" onClick={handleClick} />
+      <div className="flex items-center justify-center" onClick={handleClick}>
+        <Avatar src={userImage} alt="Foto do usuário" />
+        <MoreVertSharpIcon />
+      </div>
 
       <Popover
         open={Boolean(open)}
@@ -94,11 +107,13 @@ function HeaderBar() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle1" noWrap>
-            Lima
+            {user?.name || 'Usuário'}
           </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            joaopaulo.gomeslima8@gmail.com
-          </Typography>
+          {user && user.email && (
+            <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+              {user.email}
+            </Typography>
+          )}
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
