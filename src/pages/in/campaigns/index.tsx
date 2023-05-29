@@ -25,7 +25,9 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
+import { ROLES } from 'constants/enums/eRoles'
 import type { ICampaignCreated } from 'interfaces/entities/campaign'
+import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 
@@ -61,6 +63,7 @@ export default function CampaignsList() {
   ]
 
   const router = useRouter()
+  const { user } = useAuthStore((state) => state) as IAuthStore
   const [campaignsList, getAllCampaigns, handleCampaignActive, deleteCampaign] =
     useMainStore((state) => [
       state.campaignsList,
@@ -87,6 +90,7 @@ export default function CampaignsList() {
     state.rowsPerPage
   ])
 
+  const [isAdmin, setIsAdmin] = useState(false)
   const [isModalOpen, setOpenModal] = useState(false)
   const [campaign, setCampaign] = useState<{
     title: string
@@ -198,6 +202,11 @@ export default function CampaignsList() {
   useEffect(() => {
     getAllCampaigns()
   }, [getAllCampaigns])
+
+  useEffect(() => {
+    if (!user) return
+    setIsAdmin(user.role >= ROLES.COMPANY_ADMIN)
+  }, [user])
 
   useEffect(() => {
     if (!error) return
@@ -326,26 +335,33 @@ export default function CampaignsList() {
           </IconButton>
           Editar
         </MenuItem>
-        <MenuItem
-          onClick={() =>
-            currentCampaign &&
-            handleCampaignStatus(currentCampaign.id, !currentCampaign.active)
-          }
-        >
-          <IconButton aria-label="activation">
-            <ToggleOnIcon />
-          </IconButton>
-          {currentCampaign?.active ? 'Desativar' : 'Ativar'}
-        </MenuItem>
-        <MenuItem
-          sx={{ color: 'error.main' }}
-          onClick={() => currentCampaign && deleteItem(currentCampaign.id)}
-        >
-          <IconButton aria-label="delete" sx={{ color: 'error.main' }}>
-            <DeleteIcon />
-          </IconButton>
-          Deletar
-        </MenuItem>
+        {isAdmin && (
+          <>
+            <MenuItem
+              onClick={() =>
+                currentCampaign &&
+                handleCampaignStatus(
+                  currentCampaign.id,
+                  !currentCampaign.active
+                )
+              }
+            >
+              <IconButton aria-label="activation">
+                <ToggleOnIcon />
+              </IconButton>
+              {currentCampaign?.active ? 'Desativar' : 'Ativar'}
+            </MenuItem>
+            <MenuItem
+              sx={{ color: 'error.main' }}
+              onClick={() => currentCampaign && deleteItem(currentCampaign.id)}
+            >
+              <IconButton aria-label="delete" sx={{ color: 'error.main' }}>
+                <DeleteIcon />
+              </IconButton>
+              Deletar
+            </MenuItem>
+          </>
+        )}
       </Popover>
 
       {isModalOpen && (

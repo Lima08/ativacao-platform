@@ -15,6 +15,7 @@ import {
 import { ROLES } from 'constants/enums/eRoles'
 import { IUserModifier } from 'interfaces/entities/user'
 import httpServices from 'services/http'
+import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 
@@ -26,6 +27,7 @@ export default function RegisterUser() {
   const userId = router.query.id
 
   const [setToaster] = useGlobalStore((state) => [state.setToaster])
+  const { user } = useAuthStore((state) => state) as IAuthStore
   const [currentUser, getUserById, resetCurrentUser, updateUser] = useMainStore(
     (state) => [
       state.currentUser,
@@ -112,6 +114,9 @@ export default function RegisterUser() {
 
     if (imageUrl.length > 0) updatedUserData.imageUrl = imageUrl
     updateUser(String(userId), updatedUserData)
+    setNewPassWord(null)
+    setConfirmedPassword(null)
+    router.push('/in/users/')
   }
 
   useEffect(() => {
@@ -160,11 +165,13 @@ export default function RegisterUser() {
           {currentUser && <p className="my-2">{currentUser?.email}</p>}
         </div>
 
-        <ToggleInput
-          toggleId={currentUser?.id || ''}
-          defaultActive={activeStatus}
-          onClickToggle={() => setActiveStatus(!activeStatus)}
-        />
+        {user && user.role >= ROLES.COMPANY_ADMIN && (
+          <ToggleInput
+            toggleId={currentUser?.id || ''}
+            defaultActive={activeStatus}
+            onClickToggle={() => setActiveStatus(!activeStatus)}
+          />
+        )}
       </Stack>
       <div className="flex flex-col gap-2 ">
         <TextField
@@ -188,12 +195,14 @@ export default function RegisterUser() {
           onChange={(e) => setConfirmedPassword(e.target.value)}
         />
 
-        <FormControlLabel
-          control={
-            <Checkbox checked={isAdmin} onChange={handleCheckboxChange} />
-          }
-          label="Administrador"
-        />
+        {user && user.role >= ROLES.COMPANY_ADMIN && (
+          <FormControlLabel
+            control={
+              <Checkbox checked={isAdmin} onChange={handleCheckboxChange} />
+            }
+            label="Administrador"
+          />
+        )}
       </div>
       <Uploader uploadFile={uploadFile} multiple />
 

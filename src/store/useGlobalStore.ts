@@ -31,7 +31,7 @@ const useGlobalStore = create<IGlobalStore>((set) => ({
     type: 'success',
     duration: 5000
   },
-  page: 1,
+  page: 0,
   rowsPerPage: 5,
   setToaster: (toaster) => set((state) => ({ ...state, toaster: toaster })),
   setLoading: (isLoading) => set((state) => ({ ...state, loading: isLoading })),

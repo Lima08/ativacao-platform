@@ -1,18 +1,19 @@
 import { useRouter } from 'next/router'
 import React, { MouseEvent, useEffect, useState } from 'react'
 
-import { Notifications } from '@mui/icons-material'
+// import { Notifications } from '@mui/icons-material'
 import {
   Avatar,
-  IconButton,
+  // IconButton,
   Box,
-  Badge,
+  // Badge,
   MenuItem,
   Popover,
   Typography,
   Divider
 } from '@mui/material'
-import { useAuthStore } from 'store/useAuthStore'
+import { ROLES } from 'constants/enums/eRoles'
+import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
 import CompanySettings from './CompanySettings'
 
@@ -20,6 +21,7 @@ function HeaderBar() {
   const router = useRouter()
   const loggedUser = useAuthStore((state: any) => state.user)
 
+  const { user } = useAuthStore((state) => state) as IAuthStore
   const [anchorEl, setAnchorEl] = useState<null | (EventTarget & Element)>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [userImage, setUserImage] = useState('')
@@ -63,11 +65,11 @@ function HeaderBar() {
         gap: 2
       }}
     >
-      <IconButton color="inherit">
+      {/* <IconButton color="inherit">
         <Badge badgeContent={4} color="error">
           <Notifications />
         </Badge>
-      </IconButton>
+      </IconButton> */}
 
       <Avatar src={userImage} alt="photoURL" onClick={handleClick} />
 
@@ -100,7 +102,9 @@ function HeaderBar() {
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
-        <MenuItem onClick={handleOpenConfiguration}>Configurações</MenuItem>
+        {user && user.role >= ROLES.COMPANY_ADMIN && (
+          <MenuItem onClick={handleOpenConfiguration}>Configurações</MenuItem>
+        )}
         <MenuItem onClick={logout}>Sair</MenuItem>
       </Popover>
       {isModalOpen && <CompanySettings handleCloseModal={handleCloseModal} />}
