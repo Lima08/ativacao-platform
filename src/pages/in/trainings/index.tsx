@@ -24,7 +24,9 @@ import {
   TableCell,
   TableContainer,
   TableRow,
-  Typography
+  Typography,
+  useMediaQuery,
+  useTheme
 } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
 import type { ITrainingCreated } from 'interfaces/entities/training'
@@ -59,9 +61,12 @@ export default function TrainingsPage() {
     { id: 'title', label: 'Título', align: 'left' },
     { id: 'updatedAt', label: 'Atualizado em', align: 'left' },
     { id: 'active', label: 'Status', align: 'left' },
-    { id: 'see', label: 'Ver treinamento', align: 'left' },
+    { id: 'see', label: 'Visualizar', align: 'left' },
     { id: 'actions', label: 'Ações', align: 'right' }
   ]
+
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const router = useRouter()
   const [trainingsList, getAllTrainings, handleTrainingActive, deleteTraining] =
@@ -83,12 +88,15 @@ export default function TrainingsPage() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [filteredTrainings, setFilteredTrainings] = useState<DataList[]>([])
   const [trainingListAdapted, setTrainingListAdapted] = useState<DataList[]>([])
-  const [error, setToaster, page, rowsPerPage] = useGlobalStore((state) => [
-    state.error,
-    state.setToaster,
-    state.page,
-    state.rowsPerPage
-  ])
+  const [loading, error, setToaster, page, rowsPerPage] = useGlobalStore(
+    (state) => [
+      state.loading,
+      state.error,
+      state.setToaster,
+      state.page,
+      state.rowsPerPage
+    ]
+  )
 
   const [isModalOpen, setOpenModal] = useState(false)
 
@@ -223,13 +231,13 @@ export default function TrainingsPage() {
 
   return (
     <PageContainer pageTitle="Treinamentos" pageSection="trainings">
+      {loading && <div>Carregando...</div>}
       <Card>
-        {/* // TODO: Pensar em mobile */}
-        <TableContainer sx={{ maxHeight: '68vh' }}>
+        <TableContainer sx={{ maxHeight: '66vh' }}>
           <SearchTableCustom onSearch={searchByName} />
 
           <Table>
-            <TableHeadCustom headLabel={TABLE_HEAD} />
+            {!isMobile && <TableHeadCustom headLabel={TABLE_HEAD} />}
             <TableBody>
               {filteredTrainings &&
                 filteredTrainings.map((row: any) => {
@@ -237,61 +245,68 @@ export default function TrainingsPage() {
 
                   return (
                     <TableRow hover key={id} tabIndex={-1} role="checkbox">
-                      <TableCell
-                        align="center"
-                        sx={{ px: 1 }}
-                        component="th"
-                        scope="row"
-                      >
-                        {img.source && (
-                          <Stack alignItems="center" justifyContent="center">
-                            <Avatar
-                              variant="square"
-                              src={img.source}
-                              sx={{
-                                width: 70,
-                                height: 70
-                              }}
-                            />
-                          </Stack>
-                        )}
-                        {!img.source && <InsightsIcon fontSize="large" />}
-                      </TableCell>
+                      {!isMobile && (
+                        <TableCell
+                          align="center"
+                          sx={{ px: 1 }}
+                          component="th"
+                          scope="row"
+                        >
+                          {img.source && (
+                            <Stack alignItems="center" justifyContent="center">
+                              <Avatar
+                                variant="square"
+                                src={img.source}
+                                sx={{
+                                  width: 70,
+                                  height: 70
+                                }}
+                              />
+                            </Stack>
+                          )}
+                          {!img.source && <InsightsIcon fontSize="large" />}
+                        </TableCell>
+                      )}
                       <TableCell align="left">
                         <Stack direction="row" alignItems="center">
                           <Typography variant="subtitle2">{name}</Typography>
                         </Stack>
                       </TableCell>
-                      <TableCell align="left">
-                        {formatDate(updatedAt)}
-                      </TableCell>
-                      <TableCell align="left">
-                        <Chip
-                          label={active ? 'Ativo' : 'Desativo'}
-                          color={active ? 'success' : 'error'}
-                          sx={{ width: 80 }}
-                        />
-                      </TableCell>
-                      <TableCell align="left">
-                        {active && (
-                          <IconButton
-                            aria-label="visibility"
-                            size="large"
-                            onClick={() => onClickRow(id)}
-                          >
-                            <VisibilityIcon />
-                          </IconButton>
-                        )}
-                        {!active && (
-                          <IconButton
-                            aria-label="visibility"
-                            size="large"
-                            disabled
-                          >
-                            <VisibilityOffIcon />
-                          </IconButton>
-                        )}
-                      </TableCell>
+
+                      {!isMobile && (
+                        <>
+                          <TableCell align="left">
+                            {formatDate(updatedAt)}
+                          </TableCell>
+                          <TableCell align="left">
+                            <Chip
+                              label={active ? 'Ativo' : 'Desativo'}
+                              color={active ? 'success' : 'error'}
+                              sx={{ width: 80 }}
+                            />
+                          </TableCell>
+                          <TableCell align="left">
+                            {active && (
+                              <IconButton
+                                aria-label="visibility"
+                                size="large"
+                                onClick={() => onClickRow(id)}
+                              >
+                                <VisibilityIcon />
+                              </IconButton>
+                            )}
+                            {!active && (
+                              <IconButton
+                                aria-label="visibility"
+                                size="large"
+                                disabled
+                              >
+                                <VisibilityOffIcon />
+                              </IconButton>
+                            )}
+                          </TableCell>
+                        </>
+                      )}
 
                       <TableCell align="right">
                         <IconButton

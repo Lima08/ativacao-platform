@@ -39,11 +39,11 @@ export default function PageContainer({
     setIsAdmin(user.role >= ROLES.COMPANY_ADMIN)
   }, [user])
   return (
-    <div className=" flex flex-col items-center px-8 py-1">
+    <div className=" flex flex-col items-center px-2 md:px-8 py-1">
       <div className="w-full flex flex-row justify-between items-center ">
         <h2 className="text-2xl font-medium">{pageTitle}</h2>
 
-        {isAdmin && pageSection &&(
+        {isAdmin && pageSection && (
           <Button variant="outlined" onClick={navToCreatePage}>
             Adicionar
           </Button>

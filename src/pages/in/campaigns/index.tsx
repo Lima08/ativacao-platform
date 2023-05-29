@@ -23,7 +23,9 @@ import {
   TableCell,
   TableContainer,
   TableRow,
-  Typography
+  Typography,
+  useMediaQuery,
+  useTheme
 } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
 import type { ICampaignCreated } from 'interfaces/entities/campaign'
@@ -58,9 +60,12 @@ export default function CampaignsList() {
     { id: 'title', label: 'Título', align: 'left' },
     { id: 'updatedAt', label: 'Atualizado em', align: 'left' },
     { id: 'active', label: 'Status', align: 'left' },
-    { id: 'see', label: 'Ver campanha', align: 'left' },
+    { id: 'see', label: 'Visualizar', align: 'left' },
     { id: 'actions', label: 'Ações', align: 'right' }
   ]
+
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const router = useRouter()
   const { user } = useAuthStore((state) => state) as IAuthStore
@@ -83,12 +88,15 @@ export default function CampaignsList() {
     []
   )
   const [filteredCampaigns, setFilteredCampaigns] = useState<DataList[]>([])
-  const [error, setToaster, page, rowsPerPage] = useGlobalStore((state) => [
-    state.error,
-    state.setToaster,
-    state.page,
-    state.rowsPerPage
-  ])
+  const [loading, error, setToaster, page, rowsPerPage] = useGlobalStore(
+    (state) => [
+      state.loading,
+      state.error,
+      state.setToaster,
+      state.page,
+      state.rowsPerPage
+    ]
+  )
 
   const [isAdmin, setIsAdmin] = useState(false)
   const [isModalOpen, setOpenModal] = useState(false)
@@ -220,12 +228,12 @@ export default function CampaignsList() {
 
   return (
     <PageContainer pageTitle="Campanhas" pageSection="campaigns">
+      {loading && <div>Carregando...</div>}
       <Card>
-        {/* // TODO: Pensar em mobile */}
-        <TableContainer sx={{ maxHeight: '68vh' }}>
+        <TableContainer sx={{ maxHeight: '66vh' }}>
           <SearchTableCustom onSearch={searchByName} />
           <Table>
-            <TableHeadCustom headLabel={TABLE_HEAD} />
+            {!isMobile && <TableHeadCustom headLabel={TABLE_HEAD} />}
             <TableBody>
               {filteredCampaigns &&
                 filteredCampaigns.map((row: any) => {
@@ -233,21 +241,23 @@ export default function CampaignsList() {
 
                   return (
                     <TableRow hover key={id} tabIndex={-1} role="checkbox">
-                      <TableCell align="center" component="th" scope="row">
-                        {img.source && (
-                          <Stack alignItems="center" justifyContent="center">
-                            <Avatar
-                              variant="square"
-                              src={img.source}
-                              sx={{
-                                width: 70,
-                                height: 70
-                              }}
-                            />
-                          </Stack>
-                        )}
-                        {!img.source && <CampaignIcon fontSize="large" />}
-                      </TableCell>
+                      {!isMobile && (
+                        <TableCell align="center" component="th" scope="row">
+                          {img.source && (
+                            <Stack alignItems="center" justifyContent="center">
+                              <Avatar
+                                variant="square"
+                                src={img.source}
+                                sx={{
+                                  width: 70,
+                                  height: 70
+                                }}
+                              />
+                            </Stack>
+                          )}
+                          {!img.source && <CampaignIcon fontSize="large" />}
+                        </TableCell>
+                      )}
 
                       <TableCell align="left">
                         <Stack direction="row" alignItems="center">
@@ -255,18 +265,20 @@ export default function CampaignsList() {
                         </Stack>
                       </TableCell>
 
-                      <TableCell align="left">
-                        {formatDate(updatedAt)}
-                      </TableCell>
-
-                      <TableCell align="left">
-                        <Chip
-                          label={active ? 'Ativo' : 'Desativo'}
-                          color={active ? 'success' : 'error'}
-                          sx={{ width: 80 }}
-                        />
-                      </TableCell>
-
+                      {!isMobile && (
+                        <>
+                          <TableCell align="left">
+                            {formatDate(updatedAt)}
+                          </TableCell>
+                          <TableCell align="left">
+                            <Chip
+                              label={active ? 'Ativo' : 'Desativo'}
+                              color={active ? 'success' : 'error'}
+                              sx={{ width: 80 }}
+                            />
+                          </TableCell>
+                        </>
+                      )}
                       <TableCell align="left">
                         {active && (
                           <IconButton

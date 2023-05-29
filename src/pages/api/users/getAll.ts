@@ -12,7 +12,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
   if (req.method === REQUEST_METHODS.GET) {
     try {
       let users = await getUsers({ companyId })
-      if (role < ROLES.SYSTEM_ADMIN) {
+      if (role < ROLES.COMPANY_ADMIN) {
         users = users.filter((user) => user.id === userId)
       }
 

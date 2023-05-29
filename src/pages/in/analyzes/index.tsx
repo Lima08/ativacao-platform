@@ -22,7 +22,9 @@ import {
   TableCell,
   TableContainer,
   TableRow,
-  Typography
+  Typography,
+  useMediaQuery,
+  useTheme
 } from '@mui/material'
 import { IAnalysisCreated } from 'interfaces/entities/analysis'
 import { eAnalysisStatusType } from 'interfaces/entities/analysis/EAnalysisStatus'
@@ -75,12 +77,16 @@ export default function AnalyzesTable() {
     { id: 'status', label: 'Status', align: 'left' },
     { id: 'title', label: 'Título', align: 'left' },
     { id: 'updatedAt', label: 'Atualizado em', align: 'left' },
-    { id: 'bi', label: 'Ver análise', align: 'left' },
-    { id: 'message', label: 'Ver mensagem', align: 'left' },
+    { id: 'bi', label: 'Visualizar', align: 'left' },
+    { id: 'message', label: 'Mensagem', align: 'left' },
     { id: 'actions', label: 'Ações', align: 'right' }
   ]
 
-  const [page, rowsPerPage] = useGlobalStore((state) => [
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+  const [loading, page, rowsPerPage] = useGlobalStore((state) => [
+    state.loading,
     state.page,
     state.rowsPerPage
   ])
@@ -185,13 +191,15 @@ export default function AnalyzesTable() {
       pageSection="analyzes"
       customCallback={() => openCreateAnalysisModal()}
     >
+      {loading && <div>Carregando...</div>}
+
       <Card>
-        {/* // TODO: Pensar em mobile */}
-        <TableContainer sx={{ maxHeight: '68vh' }}>
+        <TableContainer sx={{ maxHeight: '66vh' }}>
           <SearchTableCustom onSearch={searchByTitle} />
 
           <Table>
-            <TableHeadCustom headLabel={TABLE_HEAD} />
+            {!isMobile && <TableHeadCustom headLabel={TABLE_HEAD} />}
+
             <TableBody>
               {filteredAnalyzes &&
                 filteredAnalyzes.map((row: any) => {
@@ -207,14 +215,20 @@ export default function AnalyzesTable() {
                       >
                         <Chip label={status.label} color={status.color} />
                       </TableCell>
-                      <TableCell align="left">
-                        <Stack direction="row" alignItems="center">
-                          <Typography variant="subtitle2">{title}</Typography>
-                        </Stack>
-                      </TableCell>
-                      <TableCell align="left">
-                        {formatDate(updatedAt)}
-                      </TableCell>
+                      {!isMobile && (
+                        <>
+                          <TableCell align="left">
+                            <Stack direction="row" alignItems="center">
+                              <Typography variant="subtitle2">
+                                {title}
+                              </Typography>
+                            </Stack>
+                          </TableCell>
+                          <TableCell align="left">
+                            {formatDate(updatedAt)}
+                          </TableCell>
+                        </>
+                      )}
                       <TableCell align="left">
                         {biUrl && (
                           <Link href={`${biUrl}`} target="_blank">
@@ -230,23 +244,25 @@ export default function AnalyzesTable() {
                           </IconButton>
                         )}
                       </TableCell>
-                      <TableCell align="left">
-                        {message && message.length > 1 && (
-                          <IconButton aria-label="message" size="large">
-                            <SmsIcon />
-                          </IconButton>
-                        )}
+                      {!isMobile && (
+                        <TableCell align="left">
+                          {message && message.length > 1 && (
+                            <IconButton aria-label="message" size="large">
+                              <SmsIcon />
+                            </IconButton>
+                          )}
 
-                        {!message && (
-                          <IconButton
-                            aria-label="message"
-                            size="large"
-                            disabled
-                          >
-                            <SpeakerNotesOffIcon />
-                          </IconButton>
-                        )}
-                      </TableCell>
+                          {!message && (
+                            <IconButton
+                              aria-label="message"
+                              size="large"
+                              disabled
+                            >
+                              <SpeakerNotesOffIcon />
+                            </IconButton>
+                          )}
+                        </TableCell>
+                      )}
 
                       <TableCell align="right">
                         <IconButton

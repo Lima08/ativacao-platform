@@ -4,13 +4,16 @@ import type { AppProps } from 'next/app'
 import { ThemeProvider, createTheme } from '@mui/material'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
-export default function App({ Component, pageProps, router }:  AppProps) {
+export default function App({ Component, pageProps, router }: AppProps) {
   const theme = createTheme({})
-  const isLoginPage = router.pathname === '/login' || router.pathname === '/'
+  const isUnloggedPage =
+    router.pathname === '/login' ||
+    router.pathname === '/' ||
+    router.pathname === '/create-account'
 
   return (
     <ThemeProvider theme={theme}>
-      {isLoginPage ? (
+      {isUnloggedPage ? (
         <Component {...pageProps} />
       ) : (
         <DashboardLayout>

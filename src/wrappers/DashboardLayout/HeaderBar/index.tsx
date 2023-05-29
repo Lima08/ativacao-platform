@@ -32,7 +32,7 @@ function HeaderBar() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget)
@@ -81,7 +81,10 @@ function HeaderBar() {
         </Badge>
       </IconButton> */}
 
-      <div className="flex items-center justify-center" onClick={handleClick}>
+      <div
+        className="flex items-center justify-center gap-2 cursor-pointer md:absolute md:right-6 md:top-3  "
+        onClick={handleClick}
+      >
         <Avatar src={userImage} alt="Foto do usuário" />
         <MoreVertSharpIcon />
       </div>

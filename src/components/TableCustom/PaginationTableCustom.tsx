@@ -36,6 +36,7 @@ export default function PaginationTableCustom({ tableItems }: any) {
       page={page}
       onPageChange={handleChangePage}
       onRowsPerPageChange={handleChangeRowsPerPage}
+      labelRowsPerPage="Máximo"
     />
   )
 }

@@ -27,7 +27,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   }
 
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   return (
     <>
@@ -44,12 +44,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </Grid>
         )}
         <Divider />
-        <Grid item xs={12} sm={9} md={10}>
+        <Grid item xs={12} sm={12} md={10}>
           <Box sx={{ height: '4rem', background: 'white' }}>
             <HeaderBar />
           </Box>
           <Divider />
-          <Box sx={{ pt: 4 }}>
+          <Box sx={{ pt: 3 }}>
             <main>{children}</main>
           </Box>
         </Grid>

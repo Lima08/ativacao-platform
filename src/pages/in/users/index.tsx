@@ -14,7 +14,9 @@ import {
   TableCell,
   TableContainer,
   TableRow,
-  Typography
+  Typography,
+  useMediaQuery,
+  useTheme
 } from '@mui/material'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
@@ -34,6 +36,9 @@ export default function UsersList() {
     { id: 'createdAt', label: 'Data criação', alignRight: 'left' },
     { id: 'actions', label: 'Ações', alignRight: 'right' }
   ]
+
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const router = useRouter()
 
@@ -95,12 +100,12 @@ export default function UsersList() {
     <PageContainer pageTitle="Lista de usuários">
       {loading && <div>Carregando...</div>}
       <Card>
-        {/* // TODO: Pensar em mobile */}
-        <TableContainer sx={{ maxHeight: '68vh' }}>
+        <TableContainer sx={{ maxHeight: '66vh' }}>
           <SearchTableCustom onSearch={searchByName} />
 
           <Table>
-            <TableHeadCustom headLabel={TABLE_HEAD} />
+            {!isMobile && <TableHeadCustom headLabel={TABLE_HEAD} />}
+
             <TableBody>
               {filteredUsers &&
                 filteredUsers.map((row: any) => {
@@ -122,9 +127,11 @@ export default function UsersList() {
                         </Stack>
                       </TableCell>
 
-                      <TableCell align="left">
-                        {role > 100 ? 'Administrador' : 'Usuário'}
-                      </TableCell>
+                      {!isMobile && (
+                        <TableCell align="left">
+                          {role > 100 ? 'Administrador' : 'Usuário'}
+                        </TableCell>
+                      )}
 
                       <TableCell align="left">
                         <Chip
@@ -134,9 +141,11 @@ export default function UsersList() {
                         />
                       </TableCell>
 
-                      <TableCell align="left">
-                        {formatDate(createdAt)}
-                      </TableCell>
+                      {!isMobile && (
+                        <TableCell align="left">
+                          {formatDate(createdAt)}
+                        </TableCell>
+                      )}
 
                       <TableCell align="right">
                         <IconButton

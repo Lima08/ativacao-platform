@@ -17,7 +17,7 @@ function AsidePanel() {
   const [logoSrl, setLogoSrl] = useState('/logo-ativacao.png')
 
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   useEffect(() => {
     if (!user) return
