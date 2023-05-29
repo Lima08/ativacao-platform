@@ -1,7 +1,11 @@
 {
-  "name": "ativacao-front",
+  "name": "ativacao-tec",
   "version": "0.1.0",
   "private": true,
+  "author": "João Paulo Gomes Lima",
+  "engines": {
+    "node": "^18.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
