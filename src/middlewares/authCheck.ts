@@ -20,7 +20,6 @@ export const authCheck =
     }
 
     try {
-      // TODO: Ver tipos de retorno desse verify e tratar os mesmos
       const decoded = jwt.verify(token, process.env.JWT_SECRET!)
 
       // @ts-ignore

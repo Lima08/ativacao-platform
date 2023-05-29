@@ -33,10 +33,6 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
     }
   }
 
-  // if (req.method === REQUEST_METHODS.DELETE) {
-  //   await deleteCompany(id)
-  //   return res.status(HTTP_STATUS.NO_CONTENT).end()
-  // }
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
     .json({ error: { message: 'Method not allowed' } })

@@ -1,4 +1,7 @@
+import Router from 'next/router'
+
 import axios from 'axios'
+import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 
 import AnalysisService from './analysisServices'
 import CampaignService from './campaignService'
@@ -6,7 +9,6 @@ import CompanyService from './companyService'
 import TrainingService from './trainingService'
 import UploadService from './uploadService'
 import UserService from './UserService'
-
 const httpClient = axios.create()
 
 httpClient.interceptors.request.use((config) => {
@@ -26,14 +28,13 @@ httpClient.interceptors.response.use(
     return response
   },
   (error) => {
-    // const errorStatus = error.response && error.response.status
-    // if (
-    //   [HTTP_STATUS.FORBIDDEN, HTTP_STATUS.UNAUTHORIZED].includes(errorStatus)
-    // ) {
-    //   VER se não faz mais sentido enviar uma mensagem e não deslogar
-    //   window.localStorage.removeItem('token')
-    //   Router.push('/login')
-    // }
+    const errorStatus = error.response && error.response.status
+    if (
+      [HTTP_STATUS.FORBIDDEN, HTTP_STATUS.UNAUTHORIZED].includes(errorStatus)
+    ) {
+      window.localStorage.removeItem('token')
+      Router.push('/login')
+    }
 
     return Promise.reject(error)
   }

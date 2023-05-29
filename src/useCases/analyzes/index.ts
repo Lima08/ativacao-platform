@@ -80,7 +80,7 @@ async function updateAnalysis(
   try {
     const updatedAnalysis = await repository.update(id, modifierData)
     const user = await getUserById(updatedAnalysis.userId)
-    const emailTemplatePath = path.resolve('templates/analysisUpdate.html')
+    const emailTemplatePath = path.resolve('src/templates/analysisUpdate.html')
     const emailTemplate = readFileSync(emailTemplatePath, 'utf-8')
     await EmailService.getInstance().sendEmail(
       user.email,

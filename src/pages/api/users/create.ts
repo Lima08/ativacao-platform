@@ -12,7 +12,6 @@ export default async function handler(
 ) {
   if (req.method === REQUEST_METHODS.POST) {
     const { email, password, name, companyId } = req.body
-
     const { error } = loginSchema.validate({ email, password, name, companyId })
 
     if (error) {
@@ -21,9 +20,8 @@ export default async function handler(
         .json({ error: error.details[0].message })
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
-
     try {
+      const hashedPassword = await bcrypt.hash(password, 10)
       await createUser({
         email,
         password: hashedPassword,

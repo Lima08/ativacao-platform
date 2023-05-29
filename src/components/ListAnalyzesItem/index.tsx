@@ -103,9 +103,6 @@ export default function ListAnalyzesItem({
       <div className="flex px-4 py-4 justify-center gap-4 items-center w-full">
         <button
           className={`w-1/4 flex justify-around items-center border border-gray-200 rounded-md p-1 bg-white`}
-          // className={`w-1/4 flex justify-around items-center border border-gray-200 rounded-md p-1 bg-white ${
-          //   data.status === 'pending' ? 'op-50 pointer-events-none' : ''
-          // }`}
           onClick={() => setOpenStatus(!openStatus)}
         >
           {STATUS[data.status]}

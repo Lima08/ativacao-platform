@@ -161,7 +161,6 @@ export default function UserAnalysisRegister({
                       type="file"
                       className="sr-only"
                       multiple={true}
-                      // disabled={loading}
                       onChange={(e) => uploadFile(e)}
                     />
                   </label>

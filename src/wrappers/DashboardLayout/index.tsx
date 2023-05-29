@@ -1,31 +1,11 @@
 import { ReactNode } from 'react'
 
-import {
-  Alert,
-  Grid,
-  Snackbar,
-  Box,
-  Divider,
-  useTheme,
-  useMediaQuery
-} from '@mui/material'
-import useGlobalStore from 'store/useGlobalStore'
+import { Grid, Box, Divider, useTheme, useMediaQuery } from '@mui/material'
 
 import AsidePanel from './AsidePanel'
 import HeaderBar from './HeaderBar'
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const [toaster, setToaster] = useGlobalStore((state) => [
-    state.toaster,
-    state.setToaster
-  ])
-
-  const { isOpen, message, type, duration } = toaster
-
-  function handleClose() {
-    setToaster({ ...toaster, isOpen: false })
-  }
-
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -54,17 +34,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </Box>
         </Grid>
       </Grid>
-
-      <Snackbar
-        onClose={handleClose}
-        open={isOpen}
-        autoHideDuration={duration || 5000}
-        role="alert"
-      >
-        <Alert onClose={handleClose} severity={type} sx={{ width: '100%' }}>
-          {message}
-        </Alert>
-      </Snackbar>
     </>
   )
 }

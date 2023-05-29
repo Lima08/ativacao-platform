@@ -1,11 +1,11 @@
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Alert, CircularProgress } from '@mui/material'
+import { Button, CircularProgress, Divider } from '@mui/material'
 import httpServices from 'services/http'
 import { useAuthStore } from 'store/useAuthStore'
+import useGlobalStore from 'store/useGlobalStore'
 
 import { validationSchema } from './schema'
 
@@ -24,24 +24,34 @@ export default function LoginForm() {
     resolver: yupResolver(validationSchema)
   })
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [loading, setLoading, setError, setToaster] = useGlobalStore(
+    (state) => [
+      state.loading,
+      state.setLoading,
+      state.setError,
+      state.setToaster
+    ]
+  )
 
   const router = useRouter()
   const setUserLogged = useAuthStore((state: any) => state.setUserLogged)
 
   async function loginAccount(values: IFormValues) {
     try {
-      setError(null)
-      setIsLoading(true)
       const loginData = await httpServices.user.login(values)
       if (!loginData) return
+
       setUserLogged({ company: loginData.company, user: loginData.user })
       router.push('/in/campaigns')
     } catch (error: any) {
       setError(error)
+      setToaster({
+        isOpen: true,
+        message: 'Erro ao fazer login. Tente novamente!',
+        type: 'error'
+      })
     } finally {
-      setIsLoading(false)
+      setLoading(false)
       reset()
     }
   }
@@ -55,14 +65,27 @@ export default function LoginForm() {
           alt="Workflow"
         />
       </div>
+
       <form
         className="mt-8 space-y-6 w-64 md:w-80"
         onSubmit={handleSubmit(loginAccount)}
       >
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Entrar na plataforma
+          O que deseja fazer?
         </h2>
-        <div className="rounded-md shadow-sm -space-y-px">
+        <Button
+          variant="outlined"
+          fullWidth
+          onClick={() => router.push('/create-account')}
+        >
+          Criar conta
+        </Button>
+        <Divider>ou</Divider>
+
+        <p className="mt-6 text-center  font-extrabold text-gray-900">
+          Entrar na plataforma
+        </p>
+        <div className="rounded-md shadow-sm -space-y-px flex flex-col gap-3">
           <div>
             <label htmlFor="email-address" className="sr-only">
               Email
@@ -103,23 +126,20 @@ export default function LoginForm() {
           </div>
         </div>
 
-        {!isLoading && (
-          <div className="flex items-center justify-center">
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Entrar
-            </button>
-            {isLoading && <CircularProgress />}
-          </div>
+        {!loading && (
+          <>
+            <div className="flex items-center justify-center">
+              <button
+                type="submit"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Entrar
+              </button>
+            </div>
+          </>
         )}
 
-        {!isLoading && error && (
-          <Alert severity="error">
-            Erro ao realizar login! Tente novamente.
-          </Alert>
-        )}
+        {loading && <CircularProgress />}
       </form>
     </div>
   )

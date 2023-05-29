@@ -80,7 +80,6 @@ function CompanySettings({
   const handleSaveConfiguration = () => {
     updateCompany(String(company!.id), { name: companyName, imageUrl })
     setCompany({ ...company })
-    // TODO: Salvar no auth
     setShowSuccess(true)
   }
 

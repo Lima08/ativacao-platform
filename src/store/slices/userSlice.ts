@@ -7,10 +7,8 @@ export interface IUserStore {
   currentUser: IUserCreated | null
   usersList: IUserCreated[]
   resetCurrentUser: () => void
-  // createUser: (newUser: CreatePayloadStore) => void
   getUserById: (id: string) => void
   getAllUsers: () => void
-  // deleteUser: (id: string) => void
   updateUser: (id: string, updatedUser: IUserModifier) => void
 }
 
@@ -68,70 +66,12 @@ const createUserSlice: StateCreator<IUserStore> = (set) => ({
         )
       }))
     } catch (error) {
-      console.log('🚀 ~ file: userSlice.ts:62 ~ updateUser: ~ error:', error)
       useGlobalStore.getState().setError(error)
       return
     } finally {
       useGlobalStore.getState().setLoading(false)
     }
   }
-  // createUser: async (newUser: CreatePayloadStore) => {
-  //   useGlobalStore.getState().setLoading(true)
-
-  //   try {
-  //     const response = await httpServices.user.create(newUser)
-  //     set((state) => ({
-  //       ...state,
-  //       userList: [
-  //         ...state.userList,
-  //         response.data as IUserCreated
-  //       ]
-  //     }))
-  //   } catch (error) {
-  //     useGlobalStore.getState().setError(error)
-  //     return
-  //   } finally {
-  //     useGlobalStore.getState().setLoading(false)
-  //   }
-  // },
-
-  // handleUserActive: async (id: string, status: boolean) => {
-  //   useGlobalStore.getState().setLoading(true)
-
-  //   try {
-  //     const response = await httpServices.user.update(id, {
-  //       active: status
-  //     })
-  //     set((state) => ({
-  //       ...state,
-  //       trainingsList: state.userList.map((c) =>
-  //         c.id === id ? (response.data as IUserCreated) : c
-  //       )
-  //     }))
-  //   } catch (error) {
-  //     useGlobalStore.getState().setError(error)
-  //     return
-  //   } finally {
-  //     useGlobalStore.getState().setLoading(false)
-  //   }
-  // },
-  // deleteUser: async (id: string) => {
-  //   useGlobalStore.getState().setLoading(true)
-
-  //   try {
-  //     set((state) => ({
-  //       ...state,
-  //       usersList: state.usersList.filter((c) => c.id !== id)
-  //     }))
-
-  //     await httpServices.Users.delete(id)
-  //   } catch (error) {
-  //     useGlobalStore.getState().setError(error)
-  //     return
-  //   } finally {
-  //     useGlobalStore.getState().setLoading(false)
-  //   }
-  // }
 })
 
 export default createUserSlice

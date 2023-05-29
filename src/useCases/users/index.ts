@@ -54,10 +54,10 @@ async function createUser(params: IUser): Promise<void> {
       throw new Error('Error to create user')
     }
 
-    const emailTemplatePath = path.resolve('templates/welcome.html')
+    const emailTemplatePath = path.resolve('src/templates/welcome.html')
     const emailTemplate = readFileSync(emailTemplatePath, 'utf-8')
-    await EmailService.getInstance().sendEmail(
-      'joaopaulo.gomeslima8@gmail.com',
+    EmailService.getInstance().sendEmail(
+      newUser.email,
       'Seja bem vindo!',
       emailTemplate
     )
@@ -171,7 +171,9 @@ async function updateUser(
     const updatedUser = await repository.update(id, params)
 
     if (!!updatedUser && params.isActive) {
-      const emailTemplatePath = path.resolve('templates/unblockAccount.html')
+      const emailTemplatePath = path.resolve(
+        'src/templates/unblockAccount.html'
+      )
       const emailTemplate = readFileSync(emailTemplatePath, 'utf-8')
       await EmailService.getInstance().sendEmail(
         updatedUser.email,

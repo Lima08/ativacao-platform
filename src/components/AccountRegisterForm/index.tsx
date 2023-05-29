@@ -1,10 +1,10 @@
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRouter } from 'next/router'
 import { useForm } from 'react-hook-form'
 
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Alert, Button, CircularProgress } from '@mui/material'
+import { CircularProgress, TextField } from '@mui/material'
 import httpServices from 'services/http'
+import useGlobalStore from 'store/useGlobalStore'
 
 import { validationSchema } from './schema'
 
@@ -26,28 +26,39 @@ export default function AccountRegisterForm() {
   })
 
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [errorToCreate, setIsErrorToCreate] = useState(false)
-  const [creteSuccess, setCreteSuccess] = useState(false)
+
+  const [loading, setLoading, setError, setToaster] = useGlobalStore(
+    (state) => [
+      state.loading,
+      state.setLoading,
+      state.setError,
+      state.setToaster
+    ]
+  )
 
   async function createAccount(values: IFormValues) {
-    setIsErrorToCreate(false)
-    setCreteSuccess(false)
     try {
-      setIsLoading(true)
-
-      await httpServices.user.create(values)
-      setCreteSuccess(true)
-    } catch {
-      setIsErrorToCreate(true)
+      await httpServices.user.create(values).then(() => {
+        setToaster({
+          isOpen: true,
+          message:
+            'Solicitação de cadastro enviada com sucesso! Aguarde sua conta ser liberar antes de tentar entrar no sistema. Voce receberá um e-mail de confirmando a liberação do acesso.',
+          type: 'success',
+          duration: 10000
+        })
+        router.push('/login')
+      })
+    } catch (error) {
+      setError(error)
+      setToaster({
+        isOpen: true,
+        message: 'Erro ao cadastrar usuário. Tente novamente!',
+        type: 'error'
+      })
     } finally {
-      setIsLoading(false)
+      setLoading(false)
       reset()
     }
-  }
-
-  function goToLogin() {
-    router.push('/login')
   }
 
   return (
@@ -66,85 +77,56 @@ export default function AccountRegisterForm() {
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Criar conta
         </h2>
-        <div className="rounded-md shadow-sm -space-y-px">
+        <div className="rounded-md shadow-sm -space-y-px flex flex-col gap-3">
           <div>
-            <label htmlFor="company" className="sr-only">
-              Empresa
-            </label>
-            <input
+            <TextField
               id="company"
-              type="text"
+              label="Empresa"
+              variant="outlined"
+              fullWidth
+              error={!!errors.companyId}
+              helperText={errors.companyId?.message}
               {...register('companyId')}
-              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Empresa"
-              required
             />
-            {errors.companyId && (
-              <span className=" text-red-500 text-sm">
-                {errors.companyId.message}
-              </span>
-            )}
           </div>
           <div>
-            <label htmlFor="user-name" className="sr-only">
-              Nome
-            </label>
-            <input
+            <TextField
               id="user-name"
-              type="text"
+              label="Nome"
+              variant="outlined"
+              fullWidth
+              error={!!errors.name}
+              helperText={errors.name?.message}
               {...register('name')}
-              autoComplete="text"
-              required
-              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Nome"
             />
-            {errors.name && (
-              <span className=" text-red-500 text-sm">
-                {errors.name.message}
-              </span>
-            )}
           </div>
           <div>
-            <label htmlFor="email-address" className="sr-only">
-              Email
-            </label>
-            <input
+            <TextField
               id="email-address"
+              label="Email"
               type="email"
+              variant="outlined"
+              fullWidth
+              error={!!errors.email}
+              helperText={errors.email?.message}
               {...register('email')}
-              autoComplete="email"
-              required
-              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Email"
             />
-            {errors.email && (
-              <span className=" text-red-500 text-sm">
-                {errors.email.message}
-              </span>
-            )}
           </div>
           <div>
-            <label htmlFor="password" className="sr-only">
-              Senha
-            </label>
-            <input
+            <TextField
               id="password"
+              label="Senha"
               type="password"
+              variant="outlined"
+              fullWidth
+              error={!!errors.password}
+              helperText={errors.password?.message}
               {...register('password')}
-              autoComplete="current-password"
-              required
-              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="senha"
             />
-            {errors.password && (
-              <span className=" text-red-500 text-sm">
-                {errors.password.message}
-              </span>
-            )}
           </div>
         </div>
 
-        {!isLoading && !creteSuccess && (
+        {!loading && (
           <div className="flex items-center justify-center">
             <button
               type="submit"
@@ -154,28 +136,10 @@ export default function AccountRegisterForm() {
             </button>
           </div>
         )}
-        {isLoading && (
+        {loading && (
           <div className="flex items-center justify-center">
             <CircularProgress />
           </div>
-        )}
-        {!isLoading && creteSuccess && (
-          <>
-            <Button
-              variant="contained"
-              color="success"
-              fullWidth
-              onClick={goToLogin}
-            >
-              Entrar
-            </Button>
-            <Alert severity="success">
-              Solicitação enviada com sucesso! Aguarde e-mail de confirmação.
-            </Alert>
-          </>
-        )}
-        {!isLoading && errorToCreate && (
-          <Alert severity="error">Não foi possível criar sua conta!</Alert>
         )}
       </form>
     </div>

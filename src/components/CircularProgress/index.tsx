@@ -1,6 +1,5 @@
 import * as React from 'react'
 
-// TODO: make this component dynamic
 import Box from '@mui/material/Box'
 import CircularProgress, {
   CircularProgressProps

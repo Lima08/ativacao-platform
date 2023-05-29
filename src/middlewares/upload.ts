@@ -11,7 +11,6 @@ const upload = multer({
   storage: multerS3({
     s3: getS3Client(),
     bucket: (_req, _files, cb) => {
-      // TODO: Separar buckets para document
       const bucketName = process.env.AWS_BUCKET_MEDIA!
       cb(null, bucketName)
     },
