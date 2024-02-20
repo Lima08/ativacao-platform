@@ -4,19 +4,20 @@ import { useCallback, useEffect, useState } from 'react'
 
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
+import GetAppIcon from '@mui/icons-material/GetApp'
 import MoreVertSharpIcon from '@mui/icons-material/MoreVertSharp'
 import SmsIcon from '@mui/icons-material/Sms'
 import SpeakerNotesOffIcon from '@mui/icons-material/SpeakerNotesOff'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import {
-  Card,
+  Button,
+  Paper,
   Chip,
   Divider,
   IconButton,
   MenuItem,
   Popover,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -24,14 +25,20 @@ import {
   TableRow,
   Typography,
   useMediaQuery,
-  useTheme
+  useTheme,
+  TableHead,
+  Tooltip,
+  TextField
 } from '@mui/material'
-import { IAnalysisCreated } from 'interfaces/entities/analysis'
+import { ROLES } from 'constants/enums/eRoles'
 import { eAnalysisStatusType } from 'interfaces/entities/analysis/EAnalysisStatus'
+import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 
 import AdminAnalysisRegister from 'components/AdminAnalysisRegister'
+import DeleteDoubleCheck from 'components/DeleteDoubleCheck'
+import LoadingScreen from 'components/LoadingScreen'
 import ModalCustom from 'components/ModalCustom'
 import PageContainer from 'components/PageContainer'
 import PaginationTableCustom from 'components/TableCustom/PaginationTableCustom'
@@ -52,16 +59,6 @@ type IAnalysisStatusType = {
   label: string
 }
 
-type IAnalyzesAdapted = {
-  id: string
-  title: string
-  message?: string
-  bucketUrl: string
-  biUrl?: string
-  status: IAnalysisStatusType
-  updatedAt: Date
-}
-
 type AnalyzesObject = {
   id: string
   status: string
@@ -74,16 +71,21 @@ type AnalyzesObject = {
 
 export default function AnalyzesTable() {
   const TABLE_HEAD = [
-    { id: 'status', label: 'Status', align: 'left' },
-    { id: 'title', label: 'Título', align: 'left' },
-    { id: 'updatedAt', label: 'Atualizado em', align: 'left' },
-    { id: 'bi', label: 'Visualizar', align: 'left' },
-    { id: 'message', label: 'Mensagem', align: 'left' },
-    { id: 'actions', label: 'Ações', align: 'right' }
+    { id: 'status', label: 'Status', align: 'center' },
+    { id: 'title', label: 'Título', align: 'center' },
+    { id: 'updatedAt', label: 'Atualizado em', align: 'center' },
+    { id: 'bi', label: 'Visualizar', align: 'center' },
+    { id: 'message', label: 'Mensagem', align: 'center' },
+    { id: 'actions', label: 'Ações', align: 'center' }
   ]
 
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const TABLE_HEAD_MOBILE = [
+    { id: 'status', label: 'Status', align: 'center' },
+    { id: 'bi', label: 'Visualizar', align: 'center' },
+    { id: 'actions', label: 'Ações', align: 'center' }
+  ]
+
+  const { user } = useAuthStore((state) => state) as IAuthStore
 
   const [loading, page, rowsPerPage] = useGlobalStore((state) => [
     state.loading,
@@ -94,13 +96,23 @@ export default function AnalyzesTable() {
     (state) => [state.analyzesList, state.getAllAnalyzes, state.deleteAnalysis]
   )
 
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+  const [isSystemAdmin, setIsSystemAdmin] = useState(false)
   const [filteredAnalyzes, setFilteredAnalyzes] = useState<any[]>([])
   const [analyzesListAdapted, setAnalyzesListAdapted] = useState<any>([])
+  const [showDeletePrompt, setShowDeletePrompt] = useState(false)
+  const [itemToBeDeleted, setItemToBeDeleted] = useState<string>('')
   const [currentAnalysis, setCurrentAnalysis] = useState<{
     id: string
     title: string
   } | null>(null)
   const [openUser, setOpenUser] = useState(false)
+  const [openMessage, setOpenMessage] = useState({
+    isOpen: false,
+    message: null
+  })
   const [openAdmin, setOpenAdmin] = useState(false)
   const [openOptions, setOpenOptions] = useState<any>(null)
 
@@ -136,21 +148,11 @@ export default function AnalyzesTable() {
     setCurrentAnalysis(null)
   }
 
-  function deleteItem() {
-    const userDecision = confirm('Deseja realmente deletar a análise?')
-
-    if (userDecision && currentAnalysis) {
-      deleteAnalysis(currentAnalysis.id)
-    }
-  }
-
   const startAnalyzesList = useCallback(() => {
-    if (!analyzesList.length) return
-    const analyzesAdapter = (
-      analyzes: IAnalysisCreated[]
-    ): IAnalyzesAdapted[] => {
-      const result =
-        analyzes.map((analysis) => ({
+    const analyzesAdapted =
+      analyzesList &&
+      analyzesList
+        .map((analysis: any) => ({
           id: analysis.id,
           title: analysis.title,
           message: analysis.message,
@@ -158,14 +160,11 @@ export default function AnalyzesTable() {
           biUrl: analysis.biUrl,
           status: analysisStatusAdapter(analysis.status),
           updatedAt: analysis.createdAt
-        })) || []
+        }))
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 
-      return result.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-    }
-
-    const listAdapted = analyzesAdapter(analyzesList)
-    setAnalyzesListAdapted(listAdapted)
-    setFilteredAnalyzes(listAdapted)
+    setAnalyzesListAdapted(analyzesAdapted)
+    analyzesAdapted && setFilteredAnalyzes(analyzesAdapted)
   }, [setAnalyzesListAdapted, analyzesList, page, rowsPerPage])
 
   const searchByTitle = (searchQuery: string) => {
@@ -177,13 +176,33 @@ export default function AnalyzesTable() {
     setFilteredAnalyzes(filteredAnalyzes)
   }
 
+  function deleteItem(decision: string) {
+    if (decision === 'yes') {
+      deleteAnalysis(itemToBeDeleted)
+    }
+
+    setShowDeletePrompt(!showDeletePrompt)
+  }
+
+  function showPrompt(id: string) {
+    setShowDeletePrompt(true)
+    setItemToBeDeleted(id)
+    closeMenu()
+  }
+
   useEffect(() => {
+    if (analyzesList) return
     getAllAnalyzes()
-  }, [getAllAnalyzes])
+  }, [getAllAnalyzes, analyzesList])
 
   useEffect(() => {
     startAnalyzesList()
   }, [startAnalyzesList])
+
+  useEffect(() => {
+    if (!user) return
+    setIsSystemAdmin(user.role >= ROLES.SYSTEM_ADMIN)
+  }, [user])
 
   return (
     <PageContainer
@@ -191,14 +210,34 @@ export default function AnalyzesTable() {
       pageSection="analyzes"
       customCallback={() => openCreateAnalysisModal()}
     >
-      {loading && <div>Carregando...</div>}
+      {loading && <LoadingScreen />}
 
-      <Card>
-        <TableContainer sx={{ maxHeight: '66vh' }}>
-          <SearchTableCustom onSearch={searchByTitle} />
+      <Paper
+        sx={{ width: '100%', border: `solid 1px ${theme.palette.divider}` }}
+      >
+        <SearchTableCustom onSearch={searchByTitle}>
+          <Button
+            href={process.env.NEXT_PUBLIC_EXAMPLE_ANALYSIS_ID!}
+            variant="outlined"
+            startIcon={<GetAppIcon />}
+            download
+          >
+            {!isMobile && 'Baixar Planilha Exemplo'}
+          </Button>
+        </SearchTableCustom>
 
+        <TableContainer sx={{ maxHeight: '56vh' }}>
           <Table>
-            {!isMobile && <TableHeadCustom headLabel={TABLE_HEAD} />}
+            {!!filteredAnalyzes?.length && (
+              <TableHead>
+                {!isMobile && !!filteredAnalyzes.length && (
+                  <TableHeadCustom headLabel={TABLE_HEAD} />
+                )}
+                {isMobile && !!filteredAnalyzes.length && (
+                  <TableHeadCustom headLabel={TABLE_HEAD_MOBILE} />
+                )}
+              </TableHead>
+            )}
 
             <TableBody>
               {filteredAnalyzes &&
@@ -206,10 +245,13 @@ export default function AnalyzesTable() {
                   const { id, title, message, biUrl, status, updatedAt } = row
 
                   return (
-                    <TableRow hover key={id} tabIndex={-1} role="checkbox">
+                    <TableRow
+                      key={id}
+                      sx={{ '$:hover': { cursor: 'pointer' } }}
+                    >
                       <TableCell
-                        align="left"
-                        sx={{ px: 1 }}
+                        size="small"
+                        align="center"
                         component="th"
                         scope="row"
                       >
@@ -217,19 +259,32 @@ export default function AnalyzesTable() {
                       </TableCell>
                       {!isMobile && (
                         <>
-                          <TableCell align="left">
-                            <Stack direction="row" alignItems="center">
-                              <Typography variant="subtitle2">
+                          <TableCell
+                            size="small"
+                            align="center"
+                            sx={{
+                              maxWidth: `${isMobile ? '100px' : '200px'}`
+                            }}
+                          >
+                            <Tooltip title={title}>
+                              <Typography
+                                sx={{
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}
+                                variant="subtitle2"
+                              >
                                 {title}
                               </Typography>
-                            </Stack>
+                            </Tooltip>
                           </TableCell>
-                          <TableCell align="left">
+                          <TableCell size="small" align="center">
                             {formatDate(updatedAt)}
                           </TableCell>
                         </>
                       )}
-                      <TableCell align="left">
+                      <TableCell size="small" align="center">
                         {biUrl && (
                           <Link href={`${biUrl}`} target="_blank">
                             <IconButton aria-label="bi" size="large">
@@ -245,9 +300,15 @@ export default function AnalyzesTable() {
                         )}
                       </TableCell>
                       {!isMobile && (
-                        <TableCell align="left">
-                          {message && message.length > 1 && (
-                            <IconButton aria-label="message" size="large">
+                        <TableCell size="small" align="center">
+                          {!!message?.length && (
+                            <IconButton
+                              aria-label="message"
+                              size="large"
+                              onClick={() =>
+                                setOpenMessage({ isOpen: true, message })
+                              }
+                            >
                               <SmsIcon />
                             </IconButton>
                           )}
@@ -264,7 +325,7 @@ export default function AnalyzesTable() {
                         </TableCell>
                       )}
 
-                      <TableCell align="right">
+                      <TableCell size="small" align="center">
                         <IconButton
                           size="large"
                           color="inherit"
@@ -276,12 +337,23 @@ export default function AnalyzesTable() {
                     </TableRow>
                   )
                 })}
+              {!loading &&
+                filteredAnalyzes &&
+                filteredAnalyzes.length === 0 && (
+                  <TableRow tabIndex={-1} role="checkbox" sx={{ px: 2 }}>
+                    <TableCell size="small" align="center">
+                      <Typography variant="subtitle2">
+                        Nenhuma análise encontrada
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
             </TableBody>
           </Table>
         </TableContainer>
         <Divider />
         <PaginationTableCustom tableItems={analyzesList} />
-      </Card>
+      </Paper>
 
       <Popover
         open={Boolean(openOptions)}
@@ -301,13 +373,18 @@ export default function AnalyzesTable() {
           }
         }}
       >
-        <MenuItem onClick={() => openAdminAnalysisModal()}>
-          <IconButton aria-label="edit">
-            <EditIcon />
-          </IconButton>
-          Analisar
-        </MenuItem>
-        <MenuItem sx={{ color: 'error.main' }} onClick={() => deleteItem()}>
+        {isSystemAdmin && (
+          <MenuItem onClick={() => openAdminAnalysisModal()}>
+            <IconButton aria-label="edit">
+              <EditIcon />
+            </IconButton>
+            Analisar
+          </MenuItem>
+        )}
+        <MenuItem
+          sx={{ color: 'error.main' }}
+          onClick={() => showPrompt(currentAnalysis?.id as string)}
+        >
           <IconButton aria-label="delete" sx={{ color: 'error.main' }}>
             <DeleteIcon />
           </IconButton>
@@ -331,9 +408,36 @@ export default function AnalyzesTable() {
               (el: AnalyzesObject) => el.id === currentAnalysis?.id
             )}
             closeModal={() => setOpenAdmin(false)}
+            isSystemAdmin
           />
         </ModalCustom>
       )}
+
+      {openMessage.isOpen && (
+        <ModalCustom
+          title="Mensagem:"
+          closeModal={() => setOpenMessage({ isOpen: false, message: null })}
+          width={700}
+          height={500}
+        >
+          <TextField
+            id="message"
+            value={openMessage?.message || ''}
+            multiline
+            rows={16}
+            fullWidth
+            disabled
+            variant="outlined"
+            sx={{ height: '100%' }}
+          />
+        </ModalCustom>
+      )}
+      <DeleteDoubleCheck
+        title="Confirmar exclusão?"
+        open={showDeletePrompt}
+        closeDoubleCheck={() => setShowDeletePrompt(false)}
+        deleteItem={deleteItem}
+      />
     </PageContainer>
   )
 }

@@ -3,17 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "author": "João Paulo Gomes Lima",
-
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "kill:container": "docker rm $(docker ps -a) -f",
-    "create:container": "docker run -e  MYSQL_ROOT_PASSWORD=root --name db_ativacao -d -p 3306:3306 -v $(pwd)/database:/var/lib/mysql mysql:5.7"
+    "create:container": "docker run -e  MYSQL_ROOT_PASSWORD=root --name db_ativacao -d -p 3306:3306 -v $(pwd)/database:/var/lib/mysql mysql:5.7",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.309.0",
+    "@aws-sdk/s3-request-presigner": "^3.358.0",
     "@aws-sdk/signature-v4-crt": "^3.310.0",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
@@ -22,7 +23,7 @@
     "@hookform/resolvers": "^3.1.0",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.1",
-    "@prisma/client": "^4.12.0",
+    "@prisma/client": "^4.16.2",
     "@types/node": "18.15.11",
     "@types/react": "18.0.31",
     "@types/react-dom": "18.0.11",
@@ -31,6 +32,8 @@
     "dotenv": "^16.0.3",
     "eslint-config-next": "13.2.4",
     "express": "^4.18.2",
+    "file-saver": "^2.0.5",
+    "handlebars": "^4.7.7",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.0",
     "luxon": "^3.3.0",
@@ -43,6 +46,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.9",
     "typescript": "5.0.3",
+    "xlsx": "^0.18.5",
     "yup": "^1.1.1",
     "zustand": "^4.3.7"
   },
@@ -50,6 +54,7 @@
     "@tailwindcss/forms": "^0.5.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/express": "^4.17.17",
+    "@types/file-saver": "^2.0.5",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/luxon": "^3.3.0",
     "@types/multer": "^1.4.7",
@@ -66,7 +71,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "postcss": "^8.4.21",
     "prettier": "2.8.7",
-    "prisma": "^4.12.0",
+    "prisma": "^4.16.2",
     "tailwindcss": "^3.3.1"
   }
 }

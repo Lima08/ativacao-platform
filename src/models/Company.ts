@@ -1,6 +1,10 @@
-import { PrismaClient } from '@prisma/client'
-import { ICompany, ICompanyCreated, ICompanyFilter, ICompanyModifier } from 'interfaces/entities/company'
-
+import type { PrismaClient } from '@prisma/client'
+import {
+  ICompany,
+  ICompanyCreated,
+  ICompanyFilter,
+  ICompanyModifier
+} from 'interfaces/entities/company'
 
 export class Company {
   private repository: PrismaClient
@@ -25,8 +29,21 @@ export class Company {
   }
 
   async getAll(filter: ICompanyFilter): Promise<ICompanyCreated[]> {
+    if (filter.adminId) {
+      Object.assign(filter, {
+        AdminCompany: {
+          some: {
+            adminId: filter.adminId
+          }
+        }
+      })
+      delete filter.adminId
+    }
     const allCompanies = await this.repository.Company.findMany({
-      where: filter
+      where: filter,
+      orderBy: {
+        createdAt: 'desc'
+      }
     })
 
     return allCompanies
@@ -36,6 +53,18 @@ export class Company {
     try {
       const foundedCompany = await this.repository.Company.findUnique({
         where: { id }
+      })
+
+      return foundedCompany
+    } catch (error) {
+      throw new Error(error as unknown as string)
+    }
+  }
+
+  async getOneBySlug(slug: string): Promise<ICompanyCreated> {
+    try {
+      const foundedCompany = await this.repository.Company.findUnique({
+        where: { slug }
       })
 
       return foundedCompany

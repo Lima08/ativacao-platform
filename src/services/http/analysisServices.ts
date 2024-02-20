@@ -26,6 +26,7 @@ export interface AnalysisServiceInterface {
     modifierData: IAnalysisModifier
   ): Promise<ApiResponse<IAnalysisCreated>>
   delete(id: string): Promise<void>
+  getById(id: string): Promise<ApiResponse<IAnalysisCreated>>
 }
 
 const AnalysisService = (
@@ -36,6 +37,10 @@ const AnalysisService = (
       title,
       bucketUrl
     })
+    return response.data
+  },
+  getById: async (id) => {
+    const response = await httpClient.get(`/api/analyzes/${id}`)
     return response.data
   },
   getAll: async () => {

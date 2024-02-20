@@ -1,7 +1,7 @@
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react'
 
 import { ROLES } from 'constants/enums/eRoles'
-import { useAuthStore } from 'store/useAuthStore'
+import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
 import CustomModal from 'components/CustomModal'
 
@@ -91,12 +91,12 @@ export default function ListAnalyzesItem({
 }: ListItemProps) {
   const [openStatus, setOpenStatus] = useState(false)
   const [systemAdmin, setIsSystemAdmin] = useState(false)
-  // @ts-ignore
-  const role = useAuthStore((state) => state.user?.role)
 
   useEffect(() => {
-    setIsSystemAdmin(role >= ROLES.SYSTEM_ADMIN)
-  }, [role])
+    const { user } = useAuthStore.getState() as IAuthStore
+    if (!user || !user.role) return
+    setIsSystemAdmin(user.role >= ROLES.SYSTEM_ADMIN)
+  }, [])
 
   return (
     <div className="flex flex-col items-center w-full dark:border-gray-700 rounded-md">

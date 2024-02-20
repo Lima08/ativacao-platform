@@ -1,8 +1,13 @@
 import Joi from 'joi'
-import { minNameLength, minPasswordLength } from 'schemasValidation/constants'
+
+import {
+  minNameLength,
+  minPasswordLength,
+  maxNameLength
+} from './../../constants'
 
 const createUserSchema = Joi.object({
-  name: Joi.string().min(minNameLength).optional(),
+  name: Joi.string().min(minNameLength).max(maxNameLength).optional(),
   password: Joi.string().min(minPasswordLength).optional(),
   imageUrl: Joi.string().optional(),
   role: Joi.number().optional(),

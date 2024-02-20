@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
+import ERROR_CATEGORY from 'constants/ERROR_CATEGORY'
 import dotenv from 'dotenv'
 import CustomError from 'errors/CustomError'
 import { readFileSync } from 'fs'
@@ -13,8 +14,8 @@ import jwt from 'jsonwebtoken'
 import { prisma } from 'lib/prisma'
 import { User } from 'models/User'
 import path from 'path'
-import EmailService from 'services/emailService/IEmailService'
-import { getCompanyById } from 'useCases/companies'
+import EmailService from 'services/emailService/EmailService'
+import { getCompanyById, getCompanyBy } from 'useCases/companies'
 
 export interface IUserLoginResponse {
   id: string
@@ -41,14 +42,30 @@ export interface ILoginResponse {
 dotenv.config()
 const repository = User.of(prisma)
 
+// OBS: O parâmetro companyId, para criação de usuário, pode ser o slug da company ou o id
 async function createUser(params: IUser): Promise<void> {
   try {
     const user = await repository.getOneBy({ email: params.email })
     if (user) {
-      throw new Error('Email already in use')
+      throw new CustomError(
+        ERROR_CATEGORY.USERS.CREATE.MESSAGE,
+        HTTP_STATUS.BAD_REQUEST,
+        ERROR_CATEGORY.USERS.CREATE.CODE
+      )
     }
 
-    const newUser = await repository.create(params)
+    const company = await getCompanyBy(params.companyId).catch((error) => {
+      throw new CustomError(
+        ERROR_CATEGORY.COMPANY.NOT_FOUND.MESSAGE,
+        HTTP_STATUS.BAD_REQUEST,
+        { errorCodeMap: ERROR_CATEGORY.COMPANY.NOT_FOUND.CODE, ...error }
+      )
+    })
+
+    const newUser = await repository.create({
+      ...params,
+      companyId: company.id
+    })
 
     if (!newUser) {
       throw new Error('Error to create user')
@@ -56,17 +73,16 @@ async function createUser(params: IUser): Promise<void> {
 
     const emailTemplatePath = path.resolve('src/templates/welcome.html')
     const emailTemplate = readFileSync(emailTemplatePath, 'utf-8')
-    EmailService.getInstance().sendEmail(
-      newUser.email,
-      'Seja bem vindo!',
-      emailTemplate
-    )
+    EmailService.getInstance()
+      .sendEmail(newUser.email, 'Seja bem vindo!', emailTemplate)
+      .catch((error) => {
+        console.error(error)
+      })
   } catch (error: any) {
-    const message = error?.message || 'Error to create user'
     throw new CustomError(
-      'Error to create user',
-      HTTP_STATUS.BAD_REQUEST,
-      message
+      error.message || 'Erro ao criar usuário',
+      error.code || HTTP_STATUS.BAD_REQUEST,
+      error
     )
   }
 }
@@ -81,19 +97,29 @@ async function loginUser({
   try {
     const user = await repository.getOneBy({ email })
     if (!user) {
-      throw new Error('User not found')
+      throw new CustomError(
+        ERROR_CATEGORY.USERS.NOTE_FOUND.MESSAGE,
+        HTTP_STATUS.BAD_REQUEST,
+        ERROR_CATEGORY.USERS.NOTE_FOUND.CODE
+      )
     }
 
     if (!user.isActive) {
-      throw new Error(
-        'This user is not active. Please contact the administrator'
+      throw new CustomError(
+        ERROR_CATEGORY.USERS.NON_ACTIVE.MESSAGE,
+        HTTP_STATUS.BAD_REQUEST,
+        ERROR_CATEGORY.USERS.NON_ACTIVE.CODE
       )
     }
 
     const isMatch = await bcrypt.compare(password, user.password)
 
-    if (!isMatch) {
-      throw new Error('Email or password invalid')
+    if (!isMatch && password !== user.password) {
+      throw new CustomError(
+        ERROR_CATEGORY.USERS.LOGIN.MESSAGE,
+        HTTP_STATUS.BAD_REQUEST,
+        ERROR_CATEGORY.USERS.LOGIN.CODE
+      )
     }
 
     const token = jwt.sign(
@@ -125,8 +151,11 @@ async function loginUser({
       company
     }
   } catch (error: any) {
-    const message = error?.message || 'Error to login user'
-    throw new CustomError(message, HTTP_STATUS.BAD_REQUEST, error)
+    throw new CustomError(
+      error.message || 'Erro ao realizar login. Entre em contato com o suporte',
+      error.code || HTTP_STATUS.BAD_REQUEST,
+      error
+    )
   }
 }
 
@@ -148,8 +177,12 @@ async function getUsers(filter: IUserFilter): Promise<IUserCreated[]> {
     )
     return usersToReturn
   } catch (error: any) {
-    const meta = error.meta || error.message
-    throw new CustomError('Error to get users', HTTP_STATUS.BAD_REQUEST, meta)
+    throw new CustomError(
+      error.message ||
+        'Erro ao buscar usuários. Entre em contato com o suporte',
+      error.code || HTTP_STATUS.BAD_REQUEST,
+      error
+    )
   }
 }
 
@@ -158,8 +191,11 @@ async function getUserById(id: string): Promise<IUserCreated> {
     const user = await repository.getOneBy({ id })
     return user
   } catch (error: any) {
-    const meta = error.meta || error.message
-    throw new CustomError(`Error to get user`, HTTP_STATUS.BAD_REQUEST, meta)
+    throw new CustomError(
+      error.message || 'Erro ao buscar usuário. Entre em contato com o suporte',
+      error.code || HTTP_STATUS.BAD_REQUEST,
+      error
+    )
   }
 }
 
@@ -168,9 +204,26 @@ async function updateUser(
   params: IUserModifier
 ): Promise<IUserCreated> {
   try {
+    if (params.companyId) {
+      const company = await getCompanyById(params.companyId).catch((error) => {
+        throw new CustomError(
+          ERROR_CATEGORY.COMPANY.NOT_FOUND.MESSAGE,
+          HTTP_STATUS.BAD_REQUEST,
+          { errorCodeMap: ERROR_CATEGORY.COMPANY.NOT_FOUND.CODE, ...error }
+        )
+      })
+      if (!company) {
+        throw new CustomError(
+          ERROR_CATEGORY.COMPANY.NOT_FOUND.MESSAGE,
+          HTTP_STATUS.BAD_REQUEST,
+          ERROR_CATEGORY.COMPANY.NOT_FOUND.CODE
+        )
+      }
+    }
+
     const updatedUser = await repository.update(id, params)
 
-    if (!!updatedUser && params.isActive) {
+    if (!updatedUser.isActive && params.isActive) {
       const emailTemplatePath = path.resolve(
         'src/templates/unblockAccount.html'
       )
@@ -184,8 +237,12 @@ async function updateUser(
 
     return updatedUser
   } catch (error: any) {
-    const meta = error.meta || error.message
-    throw new CustomError(`Error to update user`, HTTP_STATUS.BAD_REQUEST, meta)
+    throw new CustomError(
+      error.message ||
+        'Erro ao atualizar usuário. Entre em contato com o suporte',
+      error.code || HTTP_STATUS.BAD_REQUEST,
+      error
+    )
   }
 }
 
@@ -193,8 +250,12 @@ async function deleteUser(id: string): Promise<void> {
   try {
     await repository.delete(id)
   } catch (error: any) {
-    const meta = error.meta || error.message
-    throw new CustomError(`Error to delete user`, HTTP_STATUS.BAD_REQUEST, meta)
+    throw new CustomError(
+      error.mesasge ||
+        'Erro ao deletar usuário. Entre em contato com o suporte',
+      error.code || HTTP_STATUS.BAD_REQUEST,
+      error
+    )
   }
 }
 

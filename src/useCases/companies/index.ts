@@ -11,24 +11,39 @@ import { Company } from 'models/Company'
 
 const repository = Company.of(prisma)
 
-async function createCompany({
-  name,
-  slug,
-  imageUrl
-}: ICompany): Promise<ICompanyCreated> {
+async function createCompany(
+  adminId: string,
+  { name, slug, imageUrl }: ICompany
+): Promise<ICompanyCreated> {
   try {
+    const companyAlreadyExists = await repository.getOneBySlug(slug)
+
+    if (companyAlreadyExists) {
+      throw new CustomError(
+        'Já existe uma empresa com esse slug!',
+        HTTP_STATUS.BAD_REQUEST
+      )
+    }
+
     const createdCompany = await repository.create({
       name,
       slug,
       imageUrl
     })
+
+    await prisma.adminCompany.create({
+      data: {
+        adminId,
+        companyId: createdCompany.id
+      }
+    })
+
     return createdCompany
   } catch (error: any) {
-    const message = error?.message || 'Error to create company'
     throw new CustomError(
-      'Error to create company',
-      HTTP_STATUS.BAD_REQUEST,
-      message
+      error.message || 'Error ao criar empresa',
+      error.code || HTTP_STATUS.BAD_REQUEST,
+      error
     )
   }
 }
@@ -38,13 +53,28 @@ async function getCompanyById(id: string): Promise<ICompanyCreated> {
     const company = await repository.getOneBy(id)
     return company
   } catch (error: any) {
-    const meta = error.meta || error.message
     throw new CustomError(
-      'Error to get company',
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      meta
+      error.message || 'Error to get company',
+      error.code || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      error
     )
   }
+}
+
+async function getCompanyBy(
+  companyIdentifier: string
+): Promise<ICompanyCreated> {
+  let companyBySlug: any = {}
+  let companyById: any = {}
+  const error: any = null
+  companyBySlug = await repository.getOneBySlug(companyIdentifier)
+  companyById = await repository.getOneBy(companyIdentifier)
+
+  if ((!companyBySlug && !companyById) || error) {
+    throw new CustomError('Company not found', HTTP_STATUS.NOT_FOUND, error)
+  }
+
+  return companyBySlug || companyById
 }
 
 async function getAllCompanies(
@@ -54,11 +84,10 @@ async function getAllCompanies(
     const allCompanies = await repository.getAll(filter)
     return allCompanies
   } catch (error: any) {
-    const meta = error.meta || error.message
     throw new CustomError(
-      'Error to get companies',
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      meta
+      error.message || 'Error to get companies',
+      error.code || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      error
     )
   }
 }
@@ -71,13 +100,18 @@ async function updateCompany(
     const updatedCompany = await repository.update(id, { name, imageUrl, slug })
     return updatedCompany
   } catch (error: any) {
-    const meta = error.meta || error.message
     throw new CustomError(
-      'Error to get companies',
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      meta
+      error.message || 'Error to get companies',
+      error.code || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      error
     )
   }
 }
 
-export { createCompany, getCompanyById, getAllCompanies, updateCompany }
+export {
+  createCompany,
+  getCompanyById,
+  getAllCompanies,
+  updateCompany,
+  getCompanyBy
+}

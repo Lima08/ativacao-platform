@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import handler from 'handler'
 import { uploadS3Multer } from 'middlewares/upload'
 import { createMedia } from 'useCases/media'
@@ -9,10 +10,12 @@ export const config = {
 }
 
 export default handler.use(uploadS3Multer).post(async (req, res) => {
-  const filesList = []
+  const filesList: any = []
 
   if (!req.files.length) {
-    return res.status(400).json({ error: 'No files uploaded.' })
+    return res
+      .status(HTTP_STATUS.BAD_REQUEST)
+      .json({ message: 'No files uploaded.' })
   }
 
   for (const file of req.files) {
@@ -21,7 +24,7 @@ export default handler.use(uploadS3Multer).post(async (req, res) => {
     const type = file.contentType.split('/')[0]
 
     if (type === 'application') {
-      return res.status(201).json({
+      return res.status(HTTP_STATUS.CREATED).json({
         data: {
           type: 'document',
           key,
@@ -36,5 +39,5 @@ export default handler.use(uploadS3Multer).post(async (req, res) => {
     filesList.push(createdFile)
   }
 
-  return res.status(201).json({ data: filesList })
+  return res.status(HTTP_STATUS.OK).json({ data: filesList })
 })

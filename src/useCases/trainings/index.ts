@@ -1,9 +1,13 @@
 import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import CustomError from 'errors/CustomError'
+import { readFileSync } from 'fs'
 import { IMediaCreated } from 'interfaces/entities/media'
 import { ITrainingCreated, ITrainingFilter } from 'interfaces/entities/training'
 import { prisma } from 'lib/prisma'
 import { Training } from 'models/Training'
+import path from 'path'
+import EmailService from 'services/emailService/EmailService'
+import { getUsers } from 'useCases/users'
 
 import { updateMedia, getMediasBy, deleteMedia } from '../media'
 import { createdTrainingDto, newTrainingDto, modifierTrainingDto } from './dto'
@@ -16,46 +20,70 @@ async function createTraining({
   companyId,
   userId,
   mediaIds
-}: newTrainingDto): Promise<any> {
-  const newTraining = await repository
-    .create({
+}: newTrainingDto): Promise<ITrainingCreated> {
+  try {
+    const newTraining = await repository.create({
       name,
       description,
       companyId,
       userId
     })
-    .catch((error: any) => {
-      const meta = error.meta || error.message
+    if (!newTraining)
       throw new CustomError(
-        'Error creating Training',
-        HTTP_STATUS.BAD_REQUEST,
-        meta
+        'Error Ao criar treinamento',
+        HTTP_STATUS.BAD_REQUEST
       )
-    })
 
-  let medias: IMediaCreated[] = []
+    let medias: IMediaCreated[] = []
+    if (newTraining && !!mediaIds?.length) {
+      const promises = mediaIds.map((mediaId) =>
+        updateMedia(mediaId, { trainingId: newTraining.id })
+      )
 
-  if (newTraining && !!mediaIds?.length) {
-    const promises = mediaIds.map((mediaId) =>
-      updateMedia(mediaId, { trainingId: newTraining.id })
+      await Promise.all(promises)
+        .then((files) => (medias = files))
+        .catch((error: any) => {
+          throw new CustomError(
+            'Erro ao criar mídias',
+            HTTP_STATUS.BAD_REQUEST,
+            error
+          )
+        })
+    }
+
+    const companyUsers = await getUsers({ companyId })
+    const userEmailList = companyUsers.map((user) => user.email)
+
+    const emailTemplatePath = path.resolve(
+      'src/templates/newContentNotify.html'
+    )
+    const emailTemplate = readFileSync(emailTemplatePath, 'utf-8')
+    const title = 'Novidade no site!'
+
+    const variables = {
+      moduleName: 'Treinamento',
+      contentName: name,
+      contentDescription: description,
+      contentUrl: `https://ativacaotec.com/in/trainings/${newTraining.id}`
+    }
+
+    const compiledEmail = EmailService.getInstance().compileTemplate(
+      emailTemplate,
+      variables
     )
 
-    await Promise.all(promises)
-      .then((files) => (medias = files))
-      .catch((error: any) => {
-        const meta = error.meta || error.message
-        throw new CustomError(
-          'Error in creating Training media',
-          HTTP_STATUS.BAD_REQUEST,
-          {
-            ...meta,
-            createdTraining: newTraining
-          }
-        )
-      })
-  }
+    await EmailService.getInstance()
+      .sendEmailBulk(userEmailList, title, compiledEmail)
+      .catch((error) => console.error(error))
 
-  return { ...newTraining, medias }
+    return { ...newTraining, medias }
+  } catch (error: any) {
+    throw new CustomError(
+      error.message || 'Ao criar treinamento',
+      error.code || HTTP_STATUS.BAD_REQUEST,
+      error
+    )
+  }
 }
 
 async function getTrainingById(id: string): Promise<createdTrainingDto> {
@@ -69,11 +97,10 @@ async function getTrainingById(id: string): Promise<createdTrainingDto> {
 
     return { ...training, medias }
   } catch (error: any) {
-    const meta = error.meta || error.message
     throw new CustomError(
-      'Error to get Training',
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      meta
+      error.message || 'Error to get Training',
+      error.code || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      error
     )
   }
 }
@@ -93,11 +120,10 @@ async function getAllTrainings(
 
     return allTrainingsWithMedia
   } catch (error: any) {
-    const meta = error.meta || error.message
     throw new CustomError(
-      'Error to get Trainings',
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      meta
+      error.message || 'Error to get Trainings',
+      error.code || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      error
     )
   }
 }
@@ -109,11 +135,13 @@ async function updateTraining(
   const updatedTraining = await repository
     .update(id, { name, description, active })
     .catch((error: any) => {
-      const meta = error.meta || error.message
+      if (error.message) {
+        throw new CustomError(error.message, HTTP_STATUS.BAD_REQUEST, error)
+      }
       throw new CustomError(
-        'Error to update Training',
-        HTTP_STATUS.BAD_REQUEST,
-        meta
+        error.message || 'Erro ao atualizar treinamento',
+        error.code || HTTP_STATUS.BAD_REQUEST,
+        error
       )
     })
 
@@ -127,42 +155,40 @@ async function updateTraining(
     await Promise.all(promises)
       .then((files) => (medias = files))
       .catch((error: any) => {
-        const meta = error.meta || error.message
         throw new CustomError(
-          'Error to update Training media',
-          HTTP_STATUS.BAD_REQUEST,
-          meta
+          error.message || 'Erro ao atualizar mídias',
+          error.code || HTTP_STATUS.BAD_REQUEST,
+          error
         )
       })
-
-    if (mediasToExclude?.length) {
-      const promisesToExclude = mediasToExclude.map((id) => deleteMedia(id))
-
-      await Promise.all(promisesToExclude)
-        .catch((error: any) => {
-          const meta = error.meta || error.message
-          throw new CustomError(
-            'Error to update Training media',
-            HTTP_STATUS.BAD_REQUEST,
-            meta
-          )
-        })
-    }
   }
+
+  let promisesToExclude: any[] = []
+  if (mediasToExclude?.length) {
+    promisesToExclude = mediasToExclude.map((id) => deleteMedia(id))
+  }
+
+  await Promise.all(promisesToExclude).catch((error: any) => {
+    throw new CustomError(
+      error.message || 'Erro ao deletar mídia',
+      error.code || HTTP_STATUS.BAD_REQUEST,
+      error
+    )
+  })
 
   return { ...updatedTraining, medias }
 }
+
 async function toggleActive(id: string): Promise<createdTrainingDto> {
   const training = await repository.getOneBy(id)
 
   await repository
     .update(id, { active: !training.active })
     .catch((error: any) => {
-      const meta = error.meta || error.message
       throw new CustomError(
-        'Error to update Training',
-        HTTP_STATUS.BAD_REQUEST,
-        meta
+        error.message || 'Error to update Training',
+        error.code || HTTP_STATUS.BAD_REQUEST,
+        error
       )
     })
 
@@ -180,11 +206,10 @@ async function deleteTraining(id: string): Promise<void> {
   if (allMedias.length) {
     const promises = allMedias.map((media) => deleteMedia(media.id))
     await Promise.all(promises).catch((error: any) => {
-      const meta = error.meta || error.message
       throw new CustomError(
-        'Error to delete Training media',
-        HTTP_STATUS.INTERNAL_SERVER_ERROR,
-        meta
+        error.message || 'Error ao deletar treinamento',
+        error.code || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        error
       )
     })
   }
@@ -192,8 +217,8 @@ async function deleteTraining(id: string): Promise<void> {
   await repository.delete(id).catch((error: any) => {
     const meta = error.meta || error.message
     throw new CustomError(
-      'Error to delete Training',
-      HTTP_STATUS.BAD_REQUEST,
+      error.message || 'Erro ao deletar treinamento',
+      error.code || HTTP_STATUS.BAD_REQUEST,
       meta
     )
   })

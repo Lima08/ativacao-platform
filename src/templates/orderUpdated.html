@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atualização de pedido</title>
+</head>
+
+<body>
+  <main>
+    <h1>Pedido atualizado!</h1>
+    <p>O pedido <b>{{ orderName }}</b> {{ orderStatus }}.</p>
+    {{#if orderDescription}}
+    <p style="margin: 0;"><b>Observações:</b></p>
+    <p style="margin: 0;">{{ orderDescription }}</p>
+    {{/if}}
+    <a href="https://ativacaotec.com/in/orders">Visualizar no site</a>
+  </main>
+</body>
+
+</html>

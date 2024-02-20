@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client'
 import {
   IMedia,
   IMediaCreated,
@@ -36,7 +36,10 @@ export class Media {
 
   async getAll(filter: IMediaFilter): Promise<IMediaCreated[]> {
     const allMedias = await this.repository.media.findMany({
-      where: filter
+      where: filter,
+      orderBy: {
+        createdAt: 'desc'
+      }
     })
 
     return allMedias

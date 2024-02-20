@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client'
 import {
   IAnalysis,
   IAnalysisCreated,
@@ -30,7 +30,10 @@ export class Analysis {
 
   async getAll(filter: IAnalysisFilter): Promise<IAnalysisCreated[]> {
     const allAnalyzes = await this.repository.analysis.findMany({
-      where: filter
+      where: filter,
+      orderBy: {
+        createdAt: 'desc'
+      }
     })
 
     return allAnalyzes

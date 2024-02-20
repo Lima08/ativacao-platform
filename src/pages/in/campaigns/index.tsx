@@ -1,4 +1,5 @@
 'use client'
+
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -8,10 +9,9 @@ import EditIcon from '@mui/icons-material/Edit'
 import MoreVertSharpIcon from '@mui/icons-material/MoreVertSharp'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import {
   Avatar,
-  Card,
+  Paper,
   Chip,
   Divider,
   IconButton,
@@ -22,29 +22,29 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableHead,
   TableRow,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
-import type { ICampaignCreated } from 'interfaces/entities/campaign'
+import { FIVE_SECONDS } from 'constants/index'
 import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 
-import Modal from 'components/MediaViewer'
+import DeleteDoubleCheck from 'components/DeleteDoubleCheck'
+import LoadingScreen from 'components/LoadingScreen'
+import MediaViewer from 'components/MediaViewer'
 import PageContainer from 'components/PageContainer'
 import PaginationTableCustom from 'components/TableCustom/PaginationTableCustom'
 import SearchTableCustom from 'components/TableCustom/SearchTableCustom'
 import TableHeadCustom from 'components/TableCustom/TableHeadCustom'
 
+import { mediaObject } from '../../../../types/IMediaObject'
 import { formatDate } from '../../../../utils'
-
-interface mediaObject {
-  url: string
-  type: string
-}
 
 export type DataList = {
   id: string
@@ -57,17 +57,24 @@ export type DataList = {
 export default function CampaignsList() {
   const TABLE_HEAD = [
     { id: 'image', label: 'Capa', align: 'center' },
-    { id: 'title', label: 'Título', align: 'left' },
-    { id: 'updatedAt', label: 'Atualizado em', align: 'left' },
-    { id: 'active', label: 'Status', align: 'left' },
-    { id: 'see', label: 'Visualizar', align: 'left' },
-    { id: 'actions', label: 'Ações', align: 'right' }
+    { id: 'title', label: 'Título', align: 'center' },
+    { id: 'updatedAt', label: 'Atualizado em', align: 'center' },
+    { id: 'active', label: 'Status', align: 'center' },
+    { id: 'see', label: 'Visualizar', align: 'center' },
+    { id: 'actions', label: 'Ações', align: 'center', onlyAdmin: true }
   ]
+
+  const TABLE_HEAD_MOBILE = [
+    { id: 'title', label: 'Título', align: 'center' },
+    { id: 'see', label: 'Visualizar', align: 'center' },
+    { id: 'actions', label: 'Ações', align: 'center', onlyAdmin: true }
+  ]
+
+  const router = useRouter()
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-  const router = useRouter()
   const { user } = useAuthStore((state) => state) as IAuthStore
   const [campaignsList, getAllCampaigns, handleCampaignActive, deleteCampaign] =
     useMainStore((state) => [
@@ -77,17 +84,6 @@ export default function CampaignsList() {
       state.deleteCampaign
     ])
 
-  const [anchorEl, setAnchorEl] = useState<null | (EventTarget & Element)>(null)
-  const openPopover = Boolean(anchorEl)
-
-  const [currentCampaign, setCurrentCampaign] = useState<{
-    id: string
-    active: boolean
-  } | null>(null)
-  const [campaignsListAdapted, setCampaignsListAdapted] = useState<DataList[]>(
-    []
-  )
-  const [filteredCampaigns, setFilteredCampaigns] = useState<DataList[]>([])
   const [loading, error, setToaster, page, rowsPerPage] = useGlobalStore(
     (state) => [
       state.loading,
@@ -98,13 +94,28 @@ export default function CampaignsList() {
     ]
   )
 
+  const [anchorEl, setAnchorEl] = useState<null | (EventTarget & Element)>(null)
+  const openPopover = Boolean(anchorEl)
+
+  const [currentCampaign, setCurrentCampaign] = useState<{
+    id: string
+    active: boolean
+  } | null>(null)
+
+  const [campaignsListAdapted, setCampaignsListAdapted] = useState<DataList[]>(
+    []
+  )
+  const [filteredCampaigns, setFilteredCampaigns] = useState<DataList[]>([])
+
   const [isAdmin, setIsAdmin] = useState(false)
   const [isModalOpen, setOpenModal] = useState(false)
+  const [showDeletePrompt, setShowDeletePrompt] = useState(false)
+  const [itemToBeDeleted, setItemToBeDeleted] = useState<string>('')
   const [campaign, setCampaign] = useState<{
+    id: string
     title: string
-    description: string
-    media: mediaObject[]
-  }>({ title: '', description: '', media: [] })
+    medias: mediaObject[]
+  }>({ id: '', title: '', medias: [] })
 
   const handleEdit = async (id: string) => {
     router.push(`/in/campaigns/${id}`)
@@ -122,8 +133,10 @@ export default function CampaignsList() {
     setAnchorEl(null)
     setCurrentCampaign(null)
   }
-  const onClickRow = async (id: string) => {
-    const campaign = campaignsList.find((campaign) => campaign.id === id)
+
+  const openViewer = async (id: string) => {
+    const campaign =
+      campaignsList && campaignsList.find((campaign) => campaign.id === id)
     const media = campaign?.medias
 
     if (!media?.length) {
@@ -134,10 +147,11 @@ export default function CampaignsList() {
       })
       return
     }
+
     setCampaign({
+      id: campaign?.id || '',
       title: campaign?.name || '',
-      description: campaign?.description || '',
-      media: mediasAdapter(campaign?.medias || [])
+      medias: mediasAdapter(campaign?.medias || [])
     })
 
     setOpenModal(true)
@@ -151,12 +165,18 @@ export default function CampaignsList() {
     return mediaURLs
   }
 
-  function deleteItem(id: string) {
-    const userDecision = confirm('Confirmar deleção?')
-
-    if (userDecision) {
-      deleteCampaign(id)
+  function deleteItem(decision: string) {
+    if (decision === 'yes') {
+      deleteCampaign(itemToBeDeleted)
     }
+
+    setShowDeletePrompt(!showDeletePrompt)
+  }
+
+  function showPrompt(id: string) {
+    setShowDeletePrompt(true)
+    setItemToBeDeleted(id)
+    handleClose()
   }
 
   function handleCampaignStatus(id: string, active: boolean) {
@@ -164,16 +184,17 @@ export default function CampaignsList() {
     setAnchorEl(null)
   }
 
+  function defineCover(medias: any[]) {
+    const imagesList = medias.filter((media) => media.type === 'image')
+    const cover = imagesList?.find((image) => image.cover === true)
+
+    return cover?.url || null
+  }
+
   const initCampaignsList = useCallback(async () => {
-    if (!campaignsList) return
-
-    function defineCover(medias: any[]) {
-      const cover = medias.find((media) => media.type === 'image')
-      return cover?.url || null
-    }
-
-    function campaignsAdapter(list: ICampaignCreated[]) {
-      return list
+    const campaignsAdapted =
+      campaignsList &&
+      campaignsList
         .map((campaign) => ({
           id: campaign.id,
           name: campaign.name,
@@ -186,12 +207,9 @@ export default function CampaignsList() {
           updatedAt: campaign.updatedAt
         }))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-    }
 
-    const AllCampaigns = campaignsAdapter(campaignsList)
-
-    setCampaignsListAdapted(AllCampaigns)
-    setFilteredCampaigns(AllCampaigns)
+    campaignsAdapted && setCampaignsListAdapted(campaignsAdapted)
+    campaignsAdapted && setFilteredCampaigns(campaignsAdapted)
   }, [campaignsList, setCampaignsListAdapted, page, rowsPerPage])
 
   const searchByName = (searchQuery: string) => {
@@ -200,16 +218,21 @@ export default function CampaignsList() {
       const query = searchQuery.toLowerCase()
       return campaignName.includes(query)
     })
+
     setFilteredCampaigns(filteredCampaigns)
   }
 
   useEffect(() => {
     initCampaignsList()
-  }, [initCampaignsList])
+  }, [initCampaignsList, campaignsList])
 
   useEffect(() => {
+    if (campaignsList) {
+      initCampaignsList()
+      return
+    }
     getAllCampaigns()
-  }, [getAllCampaigns])
+  }, [getAllCampaigns, campaignsList, initCampaignsList])
 
   useEffect(() => {
     if (!user) return
@@ -218,59 +241,109 @@ export default function CampaignsList() {
 
   useEffect(() => {
     if (!error) return
+    console.error(error)
+
     setToaster({
       isOpen: true,
-      message: 'Um erro inesperado ocorreu.',
+      message: error.message || 'Um erro inesperado ocorreu.',
       type: 'error',
-      duration: 5000
+      duration: FIVE_SECONDS
     })
   }, [error, setToaster])
 
   return (
     <PageContainer pageTitle="Campanhas" pageSection="campaigns">
-      {loading && <div>Carregando...</div>}
-      <Card>
-        <TableContainer sx={{ maxHeight: '66vh' }}>
-          <SearchTableCustom onSearch={searchByName} />
-          <Table>
-            {!isMobile && <TableHeadCustom headLabel={TABLE_HEAD} />}
+      {loading && <LoadingScreen />}
+      <Paper
+        sx={{ width: '100%', border: `solid 1px ${theme.palette.divider}` }}
+      >
+        <SearchTableCustom onSearch={searchByName} />
+        <TableContainer sx={{ maxHeight: '56vh' }}>
+          <Table stickyHeader>
+            {!!filteredCampaigns?.length && (
+              <TableHead>
+                {!isMobile && (
+                  <TableHeadCustom headLabel={TABLE_HEAD} isAdmin={isAdmin} />
+                )}
+
+                {isMobile && (
+                  <TableHeadCustom
+                    headLabel={TABLE_HEAD_MOBILE}
+                    isAdmin={isAdmin}
+                  />
+                )}
+              </TableHead>
+            )}
             <TableBody>
               {filteredCampaigns &&
                 filteredCampaigns.map((row: any) => {
                   const { id, img, name, active, updatedAt } = row
 
                   return (
-                    <TableRow hover key={id} tabIndex={-1} role="checkbox">
+                    <TableRow
+                      key={id}
+                      sx={{ '$:hover': { cursor: 'pointer' } }}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        openViewer(id)
+                      }}
+                    >
                       {!isMobile && (
-                        <TableCell align="center" component="th" scope="row">
+                        <TableCell
+                          size="small"
+                          component="th"
+                          scope="row"
+                          align="center"
+                        >
                           {img.source && (
                             <Stack alignItems="center" justifyContent="center">
-                              <Avatar
-                                variant="square"
-                                src={img.source}
-                                sx={{
-                                  width: 70,
-                                  height: 70
-                                }}
-                              />
+                              <Avatar src={img.source} />
                             </Stack>
                           )}
                           {!img.source && <CampaignIcon fontSize="large" />}
                         </TableCell>
                       )}
 
-                      <TableCell align="left">
-                        <Stack direction="row" alignItems="center">
-                          <Typography variant="subtitle2">{name}</Typography>
-                        </Stack>
+                      <TableCell
+                        size="small"
+                        component="th"
+                        scope="row"
+                        align="center"
+                        sx={{
+                          maxWidth: `${isMobile ? '100px' : '200px'}`
+                        }}
+                      >
+                        <Tooltip title={name}>
+                          <Typography
+                            sx={{
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis'
+                            }}
+                            variant="subtitle2"
+                          >
+                            {name}
+                          </Typography>
+                        </Tooltip>
                       </TableCell>
 
                       {!isMobile && (
                         <>
-                          <TableCell align="left">
+                          <TableCell
+                            size="small"
+                            component="th"
+                            scope="row"
+                            align="center"
+                          >
                             {formatDate(updatedAt)}
                           </TableCell>
-                          <TableCell align="left">
+                          <TableCell
+                            size="small"
+                            component="th"
+                            scope="row"
+                            align="center"
+                          >
                             <Chip
                               label={active ? 'Ativo' : 'Desativo'}
                               color={active ? 'success' : 'error'}
@@ -279,47 +352,68 @@ export default function CampaignsList() {
                           </TableCell>
                         </>
                       )}
-                      <TableCell align="left">
-                        {active && (
-                          <IconButton
-                            aria-label="visibility"
-                            size="large"
-                            onClick={() => onClickRow(id)}
-                          >
-                            <VisibilityIcon />
-                          </IconButton>
-                        )}
-                        {!active && (
-                          <IconButton
-                            aria-label="visibility"
-                            size="large"
-                            disabled
-                          >
-                            <VisibilityOffIcon />
-                          </IconButton>
-                        )}
-                      </TableCell>
-
-                      <TableCell align="right">
+                      <TableCell
+                        size="small"
+                        component="th"
+                        scope="row"
+                        align="center"
+                      >
                         <IconButton
+                          aria-label="visibility"
                           size="large"
-                          color="inherit"
-                          onClick={(event) =>
-                            handleOpenMenu(event, { active, id })
-                          }
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            handleEdit(id)
+                          }}
                         >
-                          <MoreVertSharpIcon />
+                          <VisibilityIcon />
                         </IconButton>
                       </TableCell>
+
+                      {isAdmin && (
+                        <TableCell
+                          size="small"
+                          component="th"
+                          scope="row"
+                          align="center"
+                        >
+                          <IconButton
+                            size="large"
+                            color="inherit"
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              handleOpenMenu(event, { active, id })
+                            }}
+                          >
+                            <MoreVertSharpIcon />
+                          </IconButton>
+                        </TableCell>
+                      )}
                     </TableRow>
                   )
                 })}
+              {!loading &&
+                filteredCampaigns &&
+                filteredCampaigns.length === 0 && (
+                  <TableRow tabIndex={-1} role="checkbox" sx={{ px: 2 }}>
+                    <TableCell
+                      size="small"
+                      component="th"
+                      scope="row"
+                      align="center"
+                    >
+                      <Typography variant="subtitle2">
+                        Nenhuma campanha encontrada
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
             </TableBody>
           </Table>
         </TableContainer>
         <Divider />
         <PaginationTableCustom tableItems={campaignsList} />
-      </Card>
+      </Paper>
 
       <Popover
         open={Boolean(openPopover)}
@@ -345,7 +439,7 @@ export default function CampaignsList() {
           <IconButton aria-label="edit">
             <EditIcon />
           </IconButton>
-          Editar
+          {isAdmin ? 'Editar' : 'Visualizar'}
         </MenuItem>
         {isAdmin && (
           <>
@@ -365,7 +459,7 @@ export default function CampaignsList() {
             </MenuItem>
             <MenuItem
               sx={{ color: 'error.main' }}
-              onClick={() => currentCampaign && deleteItem(currentCampaign.id)}
+              onClick={() => currentCampaign && showPrompt(currentCampaign.id)}
             >
               <IconButton aria-label="delete" sx={{ color: 'error.main' }}>
                 <DeleteIcon />
@@ -377,19 +471,19 @@ export default function CampaignsList() {
       </Popover>
 
       {isModalOpen && (
-        <Modal
-          title={campaign.title}
-          description={campaign.description}
-          imageSource={
-            campaign.media[0].type === 'image'
-              ? campaign.media[0]
-              : 'default img src'
-          }
-          medias={campaign.media}
+        <MediaViewer
+          modelValue={campaign}
+          module="campaign"
           open={isModalOpen}
           setOpen={setOpenModal}
         />
       )}
+      <DeleteDoubleCheck
+        title="Confirmar exclusão?"
+        open={showDeletePrompt}
+        closeDoubleCheck={() => setShowDeletePrompt(false)}
+        deleteItem={deleteItem}
+      />
     </PageContainer>
   )
 }

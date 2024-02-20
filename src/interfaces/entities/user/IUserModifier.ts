@@ -4,4 +4,5 @@ export interface IUserModifier {
   imageUrl?: string
   role?: number
   isActive?: boolean
+  companyId?: string
 }

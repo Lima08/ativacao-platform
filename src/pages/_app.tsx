@@ -1,8 +1,10 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 
-import { Alert, Snackbar, ThemeProvider, createTheme } from '@mui/material'
+import { Alert, CssBaseline, Snackbar, ThemeProvider } from '@mui/material'
+import { FIVE_SECONDS } from 'constants/index'
 import useGlobalStore from 'store/useGlobalStore'
+import globalTheme from 'themes/globalTheme'
 import DashboardLayout from 'wrappers/DashboardLayout'
 
 export default function App({ Component, pageProps, router }: AppProps) {
@@ -17,15 +19,14 @@ export default function App({ Component, pageProps, router }: AppProps) {
     setToaster({ ...toaster, isOpen: false })
   }
 
-  const theme = createTheme({})
-
   const isUnloggedPage =
     router.pathname === '/login' ||
     router.pathname === '/' ||
     router.pathname === '/create-account'
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={globalTheme}>
+      <CssBaseline />
       {isUnloggedPage ? (
         <Component {...pageProps} />
       ) : (
@@ -36,7 +37,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
       <Snackbar
         onClose={handleClose}
         open={isOpen}
-        autoHideDuration={duration || 5000}
+        autoHideDuration={duration || FIVE_SECONDS}
         role="alert"
       >
         <Alert onClose={handleClose} severity={type} sx={{ width: '100%' }}>

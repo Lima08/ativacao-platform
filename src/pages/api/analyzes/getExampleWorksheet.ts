@@ -14,6 +14,6 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
   }
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
-    .json({ error: { message: 'Method not allowed' } })
+    .json({ message: 'Method not allowed' })
 }
 export default authCheck(handler)

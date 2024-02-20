@@ -9,16 +9,14 @@ import InsightsIcon from '@mui/icons-material/Insights'
 import MoreVertSharpIcon from '@mui/icons-material/MoreVertSharp'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import {
   Avatar,
-  Card,
+  Paper,
   Chip,
   Divider,
   IconButton,
   MenuItem,
   Popover,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -26,26 +24,27 @@ import {
   TableRow,
   Typography,
   useMediaQuery,
-  useTheme
+  useTheme,
+  TableHead,
+  Tooltip,
+  Stack
 } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
-import type { ITrainingCreated } from 'interfaces/entities/training'
+import { FIVE_SECONDS } from 'constants/index'
 import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 
-import Modal from 'components/MediaViewer'
+import DeleteDoubleCheck from 'components/DeleteDoubleCheck'
+import LoadingScreen from 'components/LoadingScreen'
+import MediaViewer from 'components/MediaViewer'
 import PageContainer from 'components/PageContainer'
 import PaginationTableCustom from 'components/TableCustom/PaginationTableCustom'
 import SearchTableCustom from 'components/TableCustom/SearchTableCustom'
 import TableHeadCustom from 'components/TableCustom/TableHeadCustom'
 
+import { mediaObject } from '../../../../types/IMediaObject'
 import { formatDate } from '../../../../utils'
-
-interface mediaObject {
-  url: string
-  type: string
-}
 
 export type DataList = {
   id: string
@@ -58,17 +57,24 @@ export type DataList = {
 export default function TrainingsPage() {
   const TABLE_HEAD = [
     { id: 'image', label: 'Capa', align: 'center' },
-    { id: 'title', label: 'Título', align: 'left' },
-    { id: 'updatedAt', label: 'Atualizado em', align: 'left' },
-    { id: 'active', label: 'Status', align: 'left' },
-    { id: 'see', label: 'Visualizar', align: 'left' },
-    { id: 'actions', label: 'Ações', align: 'right' }
+    { id: 'title', label: 'Título', align: 'center' },
+    { id: 'updatedAt', label: 'Atualizado em', align: 'center' },
+    { id: 'active', label: 'Status', align: 'center' },
+    { id: 'see', label: 'Visualizar', align: 'center' },
+    { id: 'actions', label: 'Ações', align: 'center', onlyAdmin: true }
   ]
+
+  const TABLE_HEAD_MOBILE = [
+    { id: 'title', label: 'Título', align: 'center' },
+    { id: 'active', label: 'Status', align: 'center' }
+  ]
+
+  const router = useRouter()
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-  const router = useRouter()
+  const { user } = useAuthStore((state) => state) as IAuthStore
   const [trainingsList, getAllTrainings, handleTrainingActive, deleteTraining] =
     useMainStore((state) => [
       state.trainingsList,
@@ -76,18 +82,7 @@ export default function TrainingsPage() {
       state.handleTrainingActive,
       state.deleteTraining
     ])
-  const [anchorEl, setAnchorEl] = useState<null | (EventTarget & Element)>(null)
-  const openPopover = Boolean(anchorEl)
 
-  const [currentTraining, setCurrentTraining] = useState<{
-    id: string
-    active: boolean
-  } | null>(null)
-
-  const { user } = useAuthStore((state) => state) as IAuthStore
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [filteredTrainings, setFilteredTrainings] = useState<DataList[]>([])
-  const [trainingListAdapted, setTrainingListAdapted] = useState<DataList[]>([])
   const [loading, error, setToaster, page, rowsPerPage] = useGlobalStore(
     (state) => [
       state.loading,
@@ -98,14 +93,26 @@ export default function TrainingsPage() {
     ]
   )
 
-  const [isModalOpen, setOpenModal] = useState(false)
+  const [anchorEl, setAnchorEl] = useState<null | (EventTarget & Element)>(null)
+  const openPopover = Boolean(anchorEl)
 
-  const [training, setTraining] = useState<{
-    title: string
+  const [currentTraining, setCurrentTraining] = useState<{
+    id: string
     active: boolean
-    description: string
-    media: mediaObject[]
-  }>({ title: '', active: true, description: '', media: [] })
+  } | null>(null)
+
+  const [filteredTrainings, setFilteredTrainings] = useState<DataList[]>([])
+  const [trainingListAdapted, setTrainingListAdapted] = useState<DataList[]>([])
+  const [showDeletePrompt, setShowDeletePrompt] = useState(false)
+  const [itemToBeDeleted, setItemToBeDeleted] = useState<string>('')
+
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [isModalOpen, setOpenModal] = useState(false)
+  const [training, setTraining] = useState<{
+    id: string
+    title: string
+    medias: mediaObject[]
+  }>({ id: '', title: '', medias: [] })
 
   const handleEdit = async (id: string) => {
     router.push(`/in/trainings/${id}`)
@@ -123,8 +130,10 @@ export default function TrainingsPage() {
     setAnchorEl(null)
     setCurrentTraining(null)
   }
-  const onClickRow = async (id: string) => {
-    const training = trainingsList.find((training) => training.id === id)
+
+  const openViewer = async (id: string) => {
+    const training =
+      trainingsList && trainingsList.find((training) => training.id === id)
     const media = training?.medias
 
     if (!media?.length) {
@@ -135,11 +144,11 @@ export default function TrainingsPage() {
       })
       return
     }
+
     setTraining({
+      id: training?.id || '',
       title: training?.name || '',
-      active: training?.active || false,
-      description: training?.description || '',
-      media: mediasAdapter(training?.medias || [])
+      medias: mediasAdapter(training?.medias || [])
     })
 
     setOpenModal(true)
@@ -153,12 +162,18 @@ export default function TrainingsPage() {
     return mediaURLs
   }
 
-  function deleteItem(id: string) {
-    const userDecision = confirm('Confirmar deleção?')
-
-    if (userDecision) {
-      deleteTraining(id)
+  function deleteItem(decision: string) {
+    if (decision === 'yes') {
+      deleteTraining(itemToBeDeleted)
     }
+
+    setShowDeletePrompt(!showDeletePrompt)
+  }
+
+  function showPrompt(id: string) {
+    setShowDeletePrompt(true)
+    setItemToBeDeleted(id)
+    handleClose()
   }
 
   function handleTrainingStatus(id: string, active: boolean) {
@@ -166,16 +181,17 @@ export default function TrainingsPage() {
     setAnchorEl(null)
   }
 
+  function defineCover(medias: any[]) {
+    const imagesList = medias.filter((media) => media.type === 'image')
+    const cover = imagesList?.find((image) => image.cover === true)
+
+    return cover?.url || null
+  }
+
   const initTrainingsList = useCallback(async () => {
-    if (!trainingsList || trainingsList.length === 0) return
-
-    function defineCover(medias: any[]) {
-      const cover = medias.find((media) => media.type === 'image')
-      return cover?.url || null
-    }
-
-    function trainingsAdapter(trainingList: ITrainingCreated[]) {
-      return trainingList
+    const trainingAdapted =
+      trainingsList &&
+      trainingsList
         .map((training) => ({
           id: training.id,
           name: training.name,
@@ -188,11 +204,9 @@ export default function TrainingsPage() {
           updatedAt: training.updatedAt
         }))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-    }
 
-    const trainingAdapted = trainingsAdapter(trainingsList)
-    setTrainingListAdapted(trainingAdapted)
-    setFilteredTrainings(trainingAdapted)
+    trainingAdapted && setTrainingListAdapted(trainingAdapted)
+    trainingAdapted && setFilteredTrainings(trainingAdapted)
   }, [setTrainingListAdapted, trainingsList, page, rowsPerPage])
 
   const searchByName = (searchQuery: string) => {
@@ -206,9 +220,16 @@ export default function TrainingsPage() {
   }
 
   useEffect(() => {
-    if (trainingsList.length > 0) return
+    initTrainingsList()
+  }, [initTrainingsList])
+
+  useEffect(() => {
+    if (trainingsList) {
+      initTrainingsList()
+      return
+    }
     getAllTrainings()
-  }, [getAllTrainings, trainingsList])
+  }, [getAllTrainings, trainingsList, initTrainingsList])
 
   useEffect(() => {
     if (!user) return
@@ -216,119 +237,152 @@ export default function TrainingsPage() {
   }, [user])
 
   useEffect(() => {
-    initTrainingsList()
-  }, [initTrainingsList])
-
-  useEffect(() => {
     if (!error) return
+    console.error(error)
+
     setToaster({
       isOpen: true,
-      message: 'Um erro inesperado ocorreu.',
+      message: error.message || 'Um erro inesperado ocorreu.',
       type: 'error',
-      duration: 5000
+      duration: FIVE_SECONDS
     })
   }, [error, setToaster])
 
   return (
     <PageContainer pageTitle="Treinamentos" pageSection="trainings">
-      {loading && <div>Carregando...</div>}
-      <Card>
-        <TableContainer sx={{ maxHeight: '66vh' }}>
-          <SearchTableCustom onSearch={searchByName} />
+      {loading && <LoadingScreen />}
 
-          <Table>
-            {!isMobile && <TableHeadCustom headLabel={TABLE_HEAD} />}
+      <Paper>
+        <SearchTableCustom onSearch={searchByName} />
+        <TableContainer sx={{ maxHeight: '56vh' }}>
+          <Table stickyHeader>
+            {!!filteredTrainings?.length && (
+              <TableHead>
+                {!isMobile && (
+                  <TableHeadCustom headLabel={TABLE_HEAD} isAdmin={isAdmin} />
+                )}
+
+                {isMobile && (
+                  <TableHeadCustom
+                    headLabel={TABLE_HEAD_MOBILE}
+                    isAdmin={isAdmin}
+                  />
+                )}
+              </TableHead>
+            )}
             <TableBody>
               {filteredTrainings &&
                 filteredTrainings.map((row: any) => {
                   const { id, img, name, active, updatedAt } = row
 
                   return (
-                    <TableRow hover key={id} tabIndex={-1} role="checkbox">
+                    <TableRow
+                      key={id}
+                      sx={{ '$:hover': { cursor: 'pointer' } }}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        openViewer(id)
+                      }}
+                    >
                       {!isMobile && (
-                        <TableCell
-                          align="center"
-                          sx={{ px: 1 }}
-                          component="th"
-                          scope="row"
-                        >
+                        <TableCell component="th" align="center" scope="row">
                           {img.source && (
                             <Stack alignItems="center" justifyContent="center">
-                              <Avatar
-                                variant="square"
-                                src={img.source}
-                                sx={{
-                                  width: 70,
-                                  height: 70
-                                }}
-                              />
+                              <Avatar alt={name} src={img.source} />
                             </Stack>
                           )}
                           {!img.source && <InsightsIcon fontSize="large" />}
                         </TableCell>
                       )}
-                      <TableCell align="left">
-                        <Stack direction="row" alignItems="center">
-                          <Typography variant="subtitle2">{name}</Typography>
-                        </Stack>
+
+                      <TableCell
+                        size="small"
+                        align="center"
+                        component="th"
+                        sx={{
+                          maxWidth: `${isMobile ? '100px' : '200px'}`
+                        }}
+                      >
+                        <Tooltip title={name}>
+                          <Typography
+                            sx={{
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              alignItems: 'center',
+                              textAlign: 'center',
+                              width: '100%'
+                            }}
+                            variant="subtitle2"
+                          >
+                            {name}
+                          </Typography>
+                        </Tooltip>
                       </TableCell>
 
                       {!isMobile && (
                         <>
-                          <TableCell align="left">
+                          <TableCell component="th" align="center">
                             {formatDate(updatedAt)}
                           </TableCell>
-                          <TableCell align="left">
+                          <TableCell align="center" component="th">
                             <Chip
                               label={active ? 'Ativo' : 'Desativo'}
                               color={active ? 'success' : 'error'}
                               sx={{ width: 80 }}
                             />
                           </TableCell>
-                          <TableCell align="left">
-                            {active && (
-                              <IconButton
-                                aria-label="visibility"
-                                size="large"
-                                onClick={() => onClickRow(id)}
-                              >
-                                <VisibilityIcon />
-                              </IconButton>
-                            )}
-                            {!active && (
-                              <IconButton
-                                aria-label="visibility"
-                                size="large"
-                                disabled
-                              >
-                                <VisibilityOffIcon />
-                              </IconButton>
-                            )}
-                          </TableCell>
                         </>
                       )}
-
-                      <TableCell align="right">
+                      <TableCell size="small" align="center" component="th">
                         <IconButton
+                          aria-label="visibility"
                           size="large"
-                          color="inherit"
-                          onClick={(event) =>
-                            handleOpenMenu(event, { active, id })
-                          }
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            handleEdit(id)
+                          }}
                         >
-                          <MoreVertSharpIcon />
+                          <VisibilityIcon />
                         </IconButton>
                       </TableCell>
+
+                      {isAdmin && !isMobile && (
+                        <TableCell size="small" component="th" align="center">
+                          <IconButton
+                            size="large"
+                            color="inherit"
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              handleOpenMenu(event, { active, id })
+                            }}
+                          >
+                            <MoreVertSharpIcon />
+                          </IconButton>
+                        </TableCell>
+                      )}
                     </TableRow>
                   )
                 })}
+              {!loading &&
+                filteredTrainings &&
+                filteredTrainings.length === 0 && (
+                  <TableRow sx={{ px: 2 }}>
+                    <TableCell size="small" align="center" component="th">
+                      <Typography variant="subtitle2">
+                        Nenhum treinamento encontrado
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
             </TableBody>
           </Table>
         </TableContainer>
 
         <Divider />
         <PaginationTableCustom tableItems={trainingsList} />
-      </Card>
+      </Paper>
 
       <Popover
         open={Boolean(openPopover)}
@@ -354,7 +408,7 @@ export default function TrainingsPage() {
           <IconButton aria-label="edit">
             <EditIcon />
           </IconButton>
-          Editar
+          {isAdmin ? 'Editar' : 'Visualizar'}
         </MenuItem>
         {isAdmin && (
           <>
@@ -374,7 +428,7 @@ export default function TrainingsPage() {
             </MenuItem>
             <MenuItem
               sx={{ color: 'error.main' }}
-              onClick={() => currentTraining && deleteItem(currentTraining.id)}
+              onClick={() => currentTraining && showPrompt(currentTraining.id)}
             >
               <IconButton aria-label="delete" sx={{ color: 'error.main' }}>
                 <DeleteIcon />
@@ -386,19 +440,19 @@ export default function TrainingsPage() {
       </Popover>
 
       {isModalOpen && (
-        <Modal
-          title={training.title}
-          description={training.description}
-          imageSource={
-            training.media[0].type === 'image'
-              ? training.media[0]
-              : 'default img src'
-          }
-          medias={training.media}
+        <MediaViewer
+          modelValue={training}
+          module="training"
           open={isModalOpen}
           setOpen={setOpenModal}
         />
       )}
+      <DeleteDoubleCheck
+        title="Confirmar exclusão?"
+        open={showDeletePrompt}
+        closeDoubleCheck={() => setShowDeletePrompt(false)}
+        deleteItem={deleteItem}
+      />
     </PageContainer>
   )
 }

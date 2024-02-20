@@ -11,5 +11,5 @@ export default async function handler(req: any, res: any) {
   // }
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
-    .json({ error: { message: 'Method not allowed' } })
+    .json({ message: 'Method not allowed' })
 }

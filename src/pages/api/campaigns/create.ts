@@ -14,7 +14,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
     if (role < ROLES.COMPANY_ADMIN) {
       return res
         .status(HTTP_STATUS.UNAUTHORIZED)
-        .json({ error: { message: 'Unauthorized' } })
+        .json({ message: 'Unauthorized' })
     }
 
     const { name, description, mediaIds } = req.body
@@ -29,7 +29,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
     if (error) {
       return res
         .status(HTTP_STATUS.BAD_REQUEST)
-        .json({ error: error.details[0].message })
+        .json({ message: error.details[0].message })
     }
 
     try {
@@ -45,13 +45,13 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
     } catch (error: any) {
       return res
         .status(error.code || HTTP_STATUS.INTERNAL_SERVER_ERROR)
-        .json({ error: { message: error.message } })
+        .json({ message: error.message })
     }
   }
 
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
-    .json({ error: { message: 'Method not allowed' } })
+    .json({ message: 'Method not allowed' })
 }
 
 export default authCheck(handler)

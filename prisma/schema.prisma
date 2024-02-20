@@ -10,56 +10,89 @@ datasource db {
 
 model User {
   id        String  @id @default(uuid())
-  name      String  @db.VarChar(95)
+  name      String  @db.VarChar(255)
   email     String  @unique
   password  String
   companyId String
-  role      Int  @default(100)
-  isActive  Boolean @default(false) 
-  imageUrl  String? @db.VarChar(255)
+  role      Int     @default(100)
+  isActive  Boolean @default(false)
+  imageUrl  String? @db.VarChar(555)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  campaigns    Campaign[]
-  trainings    Training[]
-  userTraining UserTraining[]
-  analyzes     Analysis[]
-
-  company Company @relation(fields: [companyId], references: [id])
+  campaigns     Campaign[]
+  trainings     Training[]
+  userTraining  UserTraining[]
+  analyzes      Analysis[]
+  notifications Notification[]
+  logs          Log[]
+  // accessibleCompanies Company[]      @relation("AdminCompany")
+  AdminCompany  AdminCompany[]
+  orders        Order[]
+  company       Company        @relation(fields: [companyId], references: [id])
+  process       Process[]
 
   @@map("users")
 }
 
 model Company {
   id       String  @id @default(uuid())
-  name     String  @db.VarChar(95)
+  name     String  @db.VarChar(255)
   slug     String  @unique
-  imageUrl String? @db.VarChar(255)
+  imageUrl String? @db.VarChar(555)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user      User[]
-  campaigns Campaign[]
-  trainings Training[]
+  user            User[]
+  campaigns       Campaign[]
+  trainings       Training[]
+  process         Process[]
+  templateProcess TemplateProcess[]
+
+  // admins       User[]         @relation("AdminCompany")
+  AdminCompany  AdminCompany[]
+  order         Order[]
+  templateOrder TemplateOrder[]
 
   @@map("companies")
 }
 
+model AdminCompany {
+  adminId   String
+  companyId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  admin   User    @relation(fields: [adminId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@id([adminId, companyId])
+  @@map("admin_company")
+}
+
 model Media {
   id         String    @id @default(uuid())
-  url        String    @unique @db.VarChar(255)
-  type       MediaType
-  key        String
   campaignId String?
   trainingId String?
+  processId  String?
+  catalogId  String?
+  orderId    String?
+  cover      Boolean?  @default(false)
+  url        String    @unique @db.VarChar(555)
+  type       MediaType
+  key        String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   campaign Campaign? @relation(fields: [campaignId], references: [id])
   training Training? @relation(fields: [trainingId], references: [id])
+  process  Process?  @relation(fields: [processId], references: [id])
+  catalog  Catalog?  @relation(fields: [catalogId], references: [id])
+  order    Order?    @relation(fields: [orderId], references: [id])
 
   @@map("media")
 }
@@ -71,11 +104,11 @@ enum MediaType {
 
 model Training {
   id          String  @id @default(uuid())
-  name        String  @db.VarChar(95)
-  active      Boolean @default(true)
-  description String? @db.VarChar(255)
   userId      String
   companyId   String
+  name        String  @db.VarChar(255)
+  active      Boolean @default(true)
+  description String? @db.VarChar(555)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -90,11 +123,11 @@ model Training {
 
 model Campaign {
   id          String  @id @default(uuid())
-  name        String  @db.VarChar(95)
-  active      Boolean @default(true)
-  description String? @db.VarChar(255)
   userId      String
   companyId   String
+  name        String  @db.VarChar(255)
+  active      Boolean @default(true)
+  description String? @db.VarChar(555)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -128,12 +161,12 @@ enum TrainingStatusType {
 
 model Analysis {
   id        String             @id @default(uuid())
-  title     String             @db.VarChar(255)
-  message   String?            @db.VarChar(255)
   userId    String
-  companyId    String
-  bucketUrl String?            @db.VarChar(255)
-  biUrl     String?            @db.VarChar(255)
+  companyId String
+  title     String             @db.VarChar(555)
+  message   String?            @db.VarChar(1500)
+  bucketUrl String?            @db.VarChar(555)
+  biUrl     String?            @db.VarChar(555)
   status    AnalysisStatusType @default(pending)
 
   createdAt DateTime @default(now())
@@ -148,4 +181,159 @@ enum AnalysisStatusType {
   pending
   rejected
   done
+}
+
+model Notification {
+  id          String  @id @default(uuid())
+  userId      String
+  companyId   String
+  title       String  @db.VarChar(255)
+  description String  @db.VarChar(555)
+  link        String?
+  imageUrl    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model Log {
+  id            String  @id @default(uuid())
+  userId        String
+  trainingId    String?
+  campaignId    String?
+  module        String?
+  info          String? // Field to store the info of the log. Ex: training name, campaign name, if it is a login etc
+  totalMedias   Int?
+  mediasWatched Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("logs")
+}
+
+model Document {
+  id        String  @id @default(uuid())
+  url       String  @unique @db.VarChar(555)
+  key       String
+  processId String?
+  catalogId String?
+  orderId   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  process Process? @relation(fields: [processId], references: [id])
+  catalog Catalog? @relation(fields: [catalogId], references: [id])
+  order   Order?   @relation(fields: [orderId], references: [id])
+
+  @@map("document")
+}
+
+model TemplateProcess {
+  id        String @id @default(uuid())
+  title     String @db.VarChar(255)
+  bucketUrl String @db.VarChar(555)
+  companyId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  process Process[]
+  company Company   @relation(fields: [companyId], references: [id])
+
+  @@map("template_process")
+}
+
+model Process {
+  id                String            @id @default(uuid())
+  title             String            @db.VarChar(255)
+  templateProcessId String
+  userId            String
+  companyId         String
+  message           String?           @db.VarChar(1500)
+  status            ProcessStatusType @default(open)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  templateProcess TemplateProcess @relation(fields: [templateProcessId], references: [id])
+  user            User            @relation(fields: [userId], references: [id])
+  company         Company         @relation(fields: [companyId], references: [id])
+  document        Document[]
+  media           Media[]
+
+  @@map("process")
+}
+
+enum ProcessStatusType {
+  open
+  pending
+  rejected
+  done
+}
+
+model Catalog {
+  id          String  @id @default(uuid())
+  userId      String
+  name        String  @db.VarChar(255)
+  active      Boolean @default(true)
+  description String? @db.VarChar(555)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  medias    Media[]
+  documents Document[]
+
+  @@map("catalogs")
+}
+
+model TemplateOrder {
+  id        String @id @default(uuid())
+  title     String @db.VarChar(255)
+  bucketUrl String @db.VarChar(555)
+  companyId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Order   Order[]
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@map("template_order")
+}
+
+model Order {
+  id              String          @id @default(uuid())
+  title           String          @db.VarChar(255)
+  templateOrderId String
+  userId          String
+  companyId       String
+  message         String?         @db.VarChar(1500)
+  status          OrderStatusType @default(received)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  templateOrder TemplateOrder @relation(fields: [templateOrderId], references: [id])
+  user          User          @relation(fields: [userId], references: [id])
+  company       Company       @relation(fields: [companyId], references: [id])
+  document      Document[]
+  media         Media[]
+
+  @@map("order")
+}
+
+enum OrderStatusType {
+  received
+  processing
+  invoiced
+  rejected
 }

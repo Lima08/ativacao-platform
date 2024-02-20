@@ -1,25 +1,27 @@
-import { TableRow, TableCell, TableHead, TableSortLabel } from '@mui/material'
-
+import { TableRow, TableCell, Typography } from '@mui/material'
 type ITableHead = {
   headLabel: any
+  isAdmin?: boolean
 }
 
-export default function TableHeadCustom({ headLabel }: ITableHead) {
+export default function TableHeadCustom({ headLabel, isAdmin }: ITableHead) {
   return (
-    <TableHead
-      sx={{
-        background: '#F3F3F3'
-      }}
-    >
-      <TableRow>
-        {headLabel.map((headCell: any) => (
+    <TableRow>
+      {headLabel.map((headCell: any) => {
+        if (headCell.onlyAdmin && !isAdmin) return
+        return (
           <TableCell key={headCell.id} align={headCell.align || 'left'}>
-            <TableSortLabel hideSortIcon>
-              <h2 className="font-bold">{headCell.label}</h2>
-            </TableSortLabel>
+            <Typography
+              variant="subtitle2"
+              textAlign="center"
+              alignItems="baseline"
+              sx={{ fontWeight: 'bold' }}
+            >
+              {headCell.label}
+            </Typography>
           </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
+        )
+      })}
+    </TableRow>
   )
 }

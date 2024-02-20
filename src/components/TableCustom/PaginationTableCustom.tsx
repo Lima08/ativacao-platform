@@ -24,14 +24,14 @@ export default function PaginationTableCustom({ tableItems }: any) {
 
   useEffect(() => {
     setPage(0)
-    setRowsPerPage(5)
+    setRowsPerPage(25)
   }, [setPage, setRowsPerPage])
 
   return (
     <TablePagination
-      rowsPerPageOptions={[5, 10, 25]}
+      rowsPerPageOptions={[10, 15, 25]}
       component="div"
-      count={tableItems.length}
+      count={tableItems ? tableItems.length : 0}
       rowsPerPage={rowsPerPage}
       page={page}
       onPageChange={handleChangePage}

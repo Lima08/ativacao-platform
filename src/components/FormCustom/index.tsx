@@ -12,8 +12,7 @@ export default function FormCustom({
   return (
     <form
       className={
-        customStyles ||
-        'border-grey bg-white p-5 rounded-lg mt-5 mb-5 w-10/12 mx-auto'
+        customStyles || 'border-grey p-5 rounded-lg mt-5 mb-5 w-10/12 mx-auto'
       }
       onSubmit={submitForm}
     >

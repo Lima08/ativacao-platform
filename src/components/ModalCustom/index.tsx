@@ -5,9 +5,19 @@ interface ModalCustomProps {
   title?: string
   children: React.ReactNode
   closeModal: () => void
+  width?: number
+  height?: number
+  customPadding?: number
 }
 
-function ModalCustom({ children, title, closeModal }: ModalCustomProps) {
+function ModalCustom({
+  children,
+  title,
+  closeModal,
+  width,
+  height,
+  customPadding
+}: ModalCustomProps) {
   return (
     <Box
       sx={{
@@ -25,9 +35,10 @@ function ModalCustom({ children, title, closeModal }: ModalCustomProps) {
     >
       <Box
         sx={{
-          width: 400,
+          width: width || 'auto',
+          height: height || 'auto',
           backgroundColor: 'white',
-          padding: 3,
+          padding: customPadding || 3,
           borderRadius: 4,
           display: 'flex',
           flexDirection: 'column',

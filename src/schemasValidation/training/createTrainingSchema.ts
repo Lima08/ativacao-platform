@@ -1,5 +1,6 @@
 import Joi from 'joi'
-import { minNameLength } from 'schemasValidation/constants'
+
+import { minNameLength } from './../../constants'
 
 const createTrainingSchema = Joi.object({
   companyId: Joi.string().required(),

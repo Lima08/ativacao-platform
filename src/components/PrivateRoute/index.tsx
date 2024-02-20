@@ -19,7 +19,7 @@ export const PrivateRoute = ({ children }: PrivateRouteProps) => {
     if (!isUserAuthenticated) {
       router.push(APP_ROUTES.public.login)
     }
-  }, [isUserAuthenticated, router.push])
+  }, [isUserAuthenticated, router])
 
   return (
     <>

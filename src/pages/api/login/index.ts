@@ -14,22 +14,26 @@ export default async function handler(
     if (!email || !password) {
       return res
         .status(HTTP_STATUS.UNAUTHORIZED)
-        .json({ error: { message: 'Email or password invalid' } })
+        .json({ message: 'Email or password invalid' })
     }
 
     try {
       const loginData = await loginUser({ email, password })
       return res.status(HTTP_STATUS.OK).json({
-        token: loginData.token,
-        user: loginData.user,
-        company: loginData.company
+        data: {
+          token: loginData.token,
+          user: loginData.user,
+          company: loginData.company
+        }
       })
     } catch (error: any) {
-      return res.status(error.code).json({ error: { message: error.message } })
+      return res
+        .status(error.code)
+        .json({ message: error.message, meta: error.meta })
     }
   }
 
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
-    .json({ error: { message: 'Method not allowed' } })
+    .json({ message: 'Method not allowed' })
 }

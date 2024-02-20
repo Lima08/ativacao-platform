@@ -5,7 +5,9 @@ import { StateCreator } from 'zustand'
 
 export interface IUserStore {
   currentUser: IUserCreated | null
-  usersList: IUserCreated[]
+  usersList: IUserCreated[] | null
+  resetUserState: () => void
+  setCurrentUser: (user: IUserCreated) => void
   resetCurrentUser: () => void
   getUserById: (id: string) => void
   getAllUsers: () => void
@@ -14,7 +16,16 @@ export interface IUserStore {
 
 const createUserSlice: StateCreator<IUserStore> = (set) => ({
   currentUser: null,
-  usersList: [],
+  usersList: null,
+  resetUserState: () => {
+    set(() => ({ usersList: null, currentUser: null }))
+  },
+  setCurrentUser: (user) => {
+    set((state) => ({
+      ...state,
+      currentUser: user
+    }))
+  },
   resetCurrentUser: async () => {
     set((state) => ({
       ...state,
@@ -22,8 +33,10 @@ const createUserSlice: StateCreator<IUserStore> = (set) => ({
     }))
   },
   getAllUsers: async () => {
-    useGlobalStore.getState().setLoading(true)
     try {
+      useGlobalStore.getState().setLoading(true)
+      useGlobalStore.getState().setError(null)
+
       const response = await httpServices.user.getAll()
       set((state) => ({
         ...state,
@@ -37,8 +50,10 @@ const createUserSlice: StateCreator<IUserStore> = (set) => ({
     }
   },
   getUserById: async (id) => {
-    useGlobalStore.getState().setLoading(true)
     try {
+      useGlobalStore.getState().setLoading(true)
+      useGlobalStore.getState().setError(null)
+
       const response = await httpServices.user.getById(id)
       set((state) => {
         return {
@@ -55,18 +70,33 @@ const createUserSlice: StateCreator<IUserStore> = (set) => ({
     }
   },
   updateUser: async (id: string, updatedUser: IUserModifier) => {
-    useGlobalStore.getState().setLoading(true)
-
     try {
+      useGlobalStore.getState().setLoading(true)
+      useGlobalStore.getState().setError(null)
+
       const response = await httpServices.user.update(id, updatedUser)
       set((state) => ({
         ...state,
-        usersList: state.usersList.map((user) =>
-          user.id === id ? (response.data as IUserCreated) : user
-        )
+        usersList:
+          state.usersList &&
+          state.usersList.map((user) =>
+            user.id === id ? (response.data as IUserCreated) : user
+          )
       }))
-    } catch (error) {
-      useGlobalStore.getState().setError(error)
+
+      useGlobalStore.getState().setToaster({
+        isOpen: true,
+        message: 'Usuário atualizado com sucesso!',
+        type: 'success'
+      })
+    } catch (error: any) {
+      useGlobalStore.getState().setToaster({
+        isOpen: true,
+        message:
+          error.message ||
+          'Erro ao registrar usuário! Tente novamente ou contate o suporte.',
+        type: 'error'
+      })
       return
     } finally {
       useGlobalStore.getState().setLoading(false)

@@ -1,140 +1,111 @@
-import { useState } from 'react'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 
-import HighlightOffIcon from '@mui/icons-material/HighlightOff'
-import { Box, TextField, Button, IconButton } from '@mui/material'
-import httpServices from 'services/http'
+import { Box, Button, FormControl, TextField } from '@mui/material'
+import { ROLES } from 'constants/enums/eRoles'
+import { ICompanyCreated } from 'interfaces/entities/company'
 import { useAuthStore } from 'store/useAuthStore'
-import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 
-import MediaShow from 'components/MediaShow'
 import ModalCustom from 'components/ModalCustom'
-import SuccessAction from 'components/SuccessAction'
-import Uploader from 'components/Uploader'
 
 function CompanySettings({
   handleCloseModal
 }: {
   handleCloseModal: () => void
 }) {
-  const [loading, setToaster, setLoading] = useGlobalStore((state) => [
-    state.loading,
-    state.setToaster,
-    state.setLoading
+  const router = useRouter()
+
+  const [currentCompany, setCurrentCompany] = useState<ICompanyCreated | null>(
+    null
+  )
+
+  const [companiesList, getAllCompanies, updateUser] = useMainStore((state) => [
+    state.companiesList,
+    state.getAllCompanies,
+    state.updateUser
   ])
-  const [updateCompany] = useMainStore((state) => [state.updateCompany])
-  const [company, setCompany] = useAuthStore((state) => [
+  const [company, user] = useAuthStore((state) => [
     // @ts-ignore
     state.company,
     // @ts-ignore
-    state.setCompany
+    state.user
   ])
 
-  const [companyName, setCompanyName] = useState(company.name)
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
-  const [showSuccess, setShowSuccess] = useState(false)
+  const handleChangeCompany = (event: any) => {
+    if (!companiesList) return
+    const company = companiesList.find(
+      (company) => company.id === event.target.value
+    )
 
-  const uploadFile = async (e: any) => {
-    e.preventDefault()
-    const files = e.target?.files
-
-    if (!files.length) return
-
-    if (files[0].type.split('/')[0] !== 'image') {
-      setToaster({
-        isOpen: true,
-        message: 'Formato de arquivo inválido!',
-        type: 'warning'
-      })
-      return
-    }
-
-    const formData = new FormData()
-    formData.append('files', files[0])
-
-    try {
-      setLoading(true)
-      const { data, error } = await httpServices.upload.save(formData)
-
-      if (!!error || !data) {
-        setToaster({
-          isOpen: true,
-          message: 'Error ao salvar imagem',
-          type: 'error'
-        })
-        return
-      }
-
-      setImageUrl(data[0].url)
-    } catch (error) {
-      setToaster({
-        isOpen: true,
-        message: 'Error ao carregar imagem',
-        type: 'error'
-      })
-    } finally {
-      setLoading(false)
-    }
+    if (!company) return
+    setCurrentCompany(company)
   }
 
   const handleSaveConfiguration = () => {
-    updateCompany(String(company!.id), { name: companyName, imageUrl })
-    setCompany({ ...company, imageUrl })
-    setShowSuccess(true)
+    updateUser(user.id, { companyId: currentCompany?.id })
+    router.push('/login')
   }
 
-  const handleReset = () => {
-    setCompanyName(company.name)
-    setImageUrl(company.imageUrl)
-    setShowSuccess(false)
-  }
+  useEffect(() => {
+    if (!(user && user.role >= ROLES.SYSTEM_ADMIN)) return
+    getAllCompanies()
+  }, [getAllCompanies, user])
 
-  const resetAndClose = () => {
-    handleReset()
-    handleCloseModal()
-  }
+  useEffect(() => {
+    if (!company) return
+    setCurrentCompany(company)
+  }, [company])
+
   return (
-    <ModalCustom title="Configurações" closeModal={resetAndClose}>
-      {!showSuccess && (
-        <div>
-          <TextField
-            label="Nome da Empresa"
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
-            sx={{ width: '100%', mt: 2 }}
-          />
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              mt: 1
-            }}
-          >
-            {!imageUrl && <Uploader uploadFile={uploadFile} />}
-            {imageUrl && !showSuccess && (
-              <div className="relative ">
-                <IconButton
-                  style={{ zIndex: 1 }}
-                  className="absolute right-0 top-0 m-1 hover:bg-red-500 hover:text-white"
-                  onClick={() => setImageUrl(null)}
-                >
-                  <HighlightOffIcon />
-                </IconButton>
-                <MediaShow url={imageUrl} type="image" />
-              </div>
-            )}
+    <ModalCustom title="Configurações" closeModal={handleCloseModal}>
+      <>
+        {user && user.role >= ROLES.SYSTEM_ADMIN && companiesList && (
+          <Box sx={{ minWidth: 120 }}>
+            <TextField
+              variant="standard"
+              label="Nome da empresa atual"
+              value={currentCompany?.name}
+              fullWidth
+              sx={{ mb: 2 }}
+            />
+
+            <TextField
+              variant="standard"
+              label="Slug para cadastro de usuários"
+              value={currentCompany?.slug}
+              fullWidth
+              sx={{ mb: 2 }}
+            />
+
+            <FormControl fullWidth>
+              <label htmlFor="companySelect">Trocar empresa</label>
+              <select
+                id="companySelect"
+                value={0}
+                onChange={handleChangeCompany}
+              >
+                <option value="">selecione...</option>
+                {companiesList.length > 0 &&
+                  companiesList.map((company) => (
+                    <option key={company.id} value={company.id}>
+                      {company.name}
+                    </option>
+                  ))}
+              </select>
+            </FormControl>
           </Box>
-          <Button
-            variant="outlined"
-            onClick={handleSaveConfiguration}
-            sx={{ width: '100%', mt: 2 }}
-          >
-            Salvar
-          </Button>
-        </div>
-      )}
-      {!loading && showSuccess && <SuccessAction />}
+        )}
+
+        <Button
+          variant="contained"
+          onClick={handleSaveConfiguration}
+          sx={{ width: '100%', mt: 2 }}
+          disabled={currentCompany?.id === company.id}
+        >
+          Ir para empresa selecionada
+        </Button>
+      </>
     </ModalCustom>
   )
 }

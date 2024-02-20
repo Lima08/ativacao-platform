@@ -1,9 +1,13 @@
 import { HTTP_STATUS } from 'constants/enums/eHttpStatusEnum'
 import CustomError from 'errors/CustomError'
+import { readFileSync } from 'fs'
 import { ICampaignCreated, ICampaignFilter } from 'interfaces/entities/campaign'
 import { IMediaCreated } from 'interfaces/entities/media'
 import { prisma } from 'lib/prisma'
 import { Campaign } from 'models/Campaign'
+import path from 'path'
+import EmailService from 'services/emailService/EmailService'
+import { getUsers } from 'useCases/users'
 
 import { updateMedia, getMediasBy, deleteMedia } from '../media'
 import { createdCampaignDto, newCampaignDto, modifierCampaignDto } from './dto'
@@ -25,10 +29,10 @@ async function createCampaign({
       userId
     })
     if (!newCampaign)
-      throw new CustomError('Error creating campaign', HTTP_STATUS.BAD_REQUEST)
+      throw new CustomError('Erro ao criar campanha', HTTP_STATUS.BAD_REQUEST)
 
     let medias: IMediaCreated[] = []
-    if (mediaIds && mediaIds.length) {
+    if (newCampaign && mediaIds?.length) {
       const promises = mediaIds.map((mediaId) =>
         updateMedia(mediaId, { campaignId: newCampaign.id })
       )
@@ -36,25 +40,45 @@ async function createCampaign({
       await Promise.all(promises)
         .then((files) => (medias = files))
         .catch((error: any) => {
-          const meta = error.meta || error.message
           throw new CustomError(
-            'Error in creating campaign media',
+            error.message || 'Erro ao criar mídias',
             HTTP_STATUS.BAD_REQUEST,
-            {
-              ...meta,
-              createdCampaign: newCampaign
-            }
+            error
           )
         })
     }
 
+    const companyUsers = await getUsers({ companyId })
+    const userEmailList = companyUsers.map((user) => user.email)
+
+    const emailTemplatePath = path.resolve(
+      'src/templates/newContentNotify.html'
+    )
+    const emailTemplate = readFileSync(emailTemplatePath, 'utf-8')
+    const title = 'Novidade no site!'
+
+    const variables = {
+      moduleName: 'Campanhas',
+      contentName: name,
+      contentDescription: description,
+      contentUrl: `https://ativacaotec.com/in/campaigns/${newCampaign.id}`
+    }
+
+    const compiledEmail = EmailService.getInstance().compileTemplate(
+      emailTemplate,
+      variables
+    )
+
+    await EmailService.getInstance()
+      .sendEmailBulk(userEmailList, title, compiledEmail)
+      .catch((error) => console.error(error))
+
     return { ...newCampaign, medias }
   } catch (error: any) {
-    const meta = error.meta || error.message
     throw new CustomError(
-      'Error creating campaign',
-      HTTP_STATUS.BAD_REQUEST,
-      meta
+      error.message || 'Erro ao criar campanha',
+      error.code || HTTP_STATUS.BAD_REQUEST,
+      error
     )
   }
 }
@@ -70,11 +94,10 @@ async function getCampaignById(id: string): Promise<createdCampaignDto> {
 
     return { ...campaign, medias }
   } catch (error: any) {
-    const meta = error.meta || error.message
     throw new CustomError(
-      'Error to get campaign',
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      meta
+      error.message || 'Error to get campaign',
+      error.code || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      error
     )
   }
 }
@@ -94,11 +117,10 @@ async function getAllCampaigns(
 
     return allCampaignsWithMedia
   } catch (error: any) {
-    const meta = error.meta || error.message
     throw new CustomError(
-      'Error to get campaigns',
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      meta
+      error.message || 'Error to get campaigns',
+      error.code || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      error
     )
   }
 }
@@ -110,11 +132,13 @@ async function updateCampaign(
   const updatedCampaign = await repository
     .update(id, { name, description, active })
     .catch((error: any) => {
-      const meta = error.meta || error.message
+      if (error.message) {
+        throw new CustomError(error.message, HTTP_STATUS.BAD_REQUEST, error)
+      }
       throw new CustomError(
-        'Error to update campaign',
+        'Erro ao atualizar campanha',
         HTTP_STATUS.BAD_REQUEST,
-        meta
+        error
       )
     })
 
@@ -128,27 +152,26 @@ async function updateCampaign(
     await Promise.all(promises)
       .then((files) => (medias = files))
       .catch((error: any) => {
-        const meta = error.meta || error.message
         throw new CustomError(
-          'Error to update campaign media',
-          HTTP_STATUS.BAD_REQUEST,
-          meta
+          error.message || 'Erro ao atualizar mídias',
+          error.code || HTTP_STATUS.BAD_REQUEST,
+          error
         )
       })
-
-    if (mediasToExclude?.length) {
-      const promisesToExclude = mediasToExclude.map((id) => deleteMedia(id))
-
-      await Promise.all(promisesToExclude).catch((error: any) => {
-        const meta = error.meta || error.message
-        throw new CustomError(
-          'Error to update campaign media',
-          HTTP_STATUS.BAD_REQUEST,
-          meta
-        )
-      })
-    }
   }
+
+  let promisesToExclude: any[] = []
+  if (mediasToExclude?.length) {
+    promisesToExclude = mediasToExclude.map((id) => deleteMedia(id))
+  }
+
+  await Promise.all(promisesToExclude).catch((error: any) => {
+    throw new CustomError(
+      error.message || 'Erro ao deletar mídia',
+      error.code || HTTP_STATUS.BAD_REQUEST,
+      error
+    )
+  })
 
   return { ...updatedCampaign, medias }
 }
@@ -158,21 +181,19 @@ async function deleteCampaign(id: string): Promise<void> {
   if (allMedias.length) {
     const promises = allMedias.map((media) => deleteMedia(media.id))
     await Promise.all(promises).catch((error: any) => {
-      const meta = error.meta || error.message
       throw new CustomError(
-        'Error to delete campaign media',
-        HTTP_STATUS.INTERNAL_SERVER_ERROR,
-        meta
+        error.message || 'Error to delete campaign media',
+        error.code || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        error
       )
     })
   }
 
   await repository.delete(id).catch((error: any) => {
-    const meta = error.meta || error.message
     throw new CustomError(
-      'Error to delete campaign',
+      'Erro ao deletar campanha',
       HTTP_STATUS.BAD_REQUEST,
-      meta
+      error
     )
   })
 }

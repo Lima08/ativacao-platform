@@ -12,7 +12,8 @@ export interface ITrainingDto {
 
 export interface ITrainingStore {
   currentTraining: ITrainingCreated | null
-  trainingsList: ITrainingCreated[]
+  trainingsList: ITrainingCreated[] | null
+  resetTrainingState: () => void
   resetCurrentTraining: () => void
   createTraining: (newTraining: ITrainingDto) => void
   getTrainingById: (id: string) => void
@@ -24,20 +25,42 @@ export interface ITrainingStore {
 
 const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
   currentTraining: null,
-  trainingsList: [],
+  trainingsList: null,
+  resetTrainingState: () => {
+    set(() => ({ trainingsList: null, currentTraining: null }))
+  },
   resetCurrentTraining: () => {
     set(() => ({ currentTraining: null }))
   },
   getTrainingById: async (id) => {
+    if (!id) return
+
     useGlobalStore.getState().setLoading(true)
+    useGlobalStore.getState().setError(null)
+
     try {
       const response = await httpServices.trainings.getById(id)
+
+      if (!response.data?.id) {
+        useGlobalStore.getState().setToaster({
+          isOpen: true,
+          message: 'Treinamento não encontrado!',
+          type: 'warning'
+        })
+        return
+      }
+
       set((state) => ({
         ...state,
         currentTraining: response?.data
       }))
     } catch (error) {
-      useGlobalStore.getState().setError(error)
+      console.error(error)
+      useGlobalStore.getState().setToaster({
+        isOpen: true,
+        message: 'Error ao buscar treinamento!',
+        type: 'error'
+      })
       return
     } finally {
       useGlobalStore.getState().setLoading(false)
@@ -59,64 +82,86 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
     }
   },
   createTraining: async (newTraining) => {
-    useGlobalStore.getState().setLoading(true)
     try {
+      useGlobalStore.getState().setLoading(true)
+      useGlobalStore.getState().setError(null)
+
       const response = await httpServices.trainings.create(newTraining)
       set((state) => ({
         ...state,
-        trainingsList: [
-          ...state.trainingsList,
-          response.data as ITrainingCreated
-        ]
+        trainingsList: state.trainingsList
+          ? [...state.trainingsList, response.data as ITrainingCreated]
+          : [response.data as ITrainingCreated]
       }))
-    } catch (error) {
-      useGlobalStore.getState().setError(error)
-      return
+      useGlobalStore.getState().setToaster({
+        isOpen: true,
+        message: 'Treinamento criado com sucesso!',
+        type: 'success'
+      })
+    } catch (error: any) {
+      useGlobalStore.getState().setToaster({
+        isOpen: true,
+        message:
+          error.message ||
+          'Erro ao criar treinamento! Tente novamente ou entre em contato com o suporte.',
+        type: 'error'
+      })
     } finally {
       useGlobalStore.getState().setLoading(false)
     }
   },
   updateTraining: async (id, updatedTraining) => {
     useGlobalStore.getState().setLoading(true)
- 
-    set((state) => ({
-      ...state,
-      trainingsList: state.trainingsList.map((training) => {
-        if (training.id !== id) return training
 
-        const { mediasToExclude } = updatedTraining
-        if (!mediasToExclude?.length) return { ...training, ...updatedTraining }
-
-        const updatedMedias = training.medias.filter(
-          (media) => !mediasToExclude.includes(media.id)
-        )
-        return { ...training, ...updatedTraining, medias: updatedMedias }
-      })
-    }))
     try {
-      let mediaIds: string[] = []
+      const mediaIds: string[] = []
       if (updatedTraining?.medias) {
-        mediaIds = updatedTraining.medias.map((media) => media.id)
+        const ids = updatedTraining.medias.map((media) => media.id)
+        ids.forEach((id) => {
+          mediaIds.push(id)
+        })
+      }
+      if (updatedTraining.mediaIds) {
+        updatedTraining.mediaIds.forEach((id) => {
+          mediaIds.push(id)
+        })
       }
 
       await httpServices.trainings.update(id, { ...updatedTraining, mediaIds })
+      useGlobalStore.getState().setToaster({
+        isOpen: true,
+        message: 'Treinamento atualizado com sucesso!',
+        type: 'success'
+      })
+
+      set((state) => ({
+        ...state,
+        trainingsList: null
+      }))
     } catch (error) {
-      useGlobalStore.getState().setError(error)
-      return
+      useGlobalStore.getState().setToaster({
+        isOpen: true,
+        message:
+          'Erro ao atualizar treinamento! Tente novamente ou entre em contato com o suporte.',
+        type: 'error'
+      })
     } finally {
       useGlobalStore.getState().setLoading(false)
     }
   },
   handleTrainingActive: async (id, active) => {
-    useGlobalStore.getState().setLoading(true)
-
     set((state) => ({
       ...state,
-      trainingsList: state.trainingsList.map((training) =>
-        training.id === id ? { ...training, active } : training
-      )
+      trainingsList:
+        state.trainingsList &&
+        state.trainingsList.map((training) =>
+          training.id === id ? { ...training, active } : training
+        )
     }))
     try {
+      useGlobalStore.getState().setError(null)
+      useGlobalStore.getState().setLoading(true)
+
       await httpServices.trainings.update(id, {
         active
       })
@@ -128,11 +173,13 @@ const createTrainingsSlice: StateCreator<ITrainingStore> = (set) => ({
     }
   },
   deleteTraining: async (id) => {
-    useGlobalStore.getState().setLoading(true)
+    useGlobalStore.getState().setError(null)
+
     try {
       set((state) => ({
         ...state,
-        trainingsList: state.trainingsList.filter((c) => c.id !== id)
+        trainingsList:
+          state.trainingsList && state.trainingsList.filter((c) => c.id !== id)
       }))
 
       await httpServices.trainings.delete(id)

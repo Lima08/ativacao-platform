@@ -1,7 +1,7 @@
 import { CheckCircle } from '@mui/icons-material'
 import { Card, CardContent, Typography, Box } from '@mui/material'
 
-function SuccessAction() {
+function SuccessAction({ message }: { message?: string | null }) {
   return (
     <Card sx={{ width: '100%' }}>
       <CardContent>
@@ -14,7 +14,7 @@ function SuccessAction() {
           <CheckCircle sx={{ fontSize: 64, color: 'green' }} />
         </Box>
         <Typography variant="h6" align="center">
-          Salvo com sucesso
+          {message ? message : ' Salvo com sucesso!'}
         </Typography>
       </CardContent>
     </Card>

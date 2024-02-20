@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
 
-import { Button } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 import { ROLES } from 'constants/enums/eRoles'
 import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 
@@ -12,13 +12,20 @@ type PageContainerProps = {
   pageTitle: string
   pageSection?: string
   customCallback?: () => void
+  secondaryAction?: {
+    label: string
+    callback: () => void
+  }
+  isProcesses?: boolean
 }
 
 export default function PageContainer({
   pageTitle,
   pageSection,
   children,
-  customCallback
+  customCallback,
+  secondaryAction,
+  isProcesses
 }: PageContainerProps) {
   const { user } = useAuthStore((state) => state) as IAuthStore
 
@@ -39,17 +46,55 @@ export default function PageContainer({
     setIsAdmin(user.role >= ROLES.COMPANY_ADMIN)
   }, [user])
   return (
-    <div className=" flex flex-col items-center px-2 md:px-8 py-1">
-      <div className="w-full flex flex-row justify-between items-center ">
-        <h2 className="text-2xl font-medium">{pageTitle}</h2>
+    <Box
+      className="page-container"
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        height: '100%',
+        p: 2,
+        pb: 0
+      }}
+    >
+      <Box
+        sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
+        <Typography variant="h5" fontWeight="bold">
+          {pageTitle}
+        </Typography>
 
-        {isAdmin && pageSection && (
-          <Button variant="outlined" onClick={navToCreatePage}>
+        {isAdmin && !isProcesses && pageSection && (
+          <Button variant="contained" onClick={navToCreatePage}>
             Adicionar
           </Button>
         )}
-      </div>
-      <section className="w-full flex flex-col mt-4">{children}</section>
-    </div>
+
+        {secondaryAction && (
+          <Button variant="contained" onClick={secondaryAction.callback}>
+            {secondaryAction.label}
+          </Button>
+        )}
+      </Box>
+      <Box
+        sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          mt: 2,
+          overflowY: 'auto',
+          maxHeight: 600
+        }}
+      >
+        {children}
+      </Box>
+    </Box>
   )
 }

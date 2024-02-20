@@ -17,7 +17,7 @@ export default async function handler(
     if (error) {
       return res
         .status(HTTP_STATUS.BAD_REQUEST)
-        .json({ error: error.details[0].message })
+        .json({ message: error.details[0].message })
     }
 
     try {
@@ -31,11 +31,11 @@ export default async function handler(
 
       return res.status(HTTP_STATUS.CREATED).end()
     } catch (error: any) {
-      return res.status(error.code).json({ error: { message: error.message } })
+      return res.status(error.code).json({ message: error.message, meta: error.meta })
     }
   }
 
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
-    .json({ error: { message: 'Method not allowed' } })
+    .json({message: 'Method not allowed' })
 }

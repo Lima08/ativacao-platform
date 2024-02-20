@@ -1,171 +1,200 @@
 import Image from 'next/image'
-import { Dispatch, Fragment, SetStateAction, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 
-import { Dialog, Transition } from '@headlessui/react'
+import CloseIcon from '@mui/icons-material/Close'
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Pagination,
+  Tooltip
+} from '@mui/material'
+import useMainStore from 'store/useMainStore'
 
-interface mediaObject {
+interface MediaObject {
   url: string
   type: string
 }
 
-interface ModalProps {
-  title?: string
-  children?: React.ReactNode
-  description: string
-  imageSource: string | mediaObject
-  medias: mediaObject[]
-  open: boolean
-  setOpen: Dispatch<SetStateAction<boolean>>
+interface ModelValue {
+  id: string
+  title: string
+  medias: MediaObject[]
 }
 
-export default function Modal({
-  title,
-  description,
-  imageSource,
-  medias,
-  children,
+interface ModalProps {
+  module?: string
+  modelValue: ModelValue
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export interface DialogTitleProps {
+  id: string
+  children?: React.ReactNode
+  onClose: () => void
+}
+
+export default function MediaViewer({
+  modelValue,
+  module,
   open,
   setOpen
 }: ModalProps) {
   const [index, setIndex] = useState(0)
+  const [videoLoaded, setVideoLoaded] = useState(false)
+  const mediasWatchedSet = useState(new Set<number>().add(1))[0]
 
-  function previousItem() {
-    if (index === 0) return setIndex(medias.length - 1)
+  const [createLog] = useMainStore((state) => [state.createLog])
 
-    return setIndex(index - 1)
+  const onChangeMedia = (_: any, page: number) => {
+    updateMediaWatched(page)
+    setIndex(page - 1)
   }
 
-  function nextItem() {
-    if (index === medias.length - 1) return setIndex(0)
-
-    return setIndex(index + 1)
+  const handleClose = () => {
+    handleCreateLog()
+    setOpen(false)
   }
 
-  const cancelButtonRef = useRef(null)
+  function BootstrapDialogTitle(props: DialogTitleProps) {
+    const { children, onClose, ...other } = props
+
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <DialogTitle {...other}>
+          {children}
+
+          {onClose ? (
+            <IconButton
+              aria-label="close"
+              onClick={onClose}
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[600],
+                backgroundColor: 'transparent'
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          ) : null}
+        </DialogTitle>
+      </Box>
+    )
+  }
+
+  const updateMediaWatched = useCallback(
+    (value: number) => {
+      mediasWatchedSet.add(value)
+    },
+    [mediasWatchedSet]
+  )
+
+  const handleCreateLog = useCallback(() => {
+    let campaignId = ''
+    let trainingId = ''
+
+    if (module === 'campaign') {
+      campaignId = modelValue.id
+    }
+
+    if (module === 'training') {
+      trainingId = modelValue.id
+    }
+
+    createLog({
+      module,
+      info: modelValue.title,
+      campaignId,
+      trainingId,
+      totalMedias: modelValue.medias.length,
+      mediasWatched: mediasWatchedSet.size
+    })
+  }, [
+    createLog,
+    modelValue.id,
+    modelValue.title,
+    module,
+    modelValue.medias.length,
+    mediasWatchedSet.size
+  ])
 
   return (
-    <>
-      <Transition.Root show={open} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-30"
-          initialFocus={cancelButtonRef}
-          onClose={setOpen}
-        >
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
+    <Dialog open={open} aria-labelledby="media-dialog-title" fullScreen>
+      <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+        {modelValue.title}
+      </BootstrapDialogTitle>
+      <DialogContent
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          p: 0
+        }}
+      >
+        {modelValue.medias.map((media, mediaIndex) => (
+          <div
+            key={mediaIndex}
+            hidden={index !== mediaIndex}
+            className="h-full w-full"
           >
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 z-10 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center sm:items-center sm:p-0">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                enterTo="opacity-100 translate-y-0 sm:scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white  w-10/12 h-[650px] md:h-[575px]  my-0 md:mb-0 shadow-xl transition-all">
-                  <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 flex items-center justify-center">
-                    <div className="flex items-center">
-                      <div className="mt-3 text-center sm:mt-0 sm:text-center">
-                        <Dialog.Title
-                          as="h2"
-                          className="text-base font-semibold leading-6 text-gray-900"
-                        >
-                          {title}
-                        </Dialog.Title>
-                        <div className="mt-2">
-                          <p className="text-sm text-gray-500">{description}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 h-3/4 px-4 py-3 flex items-center justify-center">
-                    <div>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="w-8 h-8 mr-4"
-                        onClick={previousItem}
-                        cursor="pointer"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M7.72 12.53a.75.75 0 010-1.06l7.5-7.5a.75.75 0 111.06 1.06L9.31 12l6.97 6.97a.75.75 0 11-1.06 1.06l-7.5-7.5z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div className="w-3/4 flex items-center justify-center flex-col">
-                      <a
-                        href={medias[index].url}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {medias[index].type === 'image' ? (
-                          <Image
-                            src={medias[index].url}
-                            alt=""
-                            width={300}
-                            height={100}
-                            style={{ width: '100%', height: '400px' }}
-                          />
-                        ) : (
-                          <video
-                            controls
-                            width="640"
-                            height="360"
-                            src={medias[index].url}
-                            style={{ height: '400px' }}
-                          >
-                            Video title
-                          </video>
-                        )}
-                      </a>
-                    </div>
-                    <div className="">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="w-8 h-8 ml-4"
-                        onClick={nextItem}
-                        cursor="pointer"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="font-bold my-2">
-                    <p className="text-sm font-bold">
-                      Clique na mídia para melhor visualização
-                    </p>
-                    <p>
-                      {index + 1} / {medias.length}
-                    </p>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
+            {media.type === 'image' && (
+              <Tooltip title="Ampliar">
+                <a
+                  href={modelValue.medias[index].url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Image
+                    src={media.url}
+                    alt={`Imagem ${mediaIndex + 1} - ${modelValue.title}`}
+                    height={400}
+                    width={800}
+                    priority
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'scale-down',
+                      borderRadius: '8px'
+                    }}
+                  />
+                </a>
+              </Tooltip>
+            )}
+            {media.type === 'video' && (
+              <video
+                autoPlay={false}
+                controls
+                controlsList="download"
+                style={{
+                  height: '100%',
+                  width: '100%'
+                }}
+                src={media.url}
+                preload={videoLoaded ? 'auto' : 'metadata'}
+                onLoadedData={() => setVideoLoaded(true)}
+              />
+            )}
           </div>
-        </Dialog>
-      </Transition.Root>
-    </>
+        ))}
+      </DialogContent>
+      <Pagination
+        count={modelValue.medias.length}
+        page={index + 1}
+        onChange={onChangeMedia}
+        shape="rounded"
+        siblingCount={0}
+        sx={{
+          backgroundColor: 'transparent',
+          display: 'flex',
+          justifyContent: 'center',
+          py: '10px'
+        }}
+      />
+    </Dialog>
   )
 }

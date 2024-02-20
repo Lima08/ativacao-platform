@@ -9,19 +9,30 @@ import { StateCreator } from 'zustand'
 
 export interface ICompanyStore {
   currentCompany: ICompanyCreated | null
-  companiesList: ICompanyCreated[]
-  resetCurrentCompany: () => void
+  companiesList: ICompanyCreated[] | null
+  companyError: any | null
+  resetCompanyState: () => void
+  resetCompanyError: () => void
+  setCurrentCompany: (company: ICompanyCreated) => void
   getCompanyById: (id: string) => void
   getAllCompanies: () => void
-  createCompany: (newCompany: ICompany) => void
+  createCompany: (newCompany: ICompany) => Promise<ICompanyCreated | undefined>
   updateCompany: (id: string, updatedCompany: ICompanyModifier) => void
 }
 
 const createCompanySlice: StateCreator<ICompanyStore> = (set) => ({
   currentCompany: null,
-  companiesList: [],
-  resetCurrentCompany: () =>
-    set((state) => ({ ...state, currentCompany: null })),
+  companiesList: null,
+  companyError: null,
+  resetCompanyError: () => set(() => ({ companyError: null })),
+  resetCompanyState: () =>
+    set(() => ({
+      currentCompany: null,
+      companiesList: null,
+      companyError: null
+    })),
+  setCurrentCompany: (company) =>
+    set((state) => ({ ...state, currentCompany: company })),
   getCompanyById: async (id) => {
     try {
       const response = await httpServices.company.getById(id)
@@ -30,8 +41,14 @@ const createCompanySlice: StateCreator<ICompanyStore> = (set) => ({
         currentCompany: response?.data,
         error: response?.error
       }))
-    } catch (error) {
-      useGlobalStore.getState().setError(error)
+    } catch (error: any) {
+      useGlobalStore.getState().setToaster({
+        isOpen: true,
+        message:
+          error.message ||
+          'Erro ao buscar empresa! Tente novamente ou contate o suporte.',
+        type: 'error'
+      })
       return
     } finally {
       useGlobalStore.getState().setLoading(false)
@@ -43,10 +60,14 @@ const createCompanySlice: StateCreator<ICompanyStore> = (set) => ({
       const response = await httpServices.company.getAll()
       set((state) => ({
         ...state,
-        CompanyList: response.data
+        companiesList: response.data
       }))
-    } catch (error) {
-      useGlobalStore.getState().setError(error)
+    } catch (error: any) {
+      useGlobalStore.getState().setToaster({
+        isOpen: true,
+        message: error.message || 'Erro ao buscar empresas!',
+        type: 'error'
+      })
       return
     } finally {
       useGlobalStore.getState().setLoading(false)
@@ -59,10 +80,21 @@ const createCompanySlice: StateCreator<ICompanyStore> = (set) => ({
       const response = await httpServices.company.create(newCompany)
       set((state) => ({
         ...state,
-        CompanyList: [...state.companiesList, response.data as ICompanyCreated]
+        companiesList: state.companiesList
+          ? [...state.companiesList, response.data as ICompanyCreated]
+          : [response.data as ICompanyCreated]
       }))
-    } catch (error) {
-      useGlobalStore.getState().setError(error)
+
+      return response.data
+    } catch (error: any) {
+      set((state) => ({
+        ...state,
+        companyError: {
+          message:
+            error.message ||
+            'Erro ao registrar empresa! Tente novamente ou contate o suporte.'
+        }
+      }))
       return
     } finally {
       useGlobalStore.getState().setLoading(false)
@@ -75,12 +107,21 @@ const createCompanySlice: StateCreator<ICompanyStore> = (set) => ({
       const response = await httpServices.company.update(id, updatedCompany)
       set((state) => ({
         ...state,
-        companiesList: state.companiesList.map((company) =>
-          company.id === id ? (response.data as ICompanyCreated) : company
-        )
+        currentCompany: response.data as ICompanyCreated,
+        companiesList:
+          state.companiesList &&
+          state.companiesList.map((company) =>
+            company.id === id ? (response.data as ICompanyCreated) : company
+          )
       }))
-    } catch (error) {
-      useGlobalStore.getState().setError(error)
+    } catch (error: any) {
+      useGlobalStore.getState().setToaster({
+        isOpen: true,
+        message:
+          error.message ||
+          'Erro ao atualizar usuário! Tente novamente ou contate o suporte.',
+        type: 'error'
+      })
       return
     } finally {
       useGlobalStore.getState().setLoading(false)

@@ -14,7 +14,7 @@ export default function ToggleInput({
   defaultActive,
   onClickToggle
 }: ToggleInputProps) {
-  const [isActive, setIsActive] = useState(defaultActive)
+  const [isActive, setIsActive] = useState(false)
 
   const handleToggle = () => {
     const newActiveState = !isActive
@@ -35,7 +35,7 @@ export default function ToggleInput({
               checked={isActive}
               onChange={() => handleToggle()}
               name="checked"
-              color="primary"
+              color="default"
             />
           }
           label={

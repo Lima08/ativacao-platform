@@ -1,26 +1,31 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import EditIcon from '@mui/icons-material/Edit'
+import HistoryIcon from '@mui/icons-material/History'
 import {
   Avatar,
-  Card,
+  Paper,
   Chip,
   Divider,
   IconButton,
-  Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
+  TableHead,
   TableRow,
+  Tooltip,
   Typography,
   useMediaQuery,
-  useTheme
+  useTheme,
+  Stack
 } from '@mui/material'
+import { ROLES } from 'constants/enums/eRoles'
+import { IAuthStore, useAuthStore } from 'store/useAuthStore'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 
+import LoadingScreen from 'components/LoadingScreen'
 import PageContainer from 'components/PageContainer'
 import PaginationTableCustom from 'components/TableCustom/PaginationTableCustom'
 import SearchTableCustom from 'components/TableCustom/SearchTableCustom'
@@ -30,11 +35,18 @@ import { formatDate } from '../../../../utils'
 
 export default function UsersList() {
   const TABLE_HEAD = [
-    { id: 'name', label: 'Name', alignRight: 'left' },
-    { id: 'role', label: 'Cargo', alignRight: 'left' },
-    { id: 'status', label: 'Status', alignRight: 'left' },
-    { id: 'createdAt', label: 'Data criação', alignRight: 'left' },
-    { id: 'actions', label: 'Ações', alignRight: 'right' }
+    { id: 'avatar', label: 'Foto perfil', align: 'center' },
+    { id: 'name', label: 'Nome', align: 'center' },
+    { id: 'role', label: 'Cargo', align: 'center' },
+    { id: 'status', label: 'Status', align: 'center' },
+    { id: 'createdAt', label: 'Data criação', align: 'center' },
+    { id: 'actions', label: 'Ações', align: 'center', onlyAdmin: true }
+  ]
+
+  const TABLE_HEAD_MOBILE = [
+    { id: 'avatar', label: 'Avatar', align: 'center' },
+    { id: 'name', label: 'Name', align: 'center' },
+    { id: 'actions', label: 'Ações', align: 'center', onlyAdmin: true }
   ]
 
   const theme = useTheme()
@@ -51,60 +63,98 @@ export default function UsersList() {
       state.page,
       state.rowsPerPage
     ])
+  const { user } = useAuthStore((state) => state) as IAuthStore
+
   const [usersList, getAllUsers] = useMainStore((state) => [
     state.usersList,
     state.getAllUsers
   ])
   const [filteredUsers, setFilteredUsers] = useState<any[]>([])
+  const [isAdmin, setIsAdmin] = useState(false)
 
   const handleEdit = async (id: string) => {
     router.push(`/in/users/${id}`)
   }
 
   const searchByName = (searchQuery: string) => {
-    const filteredUsers = usersList.filter((user) => {
-      const userName = user.name.toLowerCase()
-      const query = searchQuery.toLowerCase()
-      return userName.includes(query)
-    })
-    setFilteredUsers(
-      filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-    )
+    const filteredUsers =
+      usersList &&
+      usersList.filter((user) => {
+        const userName = user.name.toLowerCase()
+        const query = searchQuery.toLowerCase()
+        return userName.includes(query)
+      })
+    filteredUsers &&
+      setFilteredUsers(
+        filteredUsers.slice(
+          page * rowsPerPage,
+          page * rowsPerPage + rowsPerPage
+        )
+      )
+  }
+
+  function goToHistory(userId: string) {
+    router.push(`/in/users/${userId}/history`)
   }
 
   useEffect(() => {
     if (!usersList) return
 
+    console.log(
+      '🚀 ~ file: index.tsx:105 ~ usersList:',
+      usersList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    )
     setFilteredUsers(
       usersList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     )
   }, [setFilteredUsers, usersList, page, rowsPerPage])
 
   useEffect(() => {
+    if (usersList) return
     getAllUsers()
-  }, [getAllUsers])
+  }, [getAllUsers, usersList])
 
   useEffect(() => {
     if (!error) return
+    console.error(error)
     setToaster({
       isOpen: true,
-      message: 'Um erro inesperado ocorreu.',
-      type: 'error',
-      duration: 5000
+      message: error.message,
+      type: 'error'
     })
 
     setError(null)
   }, [error, setToaster, setError])
 
+  useEffect(() => {
+    if (!user || !user.role) return
+    if (user.role >= ROLES.COMPANY_ADMIN) {
+      setIsAdmin(true)
+    }
+  }, [user])
+
   return (
     <PageContainer pageTitle="Lista de usuários">
-      {loading && <div>Carregando...</div>}
-      <Card>
-        <TableContainer sx={{ maxHeight: '66vh' }}>
-          <SearchTableCustom onSearch={searchByName} />
+      {loading && <LoadingScreen />}
 
-          <Table>
-            {!isMobile && <TableHeadCustom headLabel={TABLE_HEAD} />}
+      <Paper>
+        <SearchTableCustom onSearch={searchByName} />
+        <TableContainer sx={{ maxHeight: '56vh' }}>
+          <Table stickyHeader>
+            {!!filteredUsers?.length && (
+              <TableHead>
+                {!isMobile && (
+                  <TableHeadCustom headLabel={TABLE_HEAD} isAdmin={isAdmin} />
+                )}
+
+                {isMobile && (
+                  <TableHeadCustom
+                    headLabel={TABLE_HEAD_MOBILE}
+                    isAdmin={isAdmin}
+                  />
+                )}
+              </TableHead>
+            )}
 
             <TableBody>
               {filteredUsers &&
@@ -112,50 +162,77 @@ export default function UsersList() {
                   const { id, name, role, isActive, imageUrl, createdAt } = row
 
                   return (
-                    <TableRow hover key={id} tabIndex={-1} role="checkbox">
+                    <TableRow hover key={id} onClick={() => handleEdit(id)}>
+                      <TableCell component="th" scope="row" align="center">
+                        <Stack alignItems="center" justifyContent="center">
+                          <Avatar alt={name} src={imageUrl} />
+                        </Stack>
+                      </TableCell>
                       <TableCell
                         component="th"
                         scope="row"
-                        padding="none"
-                        sx={{ px: 1 }}
+                        align="center"
+                        sx={{
+                          maxWidth: `${isMobile ? '100px' : '200px'}`
+                        }}
                       >
-                        <Stack direction="row" alignItems="center" spacing={2}>
-                          <Avatar alt={name} src={imageUrl} />
-                          <Typography variant="subtitle2" noWrap>
+                        <Tooltip title={name}>
+                          <Typography
+                            sx={{
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              width: '100%'
+                            }}
+                            variant="subtitle2"
+                            textAlign="center"
+                          >
                             {name}
                           </Typography>
-                        </Stack>
+                        </Tooltip>
                       </TableCell>
 
                       {!isMobile && (
-                        <TableCell align="left">
+                        <TableCell size="small" scope="row" align="center">
                           {role > 100 ? 'Administrador' : 'Usuário'}
                         </TableCell>
                       )}
 
-                      <TableCell align="left">
-                        <Chip
-                          label={isActive ? 'ativo' : 'inativo'}
-                          color={isActive ? 'success' : 'error'}
-                          sx={{ width: 80 }}
-                        />
-                      </TableCell>
-
                       {!isMobile && (
-                        <TableCell align="left">
-                          {formatDate(createdAt)}
-                        </TableCell>
+                        <>
+                          <TableCell size="small" scope="row" align="center">
+                            <Chip
+                              label={isActive ? 'ativo' : 'inativo'}
+                              color={isActive ? 'success' : 'error'}
+                              sx={{ width: 80 }}
+                            />
+                          </TableCell>
+
+                          <TableCell size="small" scope="row" align="center">
+                            {formatDate(createdAt)}
+                          </TableCell>
+                        </>
                       )}
 
-                      <TableCell align="right">
-                        <IconButton
-                          aria-label="edit"
-                          size="large"
-                          onClick={() => handleEdit(id)}
+                      {isAdmin && (
+                        <TableCell
+                          scope="row"
+                          align="center"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                          }}
                         >
-                          <EditIcon />
-                        </IconButton>
-                      </TableCell>
+                          <Tooltip title="Histórico de acesso" placement="top">
+                            <IconButton
+                              aria-label="edit"
+                              size="large"
+                              onClick={() => goToHistory(id)}
+                            >
+                              <HistoryIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      )}
                     </TableRow>
                   )
                 })}
@@ -164,7 +241,7 @@ export default function UsersList() {
         </TableContainer>
         <Divider />
         <PaginationTableCustom tableItems={usersList} />
-      </Card>
+      </Paper>
     </PageContainer>
   )
 }

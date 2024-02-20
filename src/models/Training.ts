@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client'
 import {
   ITraining,
   ITrainingCreated,
@@ -30,7 +30,10 @@ export class Training {
 
   async getAll(filter: ITrainingFilter): Promise<ITrainingCreated[]> {
     const allTrainings = await this.repository.training.findMany({
-      where: filter
+      where: filter,
+      orderBy: {
+        createdAt: 'desc'
+      }
     })
 
     return allTrainings

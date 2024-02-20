@@ -5,36 +5,19 @@
 html,
 body {
   @apply text-slate-800;
-  /* @apply overflow-y-hidden; */
-  background-color: rgb(239, 242, 244)
+  background-color: #f5f7fa;
 }
 
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgb(221, 215, 215);
 }
 
 /* Chrome, Edge, and Safari */
-*::-webkit-scrollbar {
-  width: 10px;
-}
+/* *::-webkit-scrollbar {} */
 
-*::-webkit-scrollbar-track {
-  background: inherit;
-  /* border-radius: 5px; */
-}
+/* *::-webkit-scrollbar-track {
+} */
 
-*::-webkit-scrollbar-thumb {
-  /* background-color: #ffd700; */
-  display: none;
-}
-
-/* CHECKBOX TOGGLE SWITCH */
-.toggle-checkbox:checked {
-  border-color: #68D391 !important;
-}
-
-/* .toggle-checkbox:checked + .toggle-label {
-  background-color: #68D391 !important;
+/* *::-webkit-scrollbar-thumb {
 } */

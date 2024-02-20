@@ -17,7 +17,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
       const training = await getTrainingById(id)
       return res.status(HTTP_STATUS.OK).json({ data: training })
     } catch (error: any) {
-      return res.status(error.code).json({ error: { message: error.message } })
+      return res.status(error.code).json({ message: error.message })
     }
   }
   if (req.method === REQUEST_METHODS.PUT) {
@@ -33,7 +33,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
       })
       return res.status(HTTP_STATUS.OK).json({ data: updatedTraining })
     } catch (error: any) {
-      return res.status(error.code).json({ error: { message: error.message } })
+      return res.status(error.code).json({ message: error.message })
     }
   }
 
@@ -42,13 +42,13 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
       await deleteTraining(id)
       return res.status(HTTP_STATUS.NO_CONTENT).end()
     } catch (error: any) {
-      return res.status(error.code).json({ error: { message: error.message } })
+      return res.status(error.code).json({ message: error.message })
     }
   }
 
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
-    .json({ error: { message: 'Method not allowed' } })
+    .json({ message: 'Method not allowed' })
 }
 
 export default authCheck(handler)

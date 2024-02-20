@@ -1,79 +1,87 @@
 import { useState } from 'react'
 
-import useGlobalStore from 'store/useGlobalStore'
+import { Box, Button } from '@mui/material'
 import useMainStore from 'store/useMainStore'
 
-export default function AdminAnalysisRegister({ analysis, closeModal }: any) {
-  const [setToaster] = useGlobalStore((state) => [state.setToaster])
+type AdminAnalysisRegisterProps = {
+  analysis: any
+  closeModal: () => void
+  isSystemAdmin: boolean
+}
+
+export default function AdminAnalysisRegister({
+  analysis,
+  closeModal,
+  isSystemAdmin
+}: AdminAnalysisRegisterProps) {
   const [done, reject] = useMainStore((state) => [state.done, state.reject])
 
-  const [linkBI, setLinkBI] = useState(analysis.biUrl || '')
-  const [comments, setComments] = useState(analysis.message || '')
-  const [status, setStatus] = useState('done')
+  const [linkBI, setLinkBI] = useState(analysis?.biUrl || '')
+  const [comments, setComments] = useState(analysis?.message || '')
+  const [status, setStatus] = useState<string | null>(null)
 
   const handleSubmit = async () => {
-    if (comments && status) {
-      if (status === 'done') {
-        done(analysis.id, { biUrl: linkBI, message: comments })
-      } else {
-        reject(analysis.id, comments)
-      }
+    if (status === 'done') {
+      done(analysis.id, { biUrl: linkBI, message: comments })
     }
-    setToaster({
-      isOpen: true,
-      type: 'success',
-      message: 'Análise concluída com sucesso'
-    })
+    if (status === 'reject') {
+      reject(analysis.id, comments)
+    }
 
     closeModal()
   }
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <button className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-        <a href={analysis.bucketUrl}>Baixar arquivo</a>
-      </button>
-      <div className="flex flex-col items-center justify-center py-2 mt-4">
-        <div className="flex flex-col items-start mb-2">
-          <label htmlFor="BIURL" className="text-left">
-            Link do BI:
-          </label>
-          <input
-            type="text"
-            name=""
-            id="BIURL"
-            value={linkBI}
-            className="py-2 my-2 rounded-md w-full drop-shadow-md"
-            onChange={(e) => setLinkBI(e.target.value)}
-          />
-        </div>
-        <div className="flex flex-col items-start w-full">
-          <label htmlFor="message" className="text-left">
-            Mensagem:
-          </label>
-          <textarea
-            id="message"
-            value={comments}
-            className="my-2 rounded-md h-2/4 w-full drop-shadow-md"
-            onChange={(e) => setComments(e.target.value)}
-          />
-        </div>
-        <div className="py-2 mt-4 mb-2 w-full flex gap-4 items-baseline justify-center">
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Button variant="contained" href={analysis.bucketUrl} size="large">
+        Baixar arquivo
+      </Button>
+      <div className="flex flex-col items-start mb-2 mt-4 w-full">
+        <label htmlFor="BIURL" className="text-left">
+          Link do BI:
+        </label>
+        <input
+          type="text"
+          name=""
+          id="BIURL"
+          value={linkBI}
+          className="py-2 my-2 rounded-md w-full drop-shadow-md"
+          onChange={(e) => setLinkBI(e.target.value)}
+          disabled={!isSystemAdmin}
+        />
+      </div>
+      <div className="flex flex-col items-start w-full">
+        <label htmlFor="message" className="text-left">
+          Mensagem:
+        </label>
+        <textarea
+          id="message"
+          value={comments}
+          className="my-2 rounded-md h-2/4 w-full drop-shadow-md"
+          onChange={(e) => setComments(e.target.value)}
+          disabled={!isSystemAdmin}
+        />
+      </div>
+      {isSystemAdmin && (
+        <div className="py-1 mt-4 mb-2 w-full flex gap-4 items-baseline justify-center">
           <select
             className="mb-2 py-3 rounded-md"
             onChange={(e) => setStatus(e.target.value)}
           >
+            <option value="">Selecione...</option>
             <option value="done">Aprovar</option>
-            <option value="rejected">Rejeitar</option>
+            <option value="reject">Rejeitar</option>
           </select>
-          <button
+          <Button
             onClick={handleSubmit}
-            className={`flex items-center justify-center w-1/2 px-5 py-3 text-gray-700 capitalize transition-colors duration-200 bg-white border border-blue-500 hover:bg-blue-600 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`}
+            variant="contained"
+            disabled={!status}
+            size="large"
           >
             Finalizar
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      )}
+    </Box>
   )
 }

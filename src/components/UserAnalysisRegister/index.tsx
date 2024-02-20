@@ -1,13 +1,12 @@
-import { useRouter } from 'next/router'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
-import Box from '@mui/material/Box'
-import CircularProgress from '@mui/material/CircularProgress'
-import httpServices from 'services/http'
+import { Button, TextField } from '@mui/material'
+import { useUpload } from 'hooks/useUpload'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 
-import FormCustom from '../../components/FormCustom'
+import SuccessAction from 'components/SuccessAction'
+import Uploader from 'components/Uploader'
 
 type UserAnalysisRegisterProps = {
   closeModal: Dispatch<SetStateAction<boolean>>
@@ -16,81 +15,44 @@ type UserAnalysisRegisterProps = {
 export default function UserAnalysisRegister({
   closeModal
 }: UserAnalysisRegisterProps) {
-  const [setLoading, setToaster] = useGlobalStore((state) => [
-    state.setLoading,
+  const [loading, setToaster] = useGlobalStore((state) => [
+    state.loading,
     state.setToaster
   ])
 
   const [createAnalysis] = useMainStore((state) => [state.createAnalysis])
-
   const [analysisTitle, setAnalysisTitle] = useState('')
-  const [analysisFile, setAnalysisFile] = useState(null)
+  const [analysisFile, setAnalysisFile] = useState<string | null>(null)
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true)
 
-  const [localLoading, setLocalLoading] = useState(false)
+  const { uploaderDocument } = useUpload()
 
   const uploadFile = async (e: any) => {
     e.preventDefault()
     const files = e.target.files
 
-    if (files.length > 1) {
-      setToaster({
-        isOpen: true,
-        message: 'Limite de 1 arquivos por vez excedido!',
-        type: 'warning'
-      })
-      return
-    }
-
-    const formData = new FormData()
-    for (const file of files) {
-      formData.append('files', file)
-    }
-
     try {
-      setLoading(true)
-      setLocalLoading(true)
+      const mediaFile = await uploaderDocument(files)
 
-      const { data, error } = await httpServices.upload.save(formData)
-      if (!!error || !data || !data.url) {
-        setToaster({
-          isOpen: true,
-          message: 'Error ao salvar medias',
-          type: 'error'
-        })
-        return
-      }
-
-      const { url } = data
-      setAnalysisFile(url)
-
+      if (!mediaFile) return
+      setAnalysisFile(mediaFile[0].url)
+    } catch (error: any) {
+      console.error(error)
       setToaster({
         isOpen: true,
-        message: 'Arquivo salvo com sucesso!',
-        type: 'success'
-      })
-      setLocalLoading(false)
-    } catch (error) {
-      setToaster({
-        isOpen: true,
-        message: 'Error ao salvar dados',
+        message: 'Error ao salvar documento',
         type: 'error'
       })
-    } finally {
-      setLoading(false)
     }
   }
 
-  const submitAnalysisRequest = async (e: any) => {
-    e.preventDefault()
-    setLocalLoading(true)
-
+  const sendAnalysisRequest = async () => {
     if (!analysisFile) {
       setToaster({
         isOpen: true,
         message: 'Arquivo não encontrado',
         type: 'error'
       })
-      setLocalLoading(false)
       return
     }
 
@@ -98,97 +60,60 @@ export default function UserAnalysisRegister({
       title: analysisTitle,
       bucketUrl: analysisFile
     })
-
-    setToaster({
-      isOpen: true,
-      message: 'Campanha salva com sucesso!',
-      type: 'success'
-    })
-    setLocalLoading(false)
     closeModal(false)
   }
 
-  return (
-    <FormCustom customStyles="p-0 m-0" submitForm={submitAnalysisRequest}>
-      <div className="flex flex-col items-center justify-center">
-        <div className="py-2 bg-gray-600 rounded-b-md w-2/4 text-white text-center">
-          <h1>Nova solicitação</h1>
-        </div>
-        <div className="flex flex-col items-center justify-center py-2 mt-4">
-          <div className="flex flex-col items-start mb-2">
-            <label htmlFor="title" className="text-left">
-              Título:{' '}
-            </label>
-            <input
-              type="text"
-              name=""
-              id="title"
-              value={analysisTitle}
-              className="py-2 my-2 rounded-md w-full drop-shadow-md"
-              onChange={(e) => setAnalysisTitle(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col items-start w-full">
-            <label htmlFor="spreadsheet" className="text-left">
-              Planilha:{' '}
-            </label>
-            <div className="mt-2 mx-auto w-full flex justify-center rounded-lg border border-dashed border-gray-900/25 px-12 py-2">
-              <div className="text-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="mx-auto w-10 h-10"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"
-                  />
-                </svg>
+  useEffect(() => {
+    if (analysisFile && analysisTitle) {
+      setIsButtonDisabled(false)
+    } else {
+      setIsButtonDisabled(true)
+    }
+  }, [analysisFile, analysisTitle])
 
-                <div className="mt-2 flex text-sm leading-6 text-gray-600">
-                  <label
-                    htmlFor="file-upload"
-                    className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
-                  >
-                    <span>Subir arquivo</span>
-                    <input
-                      id="file-upload"
-                      name="file-upload"
-                      type="file"
-                      className="sr-only"
-                      multiple={true}
-                      onChange={(e) => uploadFile(e)}
-                    />
-                  </label>
-                </div>
-                <p className="text-xs leading-5 text-gray-600">
-                  .xlsx de até 10MB
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="py-2 mt-4 mb-2 w-full flex gap-4 items-baseline justify-center">
-            {localLoading && <CircularIndeterminate />}
-            <button
-              className={`flex items-center justify-center w-1/2 px-5 py-3 text-gray-700 capitalize transition-colors duration-200 bg-white border border-grey-500 hover:bg-gray-600 hover:text-white rounded-md sm:w-auto gap-x-2 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`}
-            >
-              Enviar
-            </button>
-          </div>
+  return (
+    <div className="flex flex-col items-center justify-center">
+      <div className="py-2 bg-gray-600 rounded-b-md w-2/4 text-white text-center">
+        <h1>Nova solicitação</h1>
+      </div>
+      <div className="flex flex-col items-center justify-center py-2 mt-4">
+        <div className="flex flex-col items-start mb-2">
+          <label htmlFor="title" className="text-left">
+            Título da análise:
+          </label>
+
+          <TextField
+            id="title"
+            name="title"
+            variant="outlined"
+            type="text"
+            value={analysisTitle}
+            onChange={(e) => setAnalysisTitle(e.target.value)}
+            fullWidth
+          />
+        </div>
+        <div className="flex flex-col items-start w-full mt-2">
+          <label htmlFor="document" className="text-left">
+            Arquivo para análise:
+          </label>
+          {!analysisFile && (
+            <Uploader uploadFile={uploadFile} type="document" />
+          )}
+          {!loading && analysisFile && (
+            <SuccessAction message=" Arquivo salvo com sucesso!" />
+          )}
+        </div>
+
+        <div className="py-2 mt-4 mb-2 w-full flex gap-4 items-baseline justify-center">
+          <Button
+            variant="contained"
+            onClick={sendAnalysisRequest}
+            disabled={isButtonDisabled}
+          >
+            Enviar
+          </Button>
         </div>
       </div>
-    </FormCustom>
-  )
-}
-
-function CircularIndeterminate() {
-  return (
-    <Box sx={{ display: 'flex' }}>
-      <CircularProgress />
-    </Box>
+    </div>
   )
 }

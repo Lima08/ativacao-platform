@@ -17,11 +17,11 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
   }
 
   if (req.method === REQUEST_METHODS.PUT) {
-    const { name, password, imageUrl, role, isActive } = req.body
+    const { name, password, imageUrl, role, isActive, companyId } = req.body
     const { error } = updateUserSchema.validate({
       name,
       password,
-      imageUrl,
+      imageUrl: imageUrl || null,
       role,
       isActive
     })
@@ -29,14 +29,15 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
     if (error) {
       return res
         .status(HTTP_STATUS.BAD_REQUEST)
-        .json({ error: error.details[0].message })
+        .json({ message: error.details[0].message })
     }
 
     const updatedUserData: IUserModifier = {
       name,
       imageUrl,
       role,
-      isActive
+      isActive,
+      companyId
     }
 
     if (password) {
@@ -45,11 +46,10 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
     }
 
     try {
-      const updatedCampaign = await updateUser(id, updatedUserData)
-
-      return res.status(HTTP_STATUS.OK).json({ data: updatedCampaign })
+      const updatedUser = await updateUser(id, updatedUserData)
+      return res.status(HTTP_STATUS.OK).json({ data: updatedUser })
     } catch (error: any) {
-      return res.status(error.code).json({ error: { message: error.message } })
+      return res.status(error.code).json({ message: error.message })
     }
   }
 
@@ -59,7 +59,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
   }
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
-    .json({ error: { message: 'Method not allowed' } })
+    .json({ message: 'Method not allowed' })
 }
 
 export default authCheck(handler)

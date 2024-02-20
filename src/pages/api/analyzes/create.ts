@@ -7,16 +7,15 @@ import { authCheck } from 'middlewares/authCheck'
 import { createAnalysis } from 'useCases/analyzes'
 
 async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
+  const { companyId, userId, role } = req.user!
+
+  if (role < ROLES.COMPANY_ADMIN) {
+    return res
+      .status(HTTP_STATUS.UNAUTHORIZED)
+      .json({ message: 'Unauthorized' })
+  }
+
   if (req.method == REQUEST_METHODS.POST) {
-    const { companyId, userId, role } = req.user!
-
-    if (role < ROLES.COMPANY_ADMIN) {
-      return res
-        .status(HTTP_STATUS.UNAUTHORIZED)
-        .json({ error: { message: 'Unauthorized' } })
-    }
-
-    
     const { title, bucketUrl, message } = req.body
     const createdAnalysis = await createAnalysis({
       title,
@@ -29,6 +28,6 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
   }
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
-    .json({ error: { message: 'Method not allowed' } })
+    .json({ message: 'Method not allowed' })
 }
 export default authCheck(handler)

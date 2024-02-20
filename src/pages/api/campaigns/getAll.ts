@@ -12,6 +12,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
 
     try {
       let allCampaigns
+      // TODO: Passar regra para caso de uso
       if (role < ROLES.COMPANY_ADMIN) {
         allCampaigns = await getAllCampaigns({ companyId, active: true })
       } else {
@@ -20,13 +21,13 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
 
       return res.status(HTTP_STATUS.OK).json({ data: allCampaigns })
     } catch (error: any) {
-      return res.status(error.code).json({ error: { message: error.message } })
+      return res.status(error.code).json({ message: error.message })
     }
   }
 
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
-    .json({ error: { message: 'Method not allowed' } })
+    .json({ message: 'Method not allowed' })
 }
 
 export default authCheck(handler)

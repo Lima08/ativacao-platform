@@ -7,10 +7,12 @@ import {
   IAnalysisFilter,
   IAnalysisModifier
 } from 'interfaces/entities/analysis'
+import { eAnalysisStatusType } from 'interfaces/entities/analysis/EAnalysisStatus'
 import { prisma } from 'lib/prisma'
 import { Analysis } from 'models/Analysis'
 import path from 'path'
-import EmailService from 'services/emailService/IEmailService'
+import EmailService from 'services/emailService/EmailService'
+import { getCompanyById } from 'useCases/companies'
 import { getUserById } from 'useCases/users'
 
 const repository = Analysis.of(prisma)
@@ -31,13 +33,37 @@ async function createAnalysis({
       biUrl
     })
     .catch((error: any) => {
-      const meta = error.meta || error.message
       throw new CustomError(
-        'Error creating Analysis',
+        'Erro ao criar análise',
         HTTP_STATUS.INTERNAL_SERVER_ERROR,
-        meta
+        error
       )
     })
+
+  const emailTemplatePath = path.resolve('src/templates/analysisCreated.html')
+  const emailTemplate = readFileSync(emailTemplatePath, 'utf-8')
+  const company = await getCompanyById(companyId)
+
+  const variables = {
+    title,
+    bucketUrl,
+    companyName: company.name || 'Empresa não informada'
+  }
+
+  const compiledEmail = EmailService.getInstance().compileTemplate(
+    emailTemplate,
+    variables
+  )
+
+  const contacts = JSON.parse(process.env.NEXT_PUBLIC_ADMIN_CONTACT!)
+
+  for (const contact of contacts) {
+    EmailService.getInstance()
+      .sendEmail(contact, 'Nova solicitação de análise!', compiledEmail)
+      .catch((error) => {
+        console.error(error)
+      })
+  }
 
   return newAnalysis
 }
@@ -48,11 +74,10 @@ async function getAnalysisBy(id: string): Promise<IAnalysisCreated> {
 
     return analysis
   } catch (error: any) {
-    const meta = error.meta || error.message
     throw new CustomError(
-      'Error to get Analysis',
+      'Erro ao buscar análises',
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      meta
+      error
     )
   }
 }
@@ -64,11 +89,10 @@ async function getAllAnalyzes(
     const newAnalyzes = await repository.getAll(filter)
     return newAnalyzes
   } catch (error: any) {
-    const meta = error.meta || error.message
     throw new CustomError(
-      'Error to get Analyzes',
+      'Erro ao buscar analises',
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      meta
+      error
     )
   }
 }
@@ -80,16 +104,36 @@ async function updateAnalysis(
   try {
     const updatedAnalysis = await repository.update(id, modifierData)
     const user = await getUserById(updatedAnalysis.userId)
+
     const emailTemplatePath = path.resolve('src/templates/analysisUpdate.html')
     const emailTemplate = readFileSync(emailTemplatePath, 'utf-8')
-    await EmailService.getInstance().sendEmail(
-      user.email,
-      'Análise atualizada!',
-      emailTemplate
+
+    const variables = {
+      analysisName: updatedAnalysis.title,
+      analysisStatus:
+        updatedAnalysis.status === eAnalysisStatusType.done
+          ? 'Finalizada'
+          : 'Rejeitada',
+      biUrl: updatedAnalysis.biUrl,
+      analysisDescription: updatedAnalysis.message || 'Sem observações'
+    }
+
+    const compiledEmail = EmailService.getInstance().compileTemplate(
+      emailTemplate,
+      variables
     )
+
+    await EmailService.getInstance()
+      .sendEmail(user.email, 'Análise finalizada!', compiledEmail)
+      .catch((error) => console.error(error))
+
     return updatedAnalysis
   } catch (error: any) {
-    throw new Error(error)
+    throw new CustomError(
+      'Erro ao atualizar análise.',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      error
+    )
   }
 }
 
@@ -97,11 +141,10 @@ async function deleteAnalysis(id: string): Promise<void> {
   try {
     await repository.delete(id)
   } catch (error: any) {
-    const meta = error.meta || error.message
     throw new CustomError(
-      'Error to delete Analysis',
-      HTTP_STATUS.BAD_REQUEST,
-      meta
+      'Error ao deletar análises',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      error
     )
   }
 }

@@ -16,7 +16,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
       const campaign = await getCampaignById(id)
       return res.status(HTTP_STATUS.OK).json({ data: campaign })
     } catch (error: any) {
-      return res.status(error.code).json({ error: { message: error.message } })
+      return res.status(error.code).json({ message: error.message })
     }
   }
   if (req.method === REQUEST_METHODS.PUT) {
@@ -32,7 +32,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
 
       return res.status(HTTP_STATUS.OK).json({ data: updatedCampaign })
     } catch (error: any) {
-      return res.status(error.code).json({ error: { message: error.message } })
+      return res.status(error.code).json({ message: error.message })
     }
   }
 
@@ -41,13 +41,13 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
       await deleteCampaign(id)
       return res.status(HTTP_STATUS.NO_CONTENT).end()
     } catch (error: any) {
-      return res.status(error.code).json({ error: { message: error.message } })
+      return res.status(error.code).json({ message: error.message })
     }
   }
 
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
-    .json({ error: { message: 'Method not allowed' } })
+    .json({ message: 'Method not allowed' })
 }
 
 export default authCheck(handler)

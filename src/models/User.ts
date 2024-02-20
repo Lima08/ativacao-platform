@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client'
 import {
   IUser,
   IUserCreated,
@@ -30,7 +30,10 @@ export class User {
 
   async getAll(filter?: IUserFilter | undefined): Promise<IUserCreated[]> {
     const allUsers = await this.repository.user.findMany({
-      where: filter
+      where: filter,
+      orderBy: {
+        createdAt: 'desc'
+      }
     })
 
     return allUsers

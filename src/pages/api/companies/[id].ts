@@ -21,7 +21,7 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
     if (error) {
       return res
         .status(HTTP_STATUS.BAD_REQUEST)
-        .json({ error: error.details[0].message })
+        .json({ message: error.details[0].message })
     }
 
     try {
@@ -29,13 +29,13 @@ async function handler(req: NextApiRequestCustom, res: NextApiResponse) {
 
       return res.status(HTTP_STATUS.OK).json({ data: updatedCampaign })
     } catch (error: any) {
-      return res.status(error.code).json({ error: { message: error.message } })
+      return res.status(error.code).json({ message: error.message })
     }
   }
 
   res
     .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
-    .json({ error: { message: 'Method not allowed' } })
+    .json({ message: 'Method not allowed' })
 }
 
 export default authCheck(handler)

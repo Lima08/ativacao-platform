@@ -1,26 +1,24 @@
-import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 
-import httpServices from 'services/http'
 import useGlobalStore from 'store/useGlobalStore'
 import useMainStore from 'store/useMainStore'
 
-import FormCustom from 'components/FormCustom'
-import MediaList from 'components/MediaList'
-import Uploader from 'components/Uploader'
-
-import { MediaResponseType } from '../../../../types'
+import LoadingScreen from 'components/LoadingScreen'
+import PageRegisterTab from 'components/PageRegisterTab'
 
 export default function RegisterTraining() {
   const router = useRouter()
-  const trainingId = router.query.id
+  let trainingId = ''
+  if (router.isReady) {
+    trainingId = String(router.query.id)
+  }
 
-  const [loading, setLoading, setToaster] = useGlobalStore((state) => [
+  const [loading, uploadPercentage] = useGlobalStore((state) => [
     state.loading,
-    state.setLoading,
-    state.setToaster
+    state.uploadPercentage
   ])
+
   const [
     currentTraining,
     getTrainingById,
@@ -35,197 +33,59 @@ export default function RegisterTraining() {
     state.resetCurrentTraining
   ])
 
-  const [trainingName, setTrainingName] = useState('')
-  const [trainingDescription, setTrainingDescription] = useState('')
-  const [trainingsMedias, setTrainingMedias] = useState<MediaResponseType[]>([])
-  const [mediasToExclude, setMediasToExclude] = useState<any[]>([])
-
-  const uploadFile = async (e: any) => {
-    e.preventDefault()
-    const files = e.target.files
-
-    if (files.length > 10) {
-      setToaster({
-        isOpen: true,
-        message: 'Limite de 10 arquivos por vez excedido!',
-        type: 'warning'
-      })
-      return
-    }
-
-    const formData = new FormData()
-    for (const file of files) {
-      formData.append('files', file)
-    }
-
-    try {
-      setLoading(true)
-      const { data, error } = await httpServices.upload.save(formData)
-
-      if (!!error || !data) {
-        setToaster({
-          isOpen: true,
-          message: 'Error ao salvar medias',
-          type: 'error'
-        })
-        return
-      }
-
-      for (const media of data) {
-        setTrainingMedias((prevMediaList) => {
-          return [...prevMediaList, media]
-        })
-      }
-    } catch (error) {
-      setToaster({
-        isOpen: true,
-        message: 'Error ao salvar dados',
-        type: 'error'
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const resetState = () => {
-    setTrainingName('')
-    setTrainingDescription('')
-    setTrainingMedias([])
-    resetCurrentTraining()
-  }
-
-  const submitTraining = async (e: any) => {
-    e.preventDefault()
-    const mediaIds =
-      trainingsMedias && trainingsMedias.length
-        ? trainingsMedias.map((media) => media.id)
-        : []
-
+  const submitTraining = async ({
+    name,
+    description,
+    mediaIds,
+    mediasToExclude
+  }: {
+    name: string
+    description: string
+    mediaIds: any[]
+    mediasToExclude: any[]
+  }) => {
     if (!trainingId || trainingId === 'new') {
       createTraining({
-        name: trainingName,
-        description: trainingDescription,
+        name,
+        description,
         mediaIds
       })
     } else {
       updateTraining(String(trainingId), {
-        name: trainingName,
-        description: trainingDescription,
-        medias: trainingsMedias,
+        name,
+        description,
+        mediaIds,
         mediasToExclude
       })
     }
-    resetState()
-    router.push('/in/trainings/new')
-  }
-
-  const removeMedia = (id: string) => {
-    const medias = trainingsMedias.filter((media) => media.id !== id)
-    setTrainingMedias(medias)
-    setMediasToExclude((prevMedias) => [...prevMedias, id])
-  }
-
-  const initTraining = useCallback(() => {
-    const fetchTraining = async () => {
-      if (!trainingId || trainingId === 'new') return
-
-      getTrainingById(String(trainingId))
-    }
     resetCurrentTraining()
-    setTrainingName('')
-    setTrainingDescription('')
+    router.push('/in/trainings')
+  }
+
+  const fetchTraining = useCallback(() => {
+    if (!trainingId || trainingId === 'new') {
+      resetCurrentTraining()
+      return
+    }
+
+    getTrainingById(String(trainingId))
+  }, [resetCurrentTraining, trainingId, getTrainingById])
+
+  useEffect(() => {
     fetchTraining()
-  }, [
-    resetCurrentTraining,
-    setTrainingName,
-    setTrainingDescription,
-    trainingId,
-    getTrainingById
-  ])
-
-  useEffect(() => {
-    if (!currentTraining) return
-    setTrainingName(currentTraining.name)
-    setTrainingDescription(currentTraining?.description || '')
-    setTrainingMedias(currentTraining?.medias || [])
-  }, [currentTraining])
-
-  useEffect(() => {
-    initTraining()
-  }, [trainingId, initTraining])
+  }, [trainingId, fetchTraining])
 
   return (
-    <div className="container flex items-center justify-start">
-      <FormCustom submitForm={submitTraining}>
-        <div className="space-y-12">
-          <div className="border-b border-gray-900/10 pb-8">
-            <h2 className="text-base font-semibold leading-7 text-gray-900">
-              Novo treinamento
-            </h2>
+    <div className="container flex flex-col gap-4">
+      <PageRegisterTab
+        pageTitle="Treinamento"
+        goBack={() => router.push('/in/trainings')}
+        resetState={resetCurrentTraining}
+        submit={submitTraining}
+        currentItem={currentTraining}
+      />
 
-            <div className="mt-6">
-              <div className="">
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Título
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="name"
-                    name="name"
-                    type="name"
-                    autoComplete="name"
-                    value={trainingName}
-                    onChange={(e) => setTrainingName(e.target.value)}
-                    className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset outline-none focus:ring-blue-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Descrição
-                </label>
-                <div className="mt-2">
-                  <textarea
-                    id="description"
-                    name="description"
-                    value={trainingDescription}
-                    onChange={(e) => setTrainingDescription(e.target.value)}
-                    autoComplete="description"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-              <Uploader uploadFile={uploadFile} multiple />
-            </div>
-          </div>
-        </div>
-        <div className="mt-6 flex items-center justify-end gap-x-6">
-          <Link href="/in/trainings">
-            <button
-              type="button"
-              className="text-sm font-semibold leading-6 text-gray-900"
-            >
-              Voltar
-            </button>
-          </Link>
-          <button
-            type="submit"
-            className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            disabled={loading || loading}
-          >
-            Salvar
-          </button>
-        </div>
-
-        <MediaList mediasList={trainingsMedias} onDelete={removeMedia} />
-      </FormCustom>
+      {loading && !uploadPercentage && <LoadingScreen />}
     </div>
   )
 }

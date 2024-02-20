@@ -10,6 +10,7 @@ export interface createdCampaignDto extends ICampaignCreated {
 }
 
 export interface modifierCampaignDto extends ICampaignModifier {
+  medias?: any[]
   mediaIds?:  string[]
   mediasToExclude?: string[]
 }

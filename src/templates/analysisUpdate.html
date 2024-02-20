@@ -11,7 +11,16 @@
 <body>
   <main>
     <h1>Análise finalizada!</h1>
-    <p>Sua solicitação de análise foi finalizada!</p>
+    <p>Sua solicitação <b>{{ analysisName }}</b> foi <b>{{ analysisStatus }}</b>.</p>
+
+    {{#if biUrl}}
+    <p>Clique <a href="{{ biUrl }}" target="_blank">AQUI</a> para acessar B.I.</p>
+
+    {{/if}}
+    <p style="margin: 0;"><b>Observações:</b></p>
+    <p style="margin: 0;">{{ analysisDescription }}</p>
+    <br />
+    <a href="https://ativacaotec.com/in/analyzes">Visualizar no site</a>
   </main>
 </body>
 

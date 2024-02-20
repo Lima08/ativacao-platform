@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client'
 import {
   ICampaign,
   ICampaignCreated,
@@ -30,7 +30,10 @@ export class Campaign {
 
   async getAll(filter: ICampaignFilter): Promise<ICampaignCreated[]> {
     const allCampaigns = await this.repository.campaign.findMany({
-      where: filter
+      where: filter,
+      orderBy: {
+        createdAt: 'desc'
+      }
     })
 
     return allCampaigns

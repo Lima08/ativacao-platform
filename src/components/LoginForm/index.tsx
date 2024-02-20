@@ -1,11 +1,25 @@
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Button, CircularProgress, Divider } from '@mui/material'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+import {
+  Button,
+  Card,
+  Divider,
+  IconButton,
+  TextField,
+  Typography
+} from '@mui/material'
 import httpServices from 'services/http'
 import { useAuthStore } from 'store/useAuthStore'
 import useGlobalStore from 'store/useGlobalStore'
+import useMainStore from 'store/useMainStore'
+
+import LoadingScreen from 'components/LoadingScreen'
 
 import { validationSchema } from './schema'
 
@@ -23,6 +37,16 @@ export default function LoginForm() {
   } = useForm<IFormValues>({
     resolver: yupResolver(validationSchema)
   })
+  const router = useRouter()
+  const [setUser, setCompany] = useAuthStore((state: any) => [
+    state.setUser,
+    state.setCompany
+  ])
+
+  const [resetMainState, createLog] = useMainStore((state) => [
+    state.resetMainState,
+    state.createLog
+  ])
 
   const [loading, setLoading, setError, setToaster] = useGlobalStore(
     (state) => [
@@ -33,21 +57,35 @@ export default function LoginForm() {
     ]
   )
 
-  const router = useRouter()
-  const setUserLogged = useAuthStore((state: any) => state.setUserLogged)
+  const [showPassword, setShowPassword] = useState(false)
+
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword)
+  }
 
   async function loginAccount(values: IFormValues) {
     try {
-      const loginData = await httpServices.user.login(values)
-      if (!loginData) return
+      setLoading(true)
+      setError(null)
 
-      setUserLogged({ company: loginData.company, user: loginData.user })
-      router.push('/in/campaigns')
+      const { data } = await httpServices.user.login(values)
+
+      if (!data) return
+
+      setUser(data.user)
+      setCompany(data.company)
+      resetMainState()
+      createLog({
+        module: 'Login',
+        info: 'Login'
+      })
+
+      router.push('/in/home')
     } catch (error: any) {
-      setError(error)
+      console.error(error)
       setToaster({
         isOpen: true,
-        message: 'Erro ao fazer login. Tente novamente!',
+        message: error.message,
         type: 'error'
       })
     } finally {
@@ -55,24 +93,25 @@ export default function LoginForm() {
       reset()
     }
   }
+  useEffect(() => {
+    window.localStorage.clear()
+  }, [])
 
   return (
-    <div className="flex flex-col md:flex-row md:gap-8 items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 rounded ">
-      <div>
-        <img
-          className="mx-auto h-12 w-auto"
-          src="/logo-ativacao.png"
-          alt="Workflow"
-        />
-      </div>
-
+    <Card className="flex flex-col  md:gap-8 items-center justify-center  py-12 px-4 sm:px-6 lg:px-8 rounded ">
+      <Image
+        alt="Logo Ativação"
+        src="/logo-ativacao.png"
+        width="250"
+        height="140"
+      />
       <form
-        className="mt-8 space-y-6 w-64 md:w-80"
+        className="mt-4 space-y-6 w-64 md:w-96 flex flex-col items-center justify-center text-center"
         onSubmit={handleSubmit(loginAccount)}
       >
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <Typography variant="h4" gutterBottom>
           O que deseja fazer?
-        </h2>
+        </Typography>
         <Button
           variant="outlined"
           fullWidth
@@ -80,67 +119,64 @@ export default function LoginForm() {
         >
           Criar conta
         </Button>
+
         <Divider>ou</Divider>
 
-        <p className="mt-6 text-center  font-extrabold text-gray-900">
-          Entrar na plataforma
-        </p>
-        <div className="rounded-md shadow-sm -space-y-px flex flex-col gap-3">
-          <div>
-            <label htmlFor="email-address" className="sr-only">
-              Email
-            </label>
-            <input
-              id="email-address"
-              type="email"
-              {...register('email')}
-              autoComplete="email"
-              required
-              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Email"
-            />
-            {errors.email && (
-              <span className=" text-red-500 text-sm">
-                {errors.email.message}
-              </span>
-            )}
-          </div>
-          <div>
-            <label htmlFor="password" className="sr-only">
-              Senha
-            </label>
-            <input
-              id="password"
-              type="password"
-              {...register('password')}
-              autoComplete="current-password"
-              required
-              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="senha"
-            />
-            {errors.password && (
-              <span className=" text-red-500 text-sm">
-                {errors.password.message}
-              </span>
-            )}
-          </div>
+        <div className="rounded-md shadow-sm -space-y-px flex flex-col gap-3 w-full">
+          <Typography variant="h6" gutterBottom>
+            Entrar na plataforma
+          </Typography>
+          <TextField
+            id="email-address"
+            label="Email"
+            type="email"
+            variant="outlined"
+            fullWidth
+            error={!!errors.email}
+            helperText={errors.email?.message}
+            {...register('email')}
+          />
+
+          <TextField
+            id="password"
+            required
+            type={showPassword ? 'text' : 'password'}
+            autoComplete="current-password"
+            placeholder="senha"
+            label="Senha"
+            variant="outlined"
+            fullWidth
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            {...register('password')}
+            InputProps={{
+              endAdornment: (
+                <IconButton onClick={handleTogglePassword} edge="end">
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </IconButton>
+              )
+            }}
+          />
         </div>
 
         {!loading && (
-          <>
-            <div className="flex items-center justify-center">
-              <button
-                type="submit"
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Entrar
-              </button>
-            </div>
-          </>
+          <Button variant="contained" fullWidth type="submit">
+            Entrar
+          </Button>
         )}
 
-        {loading && <CircularProgress />}
+        <Button
+          variant="text"
+          fullWidth
+          type="button"
+          onClick={() => router.push('/')}
+          size="small"
+        >
+          Voltar
+        </Button>
       </form>
-    </div>
+
+      {loading && <LoadingScreen />}
+    </Card>
   )
 }

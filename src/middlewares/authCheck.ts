@@ -16,7 +16,7 @@ export const authCheck =
     if (token == null) {
       return res
         .status(HTTP_STATUS.UNAUTHORIZED)
-        .json({ error: { message: 'No token provided' } })
+        .json({ message: 'No token provided' })
     }
 
     try {
@@ -31,6 +31,6 @@ export const authCheck =
         message = err.message
       }
 
-      return res.status(HTTP_STATUS.UNAUTHORIZED).json({ error: { message } })
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message })
     }
   }
